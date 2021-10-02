@@ -17,7 +17,7 @@
 --      [x] preserve indent
 --      [x] determine comment status (to comment or not)
 -- [x] prevent uncomment on uncommented line
--- [ ] `comment` and `toggle` misbehaving when there is leading space
+-- [x] `comment` and `toggle` misbehaving when there is leading space
 -- [ ] `gcc` empty line not toggling comment
 
 -- THINK:

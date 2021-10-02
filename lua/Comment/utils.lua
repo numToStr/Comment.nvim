@@ -45,13 +45,12 @@ end
 
 function U.comment_str(str, r_cs, l_cs, is_pad, spacing)
     local indent, ln = str:match('(%s*)(.*)')
-    local s = spacing or ''
 
     -- if line is empty then use the space argument
     -- this is required if you are to comment multiple lines
     -- and the starting line has indentation
     local is_empty = #indent == 0 and #ln == 0
-    local idnt = is_empty and s or indent
+    local idnt = is_empty and (spacing or '') or indent
 
     if is_pad then
         -- If the rhs of cstring exists and the line is not empty then only add padding
@@ -60,10 +59,14 @@ function U.comment_str(str, r_cs, l_cs, is_pad, spacing)
         local new_r_cs = (#r_cs > 0 and not is_empty) and r_cs .. ' ' or r_cs
 
         local new_l_cs = #l_cs > 0 and ' ' .. l_cs or l_cs
-        return fit_cstring(#s, idnt, new_r_cs) .. ln .. new_l_cs
+
+        -- (spacing or indent) this is bcz of single `comment` and `uncomment`
+        -- In these case, current line might be indented and we don't have spacing
+        -- So we can use the original indentation of the line
+        return fit_cstring(#(spacing or indent), idnt, new_r_cs) .. ln .. new_l_cs
     end
 
-    return fit_cstring(#s, idnt, r_cs) .. ln .. l_cs
+    return fit_cstring(#(spacing or indent), idnt, r_cs) .. ln .. l_cs
 end
 
 function U.uncomment_str(str, r_cs_esc, l_cs_esc, is_pad)
