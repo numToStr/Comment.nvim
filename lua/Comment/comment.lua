@@ -5,10 +5,10 @@
 -- [x] Hook support
 --      [x] pre
 --      [x] post
+-- [x] Custom (language) commentstring support
 -- [ ] Block comment ie. /* */ (for js)
 -- [ ] Doc comments ie. /** */ (for js)
 -- [ ] Treesitter context commentstring
--- [ ] Support `unknown` language's commentstring
 
 -- FIXME
 -- [x] visual mode not working correctly
@@ -27,6 +27,7 @@
 local U = require('Comment.utils')
 
 local A = vim.api
+local bo = vim.bo
 
 local C = {
     config = nil,
@@ -76,7 +77,12 @@ function _G.__comment_operator(mode)
 end
 
 function C.unwrap_cstring(c_str)
-    local cs = c_str or vim.bo.commentstring
+    -- comment string priority
+    -- 1. pre-hook (in this case it is the argument)
+    -- 2. lang table
+    -- 3. `commentstring`
+    local cs = c_str or require('Comment.lang').get(bo.filetype) or bo.commentstring
+
     if not cs or #cs == 0 then
         return U.errprint("'commentstring' not found")
     end
