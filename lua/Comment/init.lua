@@ -2,7 +2,6 @@ local c = require('Comment.comment')
 
 local M = {
     setup = c.setup,
-    operator = c.operator,
     toggle = c.toggle_ln,
 }
 
