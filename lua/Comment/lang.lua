@@ -1,3 +1,5 @@
+---Lang table
+---@class lang_table
 local L = {
     toml = '#%s',
 }

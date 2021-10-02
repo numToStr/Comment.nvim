@@ -25,7 +25,7 @@
 -- 1. Should i return the operator's starting and ending position in pre-hook
 -- 2. Fix cursor position in motion operator (try `gcip`)
 -- 3. It is possible that, commentstring is updated inside pre-hook as we want to use it but we can't
---    bcz the filetype is also present in the lang-table (and it has high priority than commentstring)
+--    bcz the filetype is also present in the lang-table (and it has high priority than bo.commentstring)
 
 local U = require('Comment.utils')
 
@@ -33,14 +33,17 @@ local A = vim.api
 local bo = vim.bo
 
 local C = {
+    ---@type config|nil
     config = nil,
 }
 
+---Unwraps the commentstring by taking it from the following places in the respective order.
+---1. pre_hook (optionally a string can be returned)
+---2. lang_table (extra commentstring table in the plugin)
+---3. commentstring (already set or added in pre_hook)
+---@return string
+---@return string
 function C.unwrap_cstr()
-    -- comment string priority
-    -- 1. pre-hook (in this case it is the argument)
-    -- 2. lang table
-    -- 3. `commentstring`
     local cstr = U.is_hook(C.config.pre_hook) or require('Comment.lang').get(bo.filetype) or bo.commentstring
 
     if not cstr or #cstr == 0 then
@@ -52,17 +55,26 @@ function C.unwrap_cstr()
         return U.errprint("Invalid 'commentstring': " .. cstr)
     end
 
-    return U.strip_space(rhs), U.strip_space(lhs)
+    return U.trim(rhs), U.trim(lhs)
 end
 
-function C.comment_ln(l, r_cs, l_cs)
-    A.nvim_set_current_line(U.comment_str(l, r_cs, l_cs, C.config.padding))
+---Comments a single line
+---@param ln string
+---@param r_cs string
+---@param l_cs string
+function C.comment_ln(ln, r_cs, l_cs)
+    A.nvim_set_current_line(U.comment_str(ln, r_cs, l_cs, C.config.padding))
 end
 
-function C.uncomment_ln(l, r_cs_esc, l_cs_esc)
-    A.nvim_set_current_line(U.uncomment_str(l, r_cs_esc, l_cs_esc, C.config.padding))
+---Uncomments a single line
+---@param ln string
+---@param r_cs_esc string
+---@param l_cs_esc string
+function C.uncomment_ln(ln, r_cs_esc, l_cs_esc)
+    A.nvim_set_current_line(U.uncomment_str(ln, r_cs_esc, l_cs_esc, C.config.padding))
 end
 
+---Toggle comment of the current line
 function C.toggle_ln()
     local r_cs, l_cs = C.unwrap_cstr()
     local line = A.nvim_get_current_line()
@@ -79,21 +91,34 @@ function C.toggle_ln()
     U.is_hook(C.config.post_hook, -1)
 end
 
+---Configures the whole plugin
+---@param cfg config|nil
 function C.setup(cfg)
-    C.config = vim.tbl_extend('keep', cfg or {}, {
-        -- Add a space b/w comment and the line
+    ---@class config
+    C.config = {
+        ---Add a space b/w comment and the line
+        ---@type boolean
         padding = true,
-        -- Whether to create operator pending mappings
+        ---Whether to create operator pending mappings
+        ---@type boolean
         mappings = true,
-        -- LHS of toggle mapping in NORMAL mode
+        ---LHS of toggle mapping in NORMAL mode
+        ---@type string
         toggler = 'gcc',
-        -- LHS of operator-mode mapping in NORMAL/VISUAL mode
+        ---LHS of operator-mode mapping in NORMAL/VISUAL mode
+        ---@type string
         opleader = 'gc',
         -- Pre-hook, called before commenting the line
+        ---@type function|nil
         pre_hook = nil,
-        -- Post-hook, called after commenting is done
+        ---Post-hook, called after commenting is done
+        ---@type function|nil
         post_hook = nil,
-    })
+    }
+
+    if cfg ~= nil then
+        C.config = vim.tbl_extend('keep', cfg, C.config)
+    end
 
     if C.config.mappings then
         function _G.__comment_operator(mode)

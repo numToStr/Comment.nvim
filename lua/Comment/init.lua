@@ -6,6 +6,7 @@ local M = {
     toggle = C.toggle_ln,
 }
 
+---Comments the current line
 function M.comment()
     local r_cs, l_cs = C.unwrap_cstr()
     local l = vim.api.nvim_get_current_line()
@@ -14,6 +15,7 @@ function M.comment()
     U.is_hook(C.config.post_hook, -1)
 end
 
+---Unomments the current line
 function M.uncomment()
     local r_cs, l_cs = C.unwrap_cstr()
     local r_cs_esc = vim.pesc(r_cs)
