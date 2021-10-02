@@ -16,9 +16,9 @@
 -- [x] multiple line behavior to tcomment
 --      [x] preserve indent
 --      [x] determine comment status (to comment or not)
+-- [x] prevent uncomment on uncommented line
+-- [ ] `comment` and `toggle` misbehaving when there is leading space
 -- [ ] `gcc` empty line not toggling comment
--- [ ] `toggle` misbehaving when there is leading space
--- [ ] prevent uncomment on uncommented line
 
 -- THINK:
 -- should i return the operator's starting and ending position in pre_hook

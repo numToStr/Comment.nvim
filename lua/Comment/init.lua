@@ -18,10 +18,13 @@ end
 function M.uncomment()
     local cstr = U.is_hook(C.config.pre_hook)
     local r_cs, l_cs = C.unwrap_cstring(cstr)
-    local l = vim.api.nvim_get_current_line()
+    local r_cs_esc = vim.pesc(r_cs)
+    local line = vim.api.nvim_get_current_line()
 
-    C.uncomment_ln(l, vim.pesc(r_cs), vim.pesc(l_cs))
-    U.is_hook(C.config.post_hook, -1)
+    if U.is_commented(line, r_cs_esc) then
+        C.uncomment_ln(line, r_cs_esc, vim.pesc(l_cs))
+        U.is_hook(C.config.post_hook, -1)
+    end
 end
 
 return M
