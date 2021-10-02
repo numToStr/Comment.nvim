@@ -111,7 +111,7 @@ function C.setup(cfg)
             local is_commented = true
 
             -- When commenting multiple line, it is to be expected that indentation should be preserved
-            -- So, When looping over multiple lines we need to store the indentation of the mininum length
+            -- So, When looping over multiple lines we need to store the indentation of the mininum length (except empty line)
             -- Which will be used to semantically comment rest of the lines
             local min_indent = nil
 
@@ -120,8 +120,8 @@ function C.setup(cfg)
                 if is_commented and not is_cmt then
                     is_commented = false
                 end
-                local spc = line:match('(%s*)')
-                if not min_indent or #min_indent > #spc then
+                local spc, ln = U.split_half(line)
+                if not min_indent or (#min_indent > #spc) and #ln > 0 then
                     min_indent = spc
                 end
             end

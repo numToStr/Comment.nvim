@@ -44,7 +44,7 @@ function U.get_lines(mode)
 end
 
 function U.comment_str(str, r_cs, l_cs, is_pad, spacing)
-    local indent, ln = str:match('(%s*)(.*)')
+    local indent, ln = U.split_half(str)
 
     -- if line is empty then use the space argument
     -- this is required if you are to comment multiple lines
@@ -86,6 +86,10 @@ end
 
 function U.is_commented(line, r_cs_esc)
     return line:find('^%s*' .. r_cs_esc)
+end
+
+function U.split_half(ln)
+    return ln:match('(%s*)(.*)')
 end
 
 return U
