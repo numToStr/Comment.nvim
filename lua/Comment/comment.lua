@@ -2,7 +2,9 @@
 -- [-] Handle Tabs
 -- [x] Dot repeat
 -- [x] Comment multiple line.
--- [ ] Hook support
+-- [x] Hook support
+--      [x] pre
+--      [x] post
 -- [ ] Block comment ie. /* */ (for js)
 -- [ ] Doc comments ie. /** */ (for js)
 -- [ ] Treesitter context commentstring
@@ -13,9 +15,14 @@
 -- [x] space after and before of commentstring
 -- [-] multiple line behavior to tcomment
 --      [x] preserve indent
---      [ ] determine comment status (to comment or not) [Currently it just toggles every line]
---      [ ] fix cursor position
+--      [ ] determine comment status (to comment or not) [Currently it toggles every line]
 -- [ ] `gcc` empty line not toggling comment
+-- [ ] `toggle` misbehaving when there is leading space
+-- [ ] prevent uncomment on uncommented line
+
+-- THINK:
+-- should i return the operator's starting and ending position in pre_hook
+-- fix cursor position in motion operator (try `gcip`)
 
 local U = require('Comment.utils')
 
@@ -29,8 +36,11 @@ function _G.__comment_operator(mode)
     --`mode` can be
     --line: use single line comment
     --char: use blockwise comment
+
+    -- THINK: should i return the operator's starting and ending position in pre_hook
+    local cstr = U.is_hook(C.config.pre_hook)
+    local r_cs, l_cs = C.unwrap_cstring(cstr)
     local s_pos, e_pos, lines = U.get_lines(mode)
-    local r_cs, l_cs = C.unwrap_cstring()
     local r_cs_esc = vim.pesc(r_cs)
     local repls = {}
 
@@ -52,7 +62,9 @@ function _G.__comment_operator(mode)
             table.insert(repls, U.comment_str(line, r_cs, l_cs, C.config.padding, indent))
         end
     end
+
     A.nvim_buf_set_lines(0, s_pos, e_pos, false, repls)
+    U.is_hook(C.config.post_hook, s_pos, e_pos)
 end
 
 function C.setup(cfg)
@@ -65,6 +77,10 @@ function C.setup(cfg)
         toggler = 'gcc',
         -- LHS of operator-mode mapping in NORMAL/VISUAL mode
         opleader = 'gc',
+        -- Pre-hook, called before commenting the line
+        pre_hook = nil,
+        -- Post-hook, called after commenting is done
+        post_hook = nil,
     })
 
     if C.config.mappings then
@@ -77,9 +93,8 @@ function C.setup(cfg)
     end
 end
 
-function C.unwrap_cstring()
-    -- local cs = '<!-- %s -->'
-    local cs = vim.bo.commentstring
+function C.unwrap_cstring(c_str)
+    local cs = c_str or vim.bo.commentstring
     if not cs or #cs == 0 then
         return U.errprint("'commentstring' not found")
     end
@@ -89,7 +104,6 @@ function C.unwrap_cstring()
         return U.errprint("Invalid 'commentstring': " .. cs)
     end
 
-    -- return rhs, lhs
     return U.strip_space(rhs), U.strip_space(lhs)
 end
 
@@ -102,7 +116,9 @@ function C.uncomment_ln(l, r_cs_esc, l_cs_esc)
 end
 
 function C.toggle_ln()
-    local r_cs, l_cs = C.unwrap_cstring()
+    local cstr = U.is_hook(C.config.pre_hook)
+
+    local r_cs, l_cs = C.unwrap_cstring(cstr)
     local line = A.nvim_get_current_line()
 
     local r_cs_esc = vim.pesc(r_cs)
@@ -113,6 +129,8 @@ function C.toggle_ln()
     else
         C.comment_ln(line, r_cs, l_cs)
     end
+
+    U.is_hook(C.config.post_hook, -1)
 end
 
 return C

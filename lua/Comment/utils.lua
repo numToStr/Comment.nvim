@@ -77,4 +77,8 @@ function U.uncomment_str(str, r_cs_esc, l_cs_esc, is_pad)
     return #ln == 0 and '' or indent .. tail
 end
 
+function U.is_hook(hook, ...)
+    return type(hook) == 'function' and hook(...)
+end
+
 return U
