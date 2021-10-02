@@ -81,4 +81,8 @@ function U.is_hook(hook, ...)
     return type(hook) == 'function' and hook(...)
 end
 
+function U.is_commented(line, r_cs_esc)
+    return line:find('^%s*' .. r_cs_esc)
+end
+
 return U
