@@ -1,77 +1,87 @@
 -- TODO
 -- [-] Handle Tabs
--- [ ] Dot repeat
--- [ ] Comment multiple line. In this case comment status and indentation of first line will be applied to the rest of the lines
+-- [x] Dot repeat
+-- [x] Comment multiple line.
 -- [ ] Hook support
 -- [ ] Doc comments ie. /** */ (for js)
--- [ ] Multi-line comment ie. /* */ (for js)
+-- [ ] Block comment ie. /* */ (for js)
 -- [ ] Treesitter context commentstring
 
-local u = require("Comment.utils")
+-- FIXME
+-- [x] visual mode not working correctly
+-- [ ] space after and before of commentstring
+-- [ ] multiple line behavior to tcomment
+
+local U = require('Comment.utils')
 
 local api = vim.api
 
 local C = {}
 
-function C.setup()
-	-- local cmd = api.nvim_command
-	local map = api.nvim_set_keymap
-
-	vim.cmd([[
-        function! CommentOperator(type) abort
-            let reg_save = @@
-            exec "lua require('Comment').operator('" . a:type. "')"
-            let @@ = reg_save
-        endfunction
-    ]])
-
-	local opts = { noremap = true, silent = true }
-	map("n", "gc", "<CMD>set operatorfunc=CommentOperator<CR>g@", opts)
-	map("n", "gcc", "<CMD>set operatorfunc=CommentOperator<CR>g@j", opts)
+function _G.__comment_operator(mode)
+    --`mode` can be
+    --line: use single line comment
+    --char: use blockwise comment
+    local s_pos, e_pos, lines = U.get_lines(mode)
+    local r_cs, l_cs = C.unwrap_cstring()
+    local r_cs_esc = vim.pesc(r_cs)
+    local repls = {}
+    for _, line in ipairs(lines) do
+        local is_commented = line:find('^%s*' .. r_cs_esc)
+        if is_commented then
+            table.insert(repls, U.uncomment_str(line, r_cs_esc, vim.pesc(l_cs)))
+        else
+            table.insert(repls, U.comment_str(line, r_cs, l_cs))
+        end
+    end
+    api.nvim_buf_set_lines(0, s_pos, e_pos, false, repls)
 end
 
-function C.operator(type)
-	print(type)
+function C.setup()
+    local map = api.nvim_set_keymap
+    local opts = { noremap = true, silent = true }
+
+    map('n', 'gcc', '<CMD>set operatorfunc=v:lua.__comment_operator<CR>g@l', opts)
+    map('n', 'gc', '<CMD>set operatorfunc=v:lua.__comment_operator<CR>g@', opts)
+    map('v', 'gc', '<ESC><CMD>lua __comment_operator(vim.fn.visualmode())<CR>', opts)
 end
 
 function C.unwrap_cstring()
-	-- local cs = '<!-- %s -->'
-	local cs = vim.bo.commentstring
-	if not cs then
-		return u.errprint("'commentstring' not found")
-	end
+    -- local cs = '<!-- %s -->'
+    local cs = vim.bo.commentstring
+    if not cs then
+        return U.errprint("'commentstring' not found")
+    end
 
-	local rhs, lhs = cs:match("(.*)%%s(.*)")
-	if not rhs then
-		return u.errprint("Invalid commentstring: " .. cs)
-	end
+    local rhs, lhs = cs:match('(.*)%%s(.*)')
+    if not rhs then
+        return U.errprint("Invalid 'commentstring': " .. cs)
+    end
 
-	-- return rhs, lhs
-	return u.strip_space(rhs), u.strip_space(lhs)
+    -- return rhs, lhs
+    return U.strip_space(rhs), U.strip_space(lhs)
 end
 
 function C.comment_ln(l, r_cs, l_cs)
-	local indent, ln = l:match("(%s*)(.*)")
-	api.nvim_set_current_line(indent .. r_cs .. ln .. l_cs)
+    api.nvim_set_current_line(U.comment_str(l, r_cs, l_cs))
 end
 
 function C.uncomment_ln(l, r_cs_esc, l_cs_esc)
-	local indent, _, ln = l:match("(%s*)(" .. r_cs_esc .. "%s?)(.*)(%s?" .. l_cs_esc .. ")$")
-	api.nvim_set_current_line(indent .. ln)
+    api.nvim_set_current_line(U.uncomment_str(l, r_cs_esc, l_cs_esc))
 end
 
-function C.toggle_comment()
-	local r_cs, l_cs = C.unwrap_cstring()
-	local line = api.nvim_get_current_line()
+function C.toggle_ln()
+    local r_cs, l_cs = C.unwrap_cstring()
+    local line = api.nvim_get_current_line()
 
-	local r_cs_esc = vim.pesc(r_cs)
-	local is_commented = line:find("^%s*" .. r_cs_esc)
+    local r_cs_esc = vim.pesc(r_cs)
+    local is_commented = line:find('^%s*' .. r_cs_esc)
 
-	if is_commented then
-		C.uncomment_ln(line, r_cs_esc, vim.pesc(l_cs))
-	else
-		C.comment_ln(line, r_cs, l_cs)
-	end
+    if is_commented then
+        C.uncomment_ln(line, r_cs_esc, vim.pesc(l_cs))
+    else
+        C.comment_ln(line, r_cs, l_cs)
+    end
 end
 
 return C
