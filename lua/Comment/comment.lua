@@ -75,32 +75,6 @@ function _G.__comment_operator(mode)
     U.is_hook(C.config.post_hook, s_pos, e_pos)
 end
 
-function C.setup(cfg)
-    C.config = vim.tbl_extend('keep', cfg or {}, {
-        -- Add a space b/w comment and the line
-        padding = true,
-        -- Whether to create operator pending mappings
-        mappings = true,
-        -- LHS of toggle mapping in NORMAL mode
-        toggler = 'gcc',
-        -- LHS of operator-mode mapping in NORMAL/VISUAL mode
-        opleader = 'gc',
-        -- Pre-hook, called before commenting the line
-        pre_hook = nil,
-        -- Post-hook, called after commenting is done
-        post_hook = nil,
-    })
-
-    if C.config.mappings then
-        local map = A.nvim_set_keymap
-        local opts = { noremap = true, silent = true }
-
-        map('n', C.config.toggler, '<CMD>set operatorfunc=v:lua.__comment_operator<CR>g@l', opts)
-        map('n', C.config.opleader, '<CMD>set operatorfunc=v:lua.__comment_operator<CR>g@', opts)
-        map('v', C.config.opleader, '<ESC><CMD>lua __comment_operator(vim.fn.visualmode())<CR>', opts)
-    end
-end
-
 function C.unwrap_cstring(c_str)
     local cs = c_str or vim.bo.commentstring
     if not cs or #cs == 0 then
@@ -139,6 +113,32 @@ function C.toggle_ln()
     end
 
     U.is_hook(C.config.post_hook, -1)
+end
+
+function C.setup(cfg)
+    C.config = vim.tbl_extend('keep', cfg or {}, {
+        -- Add a space b/w comment and the line
+        padding = true,
+        -- Whether to create operator pending mappings
+        mappings = true,
+        -- LHS of toggle mapping in NORMAL mode
+        toggler = 'gcc',
+        -- LHS of operator-mode mapping in NORMAL/VISUAL mode
+        opleader = 'gc',
+        -- Pre-hook, called before commenting the line
+        pre_hook = nil,
+        -- Post-hook, called after commenting is done
+        post_hook = nil,
+    })
+
+    if C.config.mappings then
+        local map = A.nvim_set_keymap
+        local opts = { noremap = true, silent = true }
+
+        map('n', C.config.toggler, '<CMD>set operatorfunc=v:lua.__comment_operator<CR>g@l', opts)
+        map('n', C.config.opleader, '<CMD>set operatorfunc=v:lua.__comment_operator<CR>g@', opts)
+        map('v', C.config.opleader, '<ESC><CMD>lua __comment_operator(vim.fn.visualmode())<CR>', opts)
+    end
 end
 
 return C
