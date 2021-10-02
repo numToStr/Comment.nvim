@@ -21,8 +21,10 @@
 -- [ ] `gcc` empty line not toggling comment
 
 -- THINK:
--- should i return the operator's starting and ending position in pre_hook
--- fix cursor position in motion operator (try `gcip`)
+-- 1. Should i return the operator's starting and ending position in pre-hook
+-- 2. Fix cursor position in motion operator (try `gcip`)
+-- 3. It is possible that, commentstring is updated inside pre-hook as we want to use it but we can't
+--    bcz the filetype is also present in the lang-table (and it has high priority than commentstring)
 
 local U = require('Comment.utils')
 
@@ -33,20 +35,20 @@ local C = {
     config = nil,
 }
 
-function C.unwrap_cstring(c_str)
+function C.unwrap_cstr()
     -- comment string priority
     -- 1. pre-hook (in this case it is the argument)
     -- 2. lang table
     -- 3. `commentstring`
-    local cs = c_str or require('Comment.lang').get(bo.filetype) or bo.commentstring
+    local cstr = U.is_hook(C.config.pre_hook) or require('Comment.lang').get(bo.filetype) or bo.commentstring
 
-    if not cs or #cs == 0 then
+    if not cstr or #cstr == 0 then
         return U.errprint("'commentstring' not found")
     end
 
-    local rhs, lhs = cs:match('(.*)%%s(.*)')
+    local rhs, lhs = cstr:match('(.*)%%s(.*)')
     if not rhs then
-        return U.errprint("Invalid 'commentstring': " .. cs)
+        return U.errprint("Invalid 'commentstring': " .. cstr)
     end
 
     return U.strip_space(rhs), U.strip_space(lhs)
@@ -61,9 +63,7 @@ function C.uncomment_ln(l, r_cs_esc, l_cs_esc)
 end
 
 function C.toggle_ln()
-    local cstr = U.is_hook(C.config.pre_hook)
-
-    local r_cs, l_cs = C.unwrap_cstring(cstr)
+    local r_cs, l_cs = C.unwrap_cstr()
     local line = A.nvim_get_current_line()
 
     local r_cs_esc = vim.pesc(r_cs)
@@ -100,8 +100,7 @@ function C.setup(cfg)
             -- line: use single line comment
             -- char: use block comment
 
-            local cstr = U.is_hook(C.config.pre_hook)
-            local r_cs, l_cs = C.unwrap_cstring(cstr)
+            local r_cs, l_cs = C.unwrap_cstr()
             local s_pos, e_pos, lines = U.get_lines(mode)
             local r_cs_esc = vim.pesc(r_cs)
             local repls = {}

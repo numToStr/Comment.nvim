@@ -7,8 +7,7 @@ local M = {
 }
 
 function M.comment()
-    local cstr = U.is_hook(C.config.pre_hook)
-    local r_cs, l_cs = C.unwrap_cstring(cstr)
+    local r_cs, l_cs = C.unwrap_cstr()
     local l = vim.api.nvim_get_current_line()
 
     C.comment_ln(l, r_cs, l_cs)
@@ -16,8 +15,7 @@ function M.comment()
 end
 
 function M.uncomment()
-    local cstr = U.is_hook(C.config.pre_hook)
-    local r_cs, l_cs = C.unwrap_cstring(cstr)
+    local r_cs, l_cs = C.unwrap_cstr()
     local r_cs_esc = vim.pesc(r_cs)
     local line = vim.api.nvim_get_current_line()
 
