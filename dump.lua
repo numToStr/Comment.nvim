@@ -23,6 +23,7 @@
 -- [x] messed up indentation, if the first line has greater indentation than next line (calc min indendation)
 -- [x] `gcc` empty line not toggling comment
 -- [ ] dot repeat support for visual mode mappings
+-- [ ] conflict when uncommenting interchangebly with line/block wise comment
 
 -- THINK:
 -- 1. Should i return the operator's starting and ending position in pre-hook

@@ -8,8 +8,9 @@ local M = {
 ---Lang table that contains commentstring (linewise/blockwise) for mutliple filetypes
 ---@type table { filetype = { linewise = string, blockwise = string|nil } }
 local L = {
-    toml = { M.hash },
+    lua = { '--%s', '--[[%s--]]' },
     javascript = { M.cxx_ln, M.cxx_bl },
+    toml = { M.hash },
 }
 
 return setmetatable({}, {
@@ -20,13 +21,9 @@ return setmetatable({}, {
             end
             L[k] = v
         end,
-        get = function(lang)
+        get = function(lang, ty)
             local l = L[lang]
-            return l and l[1]
-        end,
-        get_bl = function(lang)
-            local l = L[lang]
-            return l and l[2]
+            return l and l[ty or 1]
         end,
     },
     __newindex = function(this, k, v)

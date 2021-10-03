@@ -12,10 +12,11 @@ local C = {
 ---1. pre_hook (optionally a string can be returned)
 ---2. lang_table (extra commentstring table in the plugin)
 ---3. commentstring (already set or added in pre_hook)
+---@param ty string Type of commentstring ie. line | block
 ---@return string Right side of the commentstring
----@return string Right side of the commentstring
-function C.unwrap_cstr()
-    local cstr = U.is_hook(C.config.pre_hook) or require('Comment.lang').get(bo.filetype) or bo.commentstring
+---@return string Left side of the commentstring
+function C.unwrap_cstr(ty)
+    local cstr = U.is_hook(C.config.pre_hook) or require('Comment.lang').get(bo.filetype, ty) or bo.commentstring
 
     if not cstr or #cstr == 0 then
         return U.errprint("'commentstring' not found")
@@ -92,12 +93,19 @@ function C.setup(cfg)
     end
 
     if C.config.mappings then
-        function _G.___comment_opfunc(mode, to_comment)
+        ---@class opfunc_opts
+        ---@field comment boolean Force comment/uncomment
+        ---@field cstr_type integer Type (line/block) of the commentstring
+
+        ---Common operatorfunc callback
+        ---@param mode string
+        ---@param opts opfunc_opts
+        local function opfunc(mode, opts)
             -- `mode` can be
-            -- line: use single line comment
+            -- line: use line comment
             -- char: use block comment
 
-            local rcs, lcs = C.unwrap_cstr()
+            local rcs, lcs = C.unwrap_cstr(opts.cstr_type)
             local s_pos, e_pos, lines = U.get_lines(mode)
             local rcs_esc = vim.pesc(rcs)
             local repls = {}
@@ -112,7 +120,7 @@ function C.setup(cfg)
             local min_indent = nil
 
             for _, line in ipairs(lines) do
-                if to_comment == nil then
+                if opts.comment == nil then
                     local is_cmt = U.is_commented(line, rcs_esc)
                     if is_commented and not is_cmt then
                         is_commented = false
@@ -125,8 +133,8 @@ function C.setup(cfg)
                 end
             end
 
-            if to_comment ~= nil then
-                is_commented = to_comment
+            if opts.comment ~= nil then
+                is_commented = opts.comment
             end
 
             for _, line in ipairs(lines) do
@@ -141,26 +149,36 @@ function C.setup(cfg)
             U.is_hook(C.config.post_hook, s_pos, e_pos)
         end
 
+        function _G.___comment_opfunc_line(mode)
+            opfunc(mode, { cstr_type = 1 })
+        end
+
+        function _G.___comment_opfunc_block(mode)
+            opfunc(mode, { cstr_type = 2 })
+        end
+
         local map = A.nvim_set_keymap
         local opts = { noremap = true, silent = true }
 
         -- NORMAL mode mappings
-        map('n', C.config.toggler, '<CMD>set operatorfunc=v:lua.___comment_opfunc<CR>g@$', opts)
-        map('n', C.config.opleader, '<CMD>set operatorfunc=v:lua.___comment_opfunc<CR>g@', opts)
+        map('n', C.config.toggler, '<CMD>set operatorfunc=v:lua.___comment_opfunc_line<CR>g@$', opts)
+        map('n', C.config.opleader, '<CMD>set operatorfunc=v:lua.___comment_opfunc_line<CR>g@', opts)
+        map('n', 'gcb', '<CMD>set operatorfunc=v:lua.___comment_opfunc_block<CR>g@$', opts)
 
         -- VISUAL mode mappings
-        map('v', C.config.opleader, '<ESC><CMD>lua ___comment_opfunc(vim.fn.visualmode())<CR>', opts)
+        map('v', C.config.opleader, '<ESC><CMD>lua ___comment_opfunc_line(vim.fn.visualmode())<CR>', opts)
+        map('v', 'gb', '<CMD>set operatorfunc=v:lua.___comment_opfunc_block<CR>g@$', opts)
 
         -- INSERT mode mappings
         -- map('i', '<C-_>', '<CMD>lua require("Comment").toggle()<CR>', opts)
 
         -- OperatorFunc extra
         function _G.___comment_opfunc_comment(mode)
-            ___comment_opfunc(mode, false)
+            opfunc(mode, { comment = false })
         end
 
         function _G.___comment_opfunc_uncomment(mode)
-            ___comment_opfunc(mode, true)
+            opfunc(mode, { comment = true })
         end
 
         -- NORMAL mode extra
