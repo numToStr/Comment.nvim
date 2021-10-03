@@ -21,10 +21,8 @@ function M.uncomment()
     local r_cs_esc = vim.pesc(r_cs)
     local line = vim.api.nvim_get_current_line()
 
-    if U.is_commented(line, r_cs_esc) then
-        C.uncomment_ln(line, r_cs_esc, vim.pesc(l_cs))
-        U.is_hook(C.config.post_hook, -1)
-    end
+    C.uncomment_ln(line, r_cs_esc, vim.pesc(l_cs))
+    U.is_hook(C.config.post_hook, -1)
 end
 
 return M
