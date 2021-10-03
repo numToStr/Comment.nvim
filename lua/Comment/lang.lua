@@ -12,6 +12,7 @@ local L = {
     cpp = { M.cxx_ln, M.cxx_bl },
     lua = { '--%s', '--[[%s--]]' },
     javascript = { M.cxx_ln, M.cxx_bl },
+    rust = { M.cxx_ln, M.cxx_bl },
     toml = { M.hash },
 }
 
