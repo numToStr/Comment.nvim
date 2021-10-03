@@ -3,6 +3,19 @@ local mark = A.nvim_buf_get_mark
 
 local U = {}
 
+---Comment modes
+U.cmode = {
+    toggle = 0,
+    comment = 1,
+    uncomment = 2,
+}
+
+---Comment string types
+U.cstr = {
+    line = 1,
+    block = 2,
+}
+
 ---Replace some char in the give string
 ---@param pos number Position for the replacement
 ---@param str string String that needs to be modified
@@ -107,7 +120,7 @@ function U.uncomment_str(str, rcs_esc, lcs_esc, is_pad)
         return str
     end
 
-    local indent, _, ln = str:match('(%s*)(' .. rcs_esc .. '%s?)(.*)(' .. lcs_esc .. ')')
+    local indent, _, ln = str:match('(%s*)(' .. rcs_esc .. '%s?)(.*)(' .. lcs_esc .. '$?)')
 
     -- If the line (after cstring) is empty then just return ''
     -- bcz when uncommenting multiline this also doesn't preserve leading whitespace as the line was previously empty
@@ -126,7 +139,7 @@ function U.is_hook(hook, ...)
     return type(hook) == 'function' and hook(...)
 end
 
----Check if the given string is commented or not
+---Check if the given string is commented  not
 ---@param str string Line that needs to be checked
 ---@param rcs_esc string (Escaped) Right side of the commentstring
 ---@return number|nil

@@ -23,7 +23,7 @@ return setmetatable({}, {
         end,
         get = function(lang, ty)
             local l = L[lang]
-            return l and l[ty or 1]
+            return l and l[ty]
         end,
     },
     __newindex = function(this, k, v)

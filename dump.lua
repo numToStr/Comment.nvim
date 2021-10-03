@@ -6,7 +6,10 @@
 --      [x] pre
 --      [x] post
 -- [x] Custom (language) commentstring support
--- [ ] Block comment ie. /* */ (for js)
+-- [x] Block comment basic ie. /* */ (for js)
+-- [ ] Block comment extended
+--      [ ] V-BLOCK
+--      [ ] left-right-motions
 -- [ ] Doc comment ie. /** */ (for js)
 -- [ ] Treesitter context commentstring
 -- [ ] Insert mode mapping (also move the cursor after commentstring)
