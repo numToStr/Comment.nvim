@@ -16,17 +16,17 @@ local C = {
 ---@return string Right side of the commentstring
 ---@return string Left side of the commentstring
 function C.unwrap_cstr(ty)
-    local cstr = U.is_hook(C.config.pre_hook)
+    local cmstr = U.is_hook(C.config.pre_hook)
         or require('Comment.lang').get(bo.filetype, ty or U.cstr.line)
         or bo.commentstring
 
-    if not cstr or #cstr == 0 then
+    if not cmstr or #cmstr == 0 then
         return U.errprint("'commentstring' not found")
     end
 
-    local rhs, lhs = cstr:match('(.*)%%s(.*)')
+    local rhs, lhs = cmstr:match('(.*)%%s(.*)')
     if not rhs then
-        return U.errprint("Invalid 'commentstring': " .. cstr)
+        return U.errprint("Invalid 'commentstring': " .. cmstr)
     end
 
     return U.trim(rhs), U.trim(lhs)
@@ -97,12 +97,12 @@ function C.setup(cfg)
     if C.config.mappings then
         ---@class opfunc_opts
         ---@field comment boolean Force comment/uncomment
-        ---@field cstr integer Type of the commentstring (line/block)
+        ---@field cstr CStr Type of the commentstring (line/block)
 
         ---Common operatorfunc callback
-        ---@param mode string
+        ---@param vmode string
         ---@param opts opfunc_opts
-        local function opfunc(mode, opts)
+        local function opfunc(vmode, opts)
             -- `mode` can be
             -- line: use line comment
             -- char: use block comment
@@ -115,7 +115,7 @@ function C.setup(cfg)
             --      * add cstr RHS to end of the last line
 
             local rcs, lcs = C.unwrap_cstr(opts.cstr)
-            local s_pos, e_pos, lines = U.get_lines(mode)
+            local s_pos, e_pos, lines = U.get_lines(vmode, opts.cstr)
             local rcs_esc = vim.pesc(rcs)
 
             local len = #lines
@@ -135,14 +135,16 @@ function C.setup(cfg)
                     is_commented = opts.comment
                 end
 
+                local l1, l2
                 if is_commented then
-                    lines[1] = U.uncomment_str(start_ln, rcs_esc, '', C.config.padding)
-                    lines[len] = U.uncomment_str(end_ln, '', lcs_esc, C.config.padding)
+                    l1 = U.uncomment_str(start_ln, rcs_esc, '', C.config.padding)
+                    l2 = U.uncomment_str(end_ln, '', lcs_esc, C.config.padding)
                 else
-                    lines[1] = U.comment_str(start_ln, rcs, '', C.config.padding)
-                    lines[len] = U.comment_str(end_ln, '', lcs, C.config.padding)
+                    l1 = U.comment_str(start_ln, rcs, '', C.config.padding)
+                    l2 = U.comment_str(end_ln, '', lcs, C.config.padding)
                 end
-                A.nvim_buf_set_lines(0, s_pos, e_pos, false, lines)
+                A.nvim_buf_set_lines(0, s_pos, s_pos + 1, false, { l1 })
+                A.nvim_buf_set_lines(0, e_pos - 1, e_pos, false, { l2 })
             else
                 -- While commenting a block of text, there is a possiblity of lines being both commented and non-commented
                 -- In that case, we need to figure out that if any line is uncommented then we should comment the whole block or vise-versa
@@ -189,11 +191,11 @@ function C.setup(cfg)
         local opts = { noremap = true, silent = true }
 
         -- OperatorFunc main
-        function _G.___opfunc_toggle_line(mode)
-            opfunc(mode, { cstr = U.cstr.line })
+        function _G.___opfunc_toggle_line(vmode)
+            opfunc(vmode, { cstr = U.cstr.line })
         end
-        function _G.___opfunc_toggle_block(mode)
-            opfunc(mode, { cstr = U.cstr.block })
+        function _G.___opfunc_toggle_block(vmode)
+            opfunc(vmode, { cstr = U.cstr.block })
         end
 
         -- NORMAL mode mappings
@@ -210,17 +212,17 @@ function C.setup(cfg)
         -- map('i', '<C-_>', '<CMD>lua require("Comment").toggle()<CR>', opts)
 
         -- OperatorFunc extra
-        function _G.___opfunc_comment_line(mode)
-            opfunc(mode, { comment = false, cstr = U.cstr.line })
+        function _G.___opfunc_comment_line(vmode)
+            opfunc(vmode, { comment = false, cstr = U.cstr.line })
         end
         function _G.___opfunc_uncomment_line(mode)
             opfunc(mode, { comment = true, cstr = U.cstr.line })
         end
-        function _G.___opfunc_comment_block(mode)
-            opfunc(mode, { comment = false, cstr = U.cstr.block })
+        function _G.___opfunc_comment_block(vmode)
+            opfunc(vmode, { comment = false, cstr = U.cstr.block })
         end
-        function _G.___opfunc_uncomment_block(mode)
-            opfunc(mode, { comment = true, cstr = U.cstr.block })
+        function _G.___opfunc_uncomment_block(vmode)
+            opfunc(vmode, { comment = true, cstr = U.cstr.block })
         end
 
         -- NORMAL mode extra

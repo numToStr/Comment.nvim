@@ -27,6 +27,7 @@
 -- [x] `gcc` empty line not toggling comment
 -- [ ] dot repeat support for visual mode mappings
 -- [ ] conflict when uncommenting interchangebly with line/block wise comment
+-- [x] Optimize blockwise mode (just modifiy the start and end line)
 
 -- THINK:
 -- 1. Should i return the operator's starting and ending position in pre-hook

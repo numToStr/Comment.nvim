@@ -4,6 +4,7 @@ local mark = A.nvim_buf_get_mark
 local U = {}
 
 ---Comment modes
+---@class CMode
 U.cmode = {
     toggle = 0,
     comment = 1,
@@ -11,6 +12,7 @@ U.cmode = {
 }
 
 ---Comment string types
+---@class CStr
 U.cstr = {
     line = 1,
     block = 2,
@@ -39,15 +41,16 @@ function U.trim(str)
 end
 
 ---Get lines from a NORMAL/VISUAL mode
----@param mode string
+---@param vmode string VIM mode
+---@param cstr CStr Comment string type
 ---@return number Start index of the lines
 ---@return number End index of the lines
 ---@return table List of lines inside the start and end index
-function U.get_lines(mode)
+function U.get_lines(vmode, cstr)
     local s_ln, e_ln
 
     local buf = 0
-    if mode:match('[vV]') then
+    if vmode:match('[vV]') then
         s_ln = mark(buf, '<')[1]
         e_ln = mark(buf, '>')[1]
     else
@@ -64,6 +67,16 @@ function U.get_lines(mode)
     -- if s_ln == e_ln then
     --     return s_ln, e_ln, { A.nvim_get_current_line() }
     -- end
+
+    -- In block we only need the starting and endling line
+    if cstr == U.cstr.block then
+        return s_ln,
+            e_ln,
+            {
+                A.nvim_buf_get_lines(0, s_ln, s_ln + 1, false)[1],
+                A.nvim_buf_get_lines(0, e_ln - 1, e_ln, false)[1],
+            }
+    end
 
     return s_ln, e_ln, A.nvim_buf_get_lines(0, s_ln, e_ln, false)
 end
@@ -139,7 +152,7 @@ function U.is_hook(hook, ...)
     return type(hook) == 'function' and hook(...)
 end
 
----Check if the given string is commented  not
+---Check if the given string is commented or not
 ---@param str string Line that needs to be checked
 ---@param rcs_esc string (Escaped) Right side of the commentstring
 ---@return number|nil
