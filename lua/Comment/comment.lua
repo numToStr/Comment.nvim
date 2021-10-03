@@ -20,6 +20,7 @@
 -- [x] `comment` and `toggle` misbehaving when there is leading space
 -- [x] messed up indentation, if the first line has greater indentation than next line (calc min indendation)
 -- [ ] `gcc` empty line not toggling comment
+-- [ ] dot repeat support for visual mode mappings
 
 -- THINK:
 -- 1. Should i return the operator's starting and ending position in pre-hook
@@ -121,7 +122,7 @@ function C.setup(cfg)
     end
 
     if C.config.mappings then
-        function _G.__comment_operator(mode)
+        function _G.___comment_opfunc(mode, to_comment)
             -- `mode` can be
             -- line: use single line comment
             -- char: use block comment
@@ -141,14 +142,21 @@ function C.setup(cfg)
             local min_indent = nil
 
             for _, line in ipairs(lines) do
-                local is_cmt = U.is_commented(line, r_cs_esc)
-                if is_commented and not is_cmt then
-                    is_commented = false
+                if to_comment == nil then
+                    local is_cmt = U.is_commented(line, r_cs_esc)
+                    if is_commented and not is_cmt then
+                        is_commented = false
+                    end
                 end
+
                 local spc, ln = U.split_half(line)
                 if not min_indent or (#min_indent > #spc) and #ln > 0 then
                     min_indent = spc
                 end
+            end
+
+            if to_comment ~= nil then
+                is_commented = to_comment
             end
 
             for _, line in ipairs(lines) do
@@ -166,9 +174,31 @@ function C.setup(cfg)
         local map = A.nvim_set_keymap
         local opts = { noremap = true, silent = true }
 
-        map('n', C.config.toggler, '<CMD>set operatorfunc=v:lua.__comment_operator<CR>g@l', opts)
-        map('n', C.config.opleader, '<CMD>set operatorfunc=v:lua.__comment_operator<CR>g@', opts)
-        map('v', C.config.opleader, '<ESC><CMD>lua __comment_operator(vim.fn.visualmode())<CR>', opts)
+        -- NORMAL mode mappings
+        map('n', C.config.toggler, '<CMD>set operatorfunc=v:lua.___comment_opfunc<CR>g@l', opts)
+        map('n', C.config.opleader, '<CMD>set operatorfunc=v:lua.___comment_opfunc<CR>g@', opts)
+
+        -- VISUAL mode mappings
+        map('v', C.config.opleader, '<ESC><CMD>lua ___comment_opfunc(vim.fn.visualmode())<CR>', opts)
+
+        -- OperatorFunc extra
+        function _G.___comment_opfunc_comment(mode)
+            ___comment_opfunc(mode, false)
+        end
+
+        function _G.___comment_opfunc_uncomment(mode)
+            ___comment_opfunc(mode, true)
+        end
+
+        -- NORMAL mode extra
+        map('n', 'g>', '<CMD>set operatorfunc=v:lua.___comment_opfunc_comment<CR>g@', opts)
+        map('n', 'g>c', '<CMD>set operatorfunc=v:lua.___comment_opfunc_comment<CR>g@l', opts)
+        map('n', 'g<', '<CMD>set operatorfunc=v:lua.___comment_opfunc_uncomment<CR>g@', opts)
+        map('n', 'g<c', '<CMD>set operatorfunc=v:lua.___comment_opfunc_uncomment<CR>g@l', opts)
+
+        -- VISUAL mode extra
+        map('v', 'g>', '<ESC><CMD>lua ___comment_opfunc_comment(vim.fn.visualmode())<CR>', opts)
+        map('v', 'g<', '<ESC><CMD>lua ___comment_opfunc_uncomment(vim.fn.visualmode())<CR>', opts)
     end
 end
 

@@ -105,6 +105,11 @@ end
 function U.uncomment_str(str, r_cs_esc, l_cs_esc, is_pad)
     local indent, _, ln = str:match('(%s*)(' .. r_cs_esc .. '%s?)(.*)(' .. l_cs_esc .. ')')
 
+    -- FIXME: better check for is_commented
+    if not ln then
+        return str
+    end
+
     -- If the line (after cstring) is empty then just return ''
     -- bcz when uncommenting multiline this also doesn't preserve leading whitespace as the line was previously empty
     if #ln == 0 then
