@@ -1,5 +1,4 @@
 local A = vim.api
-local mark = A.nvim_buf_get_mark
 
 local U = {}
 
@@ -47,38 +46,38 @@ end
 ---@return number End index of the lines
 ---@return table List of lines inside the start and end index
 function U.get_lines(vmode, ctype)
-    local s_ln, e_ln
+    local m = A.nvim_buf_get_mark
+    local sln, eln
 
     local buf = 0
     if vmode:match('[vV]') then
-        s_ln = mark(buf, '<')[1]
-        e_ln = mark(buf, '>')[1]
+        sln = m(buf, '<')[1]
+        eln = m(buf, '>')[1]
     else
-        s_ln = mark(buf, '[')[1]
-        e_ln = mark(buf, ']')[1]
+        sln = m(buf, '[')[1]
+        eln = m(buf, ']')[1]
     end
 
     -- decrementing `s_ln` by one bcz marks are 1 based but lines are 0 based
     -- and `e_ln` is the last line index (exclusive)
-    s_ln = s_ln - 1
+    local sln_new = sln - 1
 
-    -- If starting and ending is same, then just return the line
-    -- Also for some reason get_lines doesn't return empty line, if called on single empty line
-    -- if s_ln == e_ln then
-    --     return s_ln, e_ln, { A.nvim_get_current_line() }
-    -- end
+    -- If start and end is same, then just return the current line
+    if sln == eln then
+        return sln_new, eln, { A.nvim_get_current_line() }
+    end
 
     -- In block we only need the starting and endling line
     if ctype == U.ctype.block then
-        return s_ln,
-            e_ln,
+        return sln_new,
+            eln,
             {
-                A.nvim_buf_get_lines(0, s_ln, s_ln + 1, false)[1],
-                A.nvim_buf_get_lines(0, e_ln - 1, e_ln, false)[1],
+                A.nvim_buf_get_lines(0, sln_new, sln_new + 1, false)[1],
+                A.nvim_buf_get_lines(0, eln - 1, eln, false)[1],
             }
     end
 
-    return s_ln, e_ln, A.nvim_buf_get_lines(0, s_ln, e_ln, false)
+    return sln_new, eln, A.nvim_buf_get_lines(0, sln_new, eln, false)
 end
 
 ---Separate the given line into two parts ie. indentation, chars

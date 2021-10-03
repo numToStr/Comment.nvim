@@ -78,18 +78,23 @@ function C.setup(opts)
         mappings = {
             ---operator-pending mapping
             basic = true,
-            ---specific mapping
+            ---extended mapping
             extra = true,
         },
-        ---LHS of toggle mapping in NORMAL mode
-        ---@type string
-        toggler = 'gcc',
+        ---LHS of toggle mapping in NORMAL mode for line and block comment
+        ---@type table
+        toggler = {
+            ---LHS of line comment toggle
+            line = 'gcc',
+            ---LHS of block comment toggle
+            block = 'gcb',
+        },
         ---LHS of operator-mode mapping in NORMAL/VISUAL mode for line and block comment
         ---@type table
         opleader = {
-            -- LHS of line comment opfunc mapping
+            ---LHS of line comment opfunc mapping
             line = 'gc',
-            -- LHS of block comment opfunc mapping
+            ---LHS of block comment opfunc mapping
             block = 'gb',
         },
         -- Pre-hook, called before commenting the line
@@ -138,13 +143,14 @@ function C.setup(opts)
                 local end_ln = lines[len]
                 local lcs_esc = vim.pesc(lcs)
 
-                local is_start_commented = U.is_commented(start_ln, rcs_esc)
-                local is_end_commented = end_ln:find(lcs_esc .. '$')
+                local _cmode
 
-                local _cmode = (is_start_commented and is_end_commented) and U.cmode.uncomment or U.cmode.comment
-
-                -- If the comment mode given is not toggle than force that mode
-                if cmode ~= U.cmode.toggle then
+                -- If given mode is toggle then determine whether to comment or not
+                if cmode == U.cmode.toggle then
+                    local is_start_commented = U.is_commented(start_ln, rcs_esc)
+                    local is_end_commented = end_ln:find(lcs_esc .. '$')
+                    _cmode = (is_start_commented and is_end_commented) and U.cmode.uncomment or U.cmode.comment
+                else
                     _cmode = cmode
                 end
 
@@ -214,7 +220,8 @@ function C.setup(opts)
             end
 
             -- NORMAL mode mappings
-            map('n', cfg.toggler, '<CMD>set operatorfunc=v:lua.___opfunc_toggle_line<CR>g@$', mopts)
+            map('n', cfg.toggler.line, '<CMD>set operatorfunc=v:lua.___opfunc_toggle_line<CR>g@$', mopts)
+            map('n', cfg.toggler.block, '<CMD>set operatorfunc=v:lua.___opfunc_toggle_block<CR>g@$', mopts)
             map('n', cfg.opleader.line, '<CMD>set operatorfunc=v:lua.___opfunc_toggle_line<CR>g@', mopts)
             map('n', cfg.opleader.block, '<CMD>set operatorfunc=v:lua.___opfunc_toggle_block<CR>g@', mopts)
 
