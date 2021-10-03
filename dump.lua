@@ -21,7 +21,7 @@
 -- [x] prevent uncomment on uncommented line
 -- [x] `comment` and `toggle` misbehaving when there is leading space
 -- [x] messed up indentation, if the first line has greater indentation than next line (calc min indendation)
--- [ ] `gcc` empty line not toggling comment
+-- [x] `gcc` empty line not toggling comment
 -- [ ] dot repeat support for visual mode mappings
 
 -- THINK:

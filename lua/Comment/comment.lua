@@ -145,7 +145,7 @@ function C.setup(cfg)
         local opts = { noremap = true, silent = true }
 
         -- NORMAL mode mappings
-        map('n', C.config.toggler, '<CMD>set operatorfunc=v:lua.___comment_opfunc<CR>g@l', opts)
+        map('n', C.config.toggler, '<CMD>set operatorfunc=v:lua.___comment_opfunc<CR>g@$', opts)
         map('n', C.config.opleader, '<CMD>set operatorfunc=v:lua.___comment_opfunc<CR>g@', opts)
 
         -- VISUAL mode mappings
@@ -165,9 +165,9 @@ function C.setup(cfg)
 
         -- NORMAL mode extra
         map('n', 'g>', '<CMD>set operatorfunc=v:lua.___comment_opfunc_comment<CR>g@', opts)
-        map('n', 'g>c', '<CMD>set operatorfunc=v:lua.___comment_opfunc_comment<CR>g@l', opts)
+        map('n', 'g>c', '<CMD>set operatorfunc=v:lua.___comment_opfunc_comment<CR>g@$', opts)
         map('n', 'g<', '<CMD>set operatorfunc=v:lua.___comment_opfunc_uncomment<CR>g@', opts)
-        map('n', 'g<c', '<CMD>set operatorfunc=v:lua.___comment_opfunc_uncomment<CR>g@l', opts)
+        map('n', 'g<c', '<CMD>set operatorfunc=v:lua.___comment_opfunc_uncomment<CR>g@$', opts)
 
         -- VISUAL mode extra
         map('v', 'g>', '<ESC><CMD>lua ___comment_opfunc_comment(vim.fn.visualmode())<CR>', opts)
