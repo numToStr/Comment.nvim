@@ -4,7 +4,7 @@ local A = vim.api
 local bo = vim.bo
 
 local C = {
-    ---@type config|nil
+    ---@type Config|nil
     config = nil,
 }
 
@@ -66,22 +66,32 @@ function C.toggle_ln()
 end
 
 ---Configures the whole plugin
----@param cfg config|nil
-function C.setup(cfg)
-    ---@class config
+---@param opts Config|nil
+function C.setup(opts)
+    ---@class Config
     C.config = {
         ---Add a space b/w comment and the line
         ---@type boolean
         padding = true,
-        ---Whether to create operator pending mappings
-        ---@type boolean
-        mappings = true,
+        ---Whether to create basic (operator-pending) and extra mappings
+        ---@type table
+        mappings = {
+            ---operator-pending mapping
+            basic = true,
+            ---specific mapping
+            extra = true,
+        },
         ---LHS of toggle mapping in NORMAL mode
         ---@type string
         toggler = 'gcc',
-        ---LHS of operator-mode mapping in NORMAL/VISUAL mode
-        ---@type string
-        opleader = 'gc',
+        ---LHS of operator-mode mapping in NORMAL/VISUAL mode for line and block comment
+        ---@type table
+        opleader = {
+            -- LHS of line comment opfunc mapping
+            line = 'gc',
+            -- LHS of block comment opfunc mapping
+            block = 'gb',
+        },
         -- Pre-hook, called before commenting the line
         ---@type function|nil
         pre_hook = nil,
@@ -90,16 +100,18 @@ function C.setup(cfg)
         post_hook = nil,
     }
 
-    if cfg ~= nil then
-        C.config = vim.tbl_extend('keep', cfg, C.config)
+    if opts ~= nil then
+        C.config = vim.tbl_deep_extend('force', C.config, opts)
     end
 
-    if C.config.mappings then
+    local cfg = C.config
+
+    if cfg.mappings then
         ---Common operatorfunc callback
         ---@param vmode string
         ---@param cmode CMode Comment mode
         ---@param ctype CType Type of the commentstring (line/block)
-        local function opfunc(vmode, cmode, ctype)
+        function _G.__c_opfunc(vmode, cmode, ctype)
             -- `mode` can be
             -- line: use line comment
             -- char: use block comment
@@ -187,55 +199,58 @@ function C.setup(cfg)
         end
 
         local map = A.nvim_set_keymap
-        local opts = { noremap = true, silent = true }
+        local mopts = { noremap = true, silent = true }
 
-        -- OperatorFunc main
-        function _G.___opfunc_toggle_line(vmode)
-            opfunc(vmode, U.cmode.toggle, U.ctype.line)
-        end
-        function _G.___opfunc_toggle_block(vmode)
-            opfunc(vmode, U.cmode.toggle, U.ctype.block)
-        end
+        if cfg.mappings.basic then
+            -- OperatorFunc main
+            function _G.___opfunc_toggle_line(vmode)
+                __c_opfunc(vmode, U.cmode.toggle, U.ctype.line)
+            end
+            function _G.___opfunc_toggle_block(vmode)
+                __c_opfunc(vmode, U.cmode.toggle, U.ctype.block)
+            end
 
-        -- NORMAL mode mappings
-        map('n', C.config.toggler, '<CMD>set operatorfunc=v:lua.___opfunc_toggle_line<CR>g@$', opts)
+            -- NORMAL mode mappings
+            map('n', cfg.toggler, '<CMD>set operatorfunc=v:lua.___opfunc_toggle_line<CR>g@$', mopts)
+            map('n', cfg.opleader.line, '<CMD>set operatorfunc=v:lua.___opfunc_toggle_line<CR>g@', mopts)
+            map('n', cfg.opleader.block, '<CMD>set operatorfunc=v:lua.___opfunc_toggle_block<CR>g@', mopts)
 
-        map('n', C.config.opleader, '<CMD>set operatorfunc=v:lua.___opfunc_toggle_line<CR>g@', opts)
-        map('n', 'gb', '<CMD>set operatorfunc=v:lua.___opfunc_toggle_block<CR>g@', opts)
+            -- VISUAL mode mappings
+            map('v', cfg.opleader.line, '<CMD>set operatorfunc=v:lua.___opfunc_toggle_line<CR>g@$', mopts)
+            map('v', cfg.opleader.block, '<CMD>set operatorfunc=v:lua.___opfunc_toggle_block<CR>g@$', mopts)
 
-        -- VISUAL mode mappings
-        map('v', C.config.opleader, '<CMD>set operatorfunc=v:lua.___opfunc_toggle_line<CR>g@$', opts)
-        map('v', 'gb', '<CMD>set operatorfunc=v:lua.___opfunc_toggle_block<CR>g@$', opts)
-
-        -- INSERT mode mappings
-        -- map('i', '<C-_>', '<CMD>lua require("Comment").toggle()<CR>', opts)
-
-        -- OperatorFunc extra
-        function _G.___opfunc_comment_line(vmode)
-            opfunc(vmode, U.cmode.uncomment, U.ctype.line)
-        end
-        function _G.___opfunc_uncomment_line(mode)
-            opfunc(mode, U.cmode.comment, U.ctype.line)
-        end
-        function _G.___opfunc_comment_block(vmode)
-            opfunc(vmode, U.cmode.uncomment, U.ctype.block)
-        end
-        function _G.___opfunc_uncomment_block(vmode)
-            opfunc(vmode, U.cmode.comment, U.ctype.block)
+            -- INSERT mode mappings
+            -- map('i', '<C-_>', '<CMD>lua require("Comment").toggle()<CR>', opts)
         end
 
-        -- NORMAL mode extra
-        map('n', 'g>', '<CMD>set operatorfunc=v:lua.___opfunc_comment_line<CR>g@', opts)
-        map('n', 'g>c', '<CMD>set operatorfunc=v:lua.___opfunc_comment_line<CR>g@$', opts)
-        map('n', 'g>b', '<CMD>set operatorfunc=v:lua.___opfunc_comment_block<CR>g@$', opts)
+        if cfg.mappings.extra then
+            -- OperatorFunc extra
+            function _G.___opfunc_comment_line(vmode)
+                __c_opfunc(vmode, U.cmode.uncomment, U.ctype.line)
+            end
+            function _G.___opfunc_uncomment_line(mode)
+                __c_opfunc(mode, U.cmode.comment, U.ctype.line)
+            end
+            function _G.___opfunc_comment_block(vmode)
+                __c_opfunc(vmode, U.cmode.uncomment, U.ctype.block)
+            end
+            function _G.___opfunc_uncomment_block(vmode)
+                __c_opfunc(vmode, U.cmode.comment, U.ctype.block)
+            end
 
-        map('n', 'g<', '<CMD>set operatorfunc=v:lua.___opfunc_uncomment_line<CR>g@', opts)
-        map('n', 'g<c', '<CMD>set operatorfunc=v:lua.___opfunc_uncomment_line<CR>g@$', opts)
-        map('n', 'g<b', '<CMD>set operatorfunc=v:lua.___opfunc_uncomment_block<CR>g@$', opts)
+            -- NORMAL mode extra
+            map('n', 'g>', '<CMD>set operatorfunc=v:lua.___opfunc_comment_line<CR>g@', mopts)
+            map('n', 'g>c', '<CMD>set operatorfunc=v:lua.___opfunc_comment_line<CR>g@$', mopts)
+            map('n', 'g>b', '<CMD>set operatorfunc=v:lua.___opfunc_comment_block<CR>g@$', mopts)
 
-        -- VISUAL mode extra
-        map('v', 'g>', '<CMD>set operatorfunc=v:lua.___opfunc_comment_line<CR>g@$', opts)
-        map('v', 'g<', '<CMD>set operatorfunc=v:lua.___opfunc_uncomment_line<CR>g@$', opts)
+            map('n', 'g<', '<CMD>set operatorfunc=v:lua.___opfunc_uncomment_line<CR>g@', mopts)
+            map('n', 'g<c', '<CMD>set operatorfunc=v:lua.___opfunc_uncomment_line<CR>g@$', mopts)
+            map('n', 'g<b', '<CMD>set operatorfunc=v:lua.___opfunc_uncomment_block<CR>g@$', mopts)
+
+            -- VISUAL mode extra
+            map('v', 'g>', '<CMD>set operatorfunc=v:lua.___opfunc_comment_line<CR>g@$', mopts)
+            map('v', 'g<', '<CMD>set operatorfunc=v:lua.___opfunc_uncomment_line<CR>g@$', mopts)
+        end
     end
 end
 
