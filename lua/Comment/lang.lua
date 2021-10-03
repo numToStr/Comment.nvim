@@ -15,6 +15,8 @@ local L = {
     rust = { M.cxx_ln, M.cxx_bl },
     go = { M.cxx_ln, M.cxx_bl },
     toml = { M.hash },
+    yaml = { M.hash },
+    graphql = { M.hash },
 }
 
 return setmetatable({}, {
