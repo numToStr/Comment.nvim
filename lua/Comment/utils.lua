@@ -12,8 +12,8 @@ U.cmode = {
 }
 
 ---Comment string types
----@class CStr
-U.cstr = {
+---@class CType
+U.ctype = {
     line = 1,
     block = 2,
 }
@@ -42,11 +42,11 @@ end
 
 ---Get lines from a NORMAL/VISUAL mode
 ---@param vmode string VIM mode
----@param cstr CStr Comment string type
+---@param ctype CType Comment string type
 ---@return number Start index of the lines
 ---@return number End index of the lines
 ---@return table List of lines inside the start and end index
-function U.get_lines(vmode, cstr)
+function U.get_lines(vmode, ctype)
     local s_ln, e_ln
 
     local buf = 0
@@ -69,7 +69,7 @@ function U.get_lines(vmode, cstr)
     -- end
 
     -- In block we only need the starting and endling line
-    if cstr == U.cstr.block then
+    if ctype == U.ctype.block then
         return s_ln,
             e_ln,
             {
