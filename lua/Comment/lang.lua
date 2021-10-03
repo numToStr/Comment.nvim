@@ -6,8 +6,10 @@ local M = {
 }
 
 ---Lang table that contains commentstring (linewise/blockwise) for mutliple filetypes
----@type table { filetype = { linewise = string, blockwise = string|nil } }
+---@type table { filetype = { linewise, blockwise } }
 local L = {
+    c = { M.cxx_ln, M.cxx_bl },
+    cpp = { M.cxx_ln, M.cxx_bl },
     lua = { '--%s', '--[[%s--]]' },
     javascript = { M.cxx_ln, M.cxx_bl },
     toml = { M.hash },
