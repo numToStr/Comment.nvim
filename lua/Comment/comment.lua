@@ -1,33 +1,3 @@
--- TODO
--- [-] Handle Tabs
--- [x] Dot repeat
--- [x] Comment multiple line.
--- [x] Hook support
---      [x] pre
---      [x] post
--- [x] Custom (language) commentstring support
--- [ ] Block comment ie. /* */ (for js)
--- [ ] Doc comment ie. /** */ (for js)
--- [ ] Treesitter context commentstring
-
--- FIXME
--- [x] visual mode not working correctly
--- [x] space after and before of commentstring
--- [x] multiple line behavior to tcomment
---      [x] preserve indent
---      [x] determine comment status (to comment or not)
--- [x] prevent uncomment on uncommented line
--- [x] `comment` and `toggle` misbehaving when there is leading space
--- [x] messed up indentation, if the first line has greater indentation than next line (calc min indendation)
--- [ ] `gcc` empty line not toggling comment
--- [ ] dot repeat support for visual mode mappings
-
--- THINK:
--- 1. Should i return the operator's starting and ending position in pre-hook
--- 2. Fix cursor position in motion operator (try `gcip`)
--- 3. It is possible that, commentstring is updated inside pre-hook as we want to use it but we can't
---    bcz the filetype is also present in the lang-table (and it has high priority than bo.commentstring)
-
 local U = require('Comment.utils')
 
 local A = vim.api
@@ -42,8 +12,8 @@ local C = {
 ---1. pre_hook (optionally a string can be returned)
 ---2. lang_table (extra commentstring table in the plugin)
 ---3. commentstring (already set or added in pre_hook)
----@return string
----@return string
+---@return string Right side of the commentstring
+---@return string Right side of the commentstring
 function C.unwrap_cstr()
     local cstr = U.is_hook(C.config.pre_hook) or require('Comment.lang').get(bo.filetype) or bo.commentstring
 
@@ -60,19 +30,19 @@ function C.unwrap_cstr()
 end
 
 ---Comments a single line
----@param ln string
----@param r_cs string
----@param l_cs string
-function C.comment_ln(ln, r_cs, l_cs)
-    A.nvim_set_current_line(U.comment_str(ln, r_cs, l_cs, C.config.padding))
+---@param ln string Line that needs to be commented
+---@param rcs string Right side of the commentstring
+---@param lcs string Left side of the commentstring
+function C.comment_ln(ln, rcs, lcs)
+    A.nvim_set_current_line(U.comment_str(ln, rcs, lcs, C.config.padding))
 end
 
 ---Uncomments a single line
----@param ln string
----@param r_cs_esc string
----@param l_cs_esc string
-function C.uncomment_ln(ln, r_cs_esc, l_cs_esc)
-    A.nvim_set_current_line(U.uncomment_str(ln, r_cs_esc, l_cs_esc, C.config.padding))
+---@param ln string Line that needs to be uncommented
+---@param rcs_esc string (Escaped) Right side of the commentstring
+---@param lcs_esc string (Escaped) Left side of the commentstring
+function C.uncomment_ln(ln, rcs_esc, lcs_esc)
+    A.nvim_set_current_line(U.uncomment_str(ln, rcs_esc, lcs_esc, C.config.padding))
 end
 
 ---Toggle comment of the current line
@@ -127,9 +97,9 @@ function C.setup(cfg)
             -- line: use single line comment
             -- char: use block comment
 
-            local r_cs, l_cs = C.unwrap_cstr()
+            local rcs, lcs = C.unwrap_cstr()
             local s_pos, e_pos, lines = U.get_lines(mode)
-            local r_cs_esc = vim.pesc(r_cs)
+            local rcs_esc = vim.pesc(rcs)
             local repls = {}
 
             -- While commenting a block of text, there is a possiblity of lines being both commented and non-commented
@@ -143,7 +113,7 @@ function C.setup(cfg)
 
             for _, line in ipairs(lines) do
                 if to_comment == nil then
-                    local is_cmt = U.is_commented(line, r_cs_esc)
+                    local is_cmt = U.is_commented(line, rcs_esc)
                     if is_commented and not is_cmt then
                         is_commented = false
                     end
@@ -161,9 +131,9 @@ function C.setup(cfg)
 
             for _, line in ipairs(lines) do
                 if is_commented then
-                    table.insert(repls, U.uncomment_str(line, r_cs_esc, vim.pesc(l_cs), C.config.padding))
+                    table.insert(repls, U.uncomment_str(line, rcs_esc, vim.pesc(lcs), C.config.padding))
                 else
-                    table.insert(repls, U.comment_str(line, r_cs, l_cs, C.config.padding, min_indent or ''))
+                    table.insert(repls, U.comment_str(line, rcs, lcs, C.config.padding, min_indent or ''))
                 end
             end
 
@@ -180,6 +150,9 @@ function C.setup(cfg)
 
         -- VISUAL mode mappings
         map('v', C.config.opleader, '<ESC><CMD>lua ___comment_opfunc(vim.fn.visualmode())<CR>', opts)
+
+        -- INSERT mode mappings
+        -- map('i', '<C-_>', '<CMD>lua require("Comment").toggle()<CR>', opts)
 
         -- OperatorFunc extra
         function _G.___comment_opfunc_comment(mode)
