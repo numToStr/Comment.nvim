@@ -108,20 +108,23 @@ function C.setup(opts)
 
     if cfg.mappings then
         ---Common operatorfunc callback
-        ---@param vmode string
+        ---@param vmode string VIM mode - line|char
         ---@param cmode CMode Comment mode
         ---@param ctype CType Type of the commentstring (line/block)
         function _G.__c_opfunc(vmode, cmode, ctype)
-            -- `mode` can be
-            -- line: use line comment
-            -- char: use block comment
-
-            -- How to comment/uncomment
+            -- comment/uncomment logic
+            --
             -- 1. type == line
+            --      * decide whether to comment or not
+            --      * store the minimum indent from all the lines (exclude empty line)
             -- 2. type == block
             --      * check if the first and last is commented or not with cstr LHS and RHS respectively.
             --      * add cstr LHS after the leading whitespace and before the first char of the first line
             --      * add cstr RHS to end of the last line
+            --
+            -- # common action
+            --      * comment/uncomment the lines
+            --      * update the lines
 
             local rcs, lcs = C.unwrap_cstr(ctype)
             local s_pos, e_pos, lines = U.get_lines(vmode, ctype)
@@ -226,16 +229,16 @@ function C.setup(opts)
         if cfg.mappings.extra then
             -- OperatorFunc extra
             function _G.___opfunc_comment_line(vmode)
-                __c_opfunc(vmode, U.cmode.uncomment, U.ctype.line)
+                __c_opfunc(vmode, U.cmode.comment, U.ctype.line)
             end
             function _G.___opfunc_uncomment_line(mode)
-                __c_opfunc(mode, U.cmode.comment, U.ctype.line)
+                __c_opfunc(mode, U.cmode.uncomment, U.ctype.line)
             end
             function _G.___opfunc_comment_block(vmode)
-                __c_opfunc(vmode, U.cmode.uncomment, U.ctype.block)
+                __c_opfunc(vmode, U.cmode.comment, U.ctype.block)
             end
             function _G.___opfunc_uncomment_block(vmode)
-                __c_opfunc(vmode, U.cmode.comment, U.ctype.block)
+                __c_opfunc(vmode, U.cmode.uncomment, U.ctype.block)
             end
 
             -- NORMAL mode extra
