@@ -13,6 +13,7 @@ local L = {
     lua = { '--%s', '--[[%s--]]' },
     javascript = { M.cxx_ln, M.cxx_bl },
     rust = { M.cxx_ln, M.cxx_bl },
+    go = { M.cxx_ln, M.cxx_bl },
     toml = { M.hash },
 }
 
