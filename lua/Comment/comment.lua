@@ -120,19 +120,23 @@ function C.setup(opts)
             -- comment/uncomment logic
             --
             -- 1. type == line
-            --      * decide whether to comment or not
-            --      * store the minimum indent from all the lines (exclude empty line)
+            --      * decide whether to comment or not, if all the lines are commented then uncomment otherwise comment
+            --      * also, store the minimum indent from all the lines (exclude empty line)
+            --      * if comment the line, use cstr LHS and also considering the min indent
+            --      * if uncomment the line, remove cstr LHS from lines
+            --      * update the lines
             -- 2. type == block
             --      * check if the first and last is commented or not with cstr LHS and RHS respectively.
-            --      * add cstr LHS after the leading whitespace and before the first char of the first line
-            --      * add cstr RHS to end of the last line
-            --
-            -- # common action
-            --      * comment/uncomment the lines
+            --      * if both lines commented
+            --          - remove cstr LHS from the first line
+            --          - remove cstr RHS to end of the last line
+            --      * if both lines uncommented
+            --          - add cstr LHS after the leading whitespace and before the first char of the first line
+            --          - add cstr RHS to end of the last line
             --      * update the lines
 
             local rcs, lcs = C.unwrap_cstr(ctype)
-            local s_pos, e_pos, lines = U.get_lines(vmode, ctype)
+            local scol, ecol, lines = U.get_lines(vmode, ctype)
             local rcs_esc = vim.pesc(rcs)
 
             local len = #lines
@@ -162,8 +166,8 @@ function C.setup(opts)
                     l1 = U.comment_str(start_ln, rcs, '', C.config.padding)
                     l2 = U.comment_str(end_ln, '', lcs, C.config.padding)
                 end
-                A.nvim_buf_set_lines(0, s_pos, s_pos + 1, false, { l1 })
-                A.nvim_buf_set_lines(0, e_pos - 1, e_pos, false, { l2 })
+                A.nvim_buf_set_lines(0, scol, scol + 1, false, { l1 })
+                A.nvim_buf_set_lines(0, ecol - 1, ecol, false, { l2 })
             else
                 -- While commenting a block of text, there is a possiblity of lines being both commented and non-commented
                 -- In that case, we need to figure out that if any line is uncommented then we should comment the whole block or vise-versa
@@ -182,9 +186,13 @@ function C.setup(opts)
                         end
                     end
 
-                    local spc, ln = U.split_half(line)
-                    if not min_indent or (#min_indent > #spc) and #ln > 0 then
-                        min_indent = spc
+                    -- If the internal cmode changes to comment or the given cmode is not uncomment, then only calculate min_indent
+                    -- As calculating min_indent only makes sense when we actually want to comment the lines
+                    if _cmode == U.cmode.comment or cmode ~= U.cmode.uncomment then
+                        local indent, ln = U.split_half(line)
+                        if not min_indent or (#min_indent > #indent) and #ln > 0 then
+                            min_indent = indent
+                        end
                     end
                 end
 
@@ -201,10 +209,10 @@ function C.setup(opts)
                         table.insert(repls, U.comment_str(line, rcs, lcs, C.config.padding, min_indent or ''))
                     end
                 end
-                A.nvim_buf_set_lines(0, s_pos, e_pos, false, repls)
+                A.nvim_buf_set_lines(0, scol, ecol, false, repls)
             end
 
-            U.is_hook(C.config.post_hook, s_pos, e_pos)
+            U.is_hook(C.config.post_hook, scol, ecol)
         end
 
         local map = A.nvim_set_keymap
