@@ -27,9 +27,9 @@ return setmetatable({}, {
             end
             L[k] = v
         end,
-        get = function(lang, ty)
+        get = function(lang, ctype)
             local l = L[lang]
-            return l and l[ty]
+            return l and l[ctype]
         end,
     },
     __newindex = function(this, k, v)

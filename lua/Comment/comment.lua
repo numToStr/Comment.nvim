@@ -12,12 +12,12 @@ local C = {
 ---1. pre_hook (optionally a string can be returned)
 ---2. lang_table (extra commentstring table in the plugin)
 ---3. commentstring (already set or added in pre_hook)
----@param ty string Type of commentstring ie. line | block
----@return string Right side of the commentstring
----@return string Left side of the commentstring
-function C.unwrap_cstr(ty)
+---@param ctype CType (optional) Type of commentstring ie. line | block
+---@return string string Right side of the commentstring
+---@return string string Left side of the commentstring
+function C.unwrap_cstr(ctype)
     local cmstr = U.is_hook(C.config.pre_hook)
-        or require('Comment.lang').get(bo.filetype, ty or U.ctype.line)
+        or require('Comment.lang').get(bo.filetype, ctype or U.ctype.line)
         or bo.commentstring
 
     if not cmstr or #cmstr == 0 then
@@ -66,7 +66,7 @@ function C.toggle_ln()
 end
 
 ---Configures the whole plugin
----@param opts Config|nil
+---@param opts Config
 function C.setup(opts)
     ---@class Config
     C.config = {
@@ -84,20 +84,20 @@ function C.setup(opts)
         ---LHS of toggle mapping in NORMAL mode for line and block comment
         ---@type table
         toggler = {
-            ---LHS of line comment toggle
+            ---LHS of line-comment toggle
             line = 'gcc',
-            ---LHS of block comment toggle
+            ---LHS of block-comment toggle
             block = 'gcb',
         },
         ---LHS of operator-mode mapping in NORMAL/VISUAL mode for line and block comment
         ---@type table
         opleader = {
-            ---LHS of line comment opfunc mapping
+            ---LHS of line-comment opfunc mapping
             line = 'gc',
-            ---LHS of block comment opfunc mapping
+            ---LHS of block-comment opfunc mapping
             block = 'gb',
         },
-        -- Pre-hook, called before commenting the line
+        ---Pre-hook, called before commenting the line
         ---@type function|nil
         pre_hook = nil,
         ---Post-hook, called after commenting is done
@@ -116,7 +116,7 @@ function C.setup(opts)
         ---@param vmode string VIM mode - line|char
         ---@param cmode CMode Comment mode
         ---@param ctype CType Type of the commentstring (line/block)
-        function _G.__c_opfunc(vmode, cmode, ctype)
+        local function opfunc(vmode, cmode, ctype)
             -- comment/uncomment logic
             --
             -- 1. type == line
@@ -137,7 +137,7 @@ function C.setup(opts)
 
             local len = #lines
 
-            -- Block wise, this only be applicable when there are more than 1 lines
+            -- Block wise, only when there are more than 1 lines
             if ctype == U.ctype.block and len > 1 then
                 local start_ln = lines[1]
                 local end_ln = lines[len]
@@ -213,10 +213,10 @@ function C.setup(opts)
         if cfg.mappings.basic then
             -- OperatorFunc main
             function _G.___opfunc_toggle_line(vmode)
-                __c_opfunc(vmode, U.cmode.toggle, U.ctype.line)
+                opfunc(vmode, U.cmode.toggle, U.ctype.line)
             end
             function _G.___opfunc_toggle_block(vmode)
-                __c_opfunc(vmode, U.cmode.toggle, U.ctype.block)
+                opfunc(vmode, U.cmode.toggle, U.ctype.block)
             end
 
             -- NORMAL mode mappings
@@ -236,16 +236,16 @@ function C.setup(opts)
         if cfg.mappings.extra then
             -- OperatorFunc extra
             function _G.___opfunc_comment_line(vmode)
-                __c_opfunc(vmode, U.cmode.comment, U.ctype.line)
+                opfunc(vmode, U.cmode.comment, U.ctype.line)
             end
             function _G.___opfunc_uncomment_line(mode)
-                __c_opfunc(mode, U.cmode.uncomment, U.ctype.line)
+                opfunc(mode, U.cmode.uncomment, U.ctype.line)
             end
             function _G.___opfunc_comment_block(vmode)
-                __c_opfunc(vmode, U.cmode.comment, U.ctype.block)
+                opfunc(vmode, U.cmode.comment, U.ctype.block)
             end
             function _G.___opfunc_uncomment_block(vmode)
-                __c_opfunc(vmode, U.cmode.uncomment, U.ctype.block)
+                opfunc(vmode, U.cmode.uncomment, U.ctype.block)
             end
 
             -- NORMAL mode extra

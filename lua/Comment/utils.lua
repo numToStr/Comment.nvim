@@ -10,7 +10,7 @@ U.cmode = {
     uncomment = 2,
 }
 
----Comment string types
+---Comment types
 ---@class CType
 U.ctype = {
     line = 1,
@@ -21,7 +21,7 @@ U.ctype = {
 ---@param pos number Position for the replacement
 ---@param str string String that needs to be modified
 ---@param rep string Replacement chars
----@return string Replaced string
+---@return string string Replaced string
 function U.replace(pos, str, rep)
     return str:sub(0, pos) .. rep .. str:sub(pos + 1)
 end
@@ -42,9 +42,9 @@ end
 ---Get lines from a NORMAL/VISUAL mode
 ---@param vmode string VIM mode
 ---@param ctype CType Comment string type
----@return number Start index of the lines
----@return number End index of the lines
----@return table List of lines inside the start and end index
+---@return number number Start index of the lines
+---@return number number End index of the lines
+---@return table table List of lines inside the start and end index
 function U.get_lines(vmode, ctype)
     local m = A.nvim_buf_get_mark
     local sln, eln
@@ -60,30 +60,30 @@ function U.get_lines(vmode, ctype)
 
     -- decrementing `s_ln` by one bcz marks are 1 based but lines are 0 based
     -- and `e_ln` is the last line index (exclusive)
-    local sln_new = sln - 1
+    local scol = sln - 1
 
     -- If start and end is same, then just return the current line
     if sln == eln then
-        return sln_new, eln, { A.nvim_get_current_line() }
+        return scol, eln, { A.nvim_get_current_line() }
     end
 
     -- In block we only need the starting and endling line
     if ctype == U.ctype.block then
-        return sln_new,
+        return scol,
             eln,
             {
-                A.nvim_buf_get_lines(0, sln_new, sln_new + 1, false)[1],
+                A.nvim_buf_get_lines(0, scol, sln, false)[1],
                 A.nvim_buf_get_lines(0, eln - 1, eln, false)[1],
             }
     end
 
-    return sln_new, eln, A.nvim_buf_get_lines(0, sln_new, eln, false)
+    return scol, eln, A.nvim_buf_get_lines(0, scol, eln, false)
 end
 
 ---Separate the given line into two parts ie. indentation, chars
 ---@param ln string|table Line that need to be split
----@return string|nil Indentation chars
----@return string|nil Remaining chars
+---@return string string Indentation chars
+---@return string string Remaining chars
 function U.split_half(ln)
     return ln:match('(%s*)(.*)')
 end
@@ -94,7 +94,7 @@ end
 ---@param lcs string Left side of the commentstring
 ---@param is_pad boolean Whether to add padding b/w comment and line
 ---@param spacing string|nil Pre-determine indentation (useful) when dealing w/ multiple lines
----@return string Commented string
+---@return string string Commented string
 function U.comment_str(str, rcs, lcs, is_pad, spacing)
     local indent, ln = U.split_half(str)
 
@@ -126,7 +126,7 @@ end
 ---@param rcs_esc string (Escaped) Right side of the commentstring
 ---@param lcs_esc string (Escaped) Left side of the commentstring
 ---@param is_pad boolean Whether to add padding b/w comment and line
----@return string Uncommented string
+---@return string string Uncommented string
 function U.uncomment_str(str, rcs_esc, lcs_esc, is_pad)
     if not U.is_commented(str, rcs_esc) then
         return str
@@ -145,8 +145,8 @@ function U.uncomment_str(str, rcs_esc, lcs_esc, is_pad)
 end
 
 ---Check if {pre,post}_hook is present then call it
----@param hook function|nil Hook function
----@return boolean|nil|string
+---@param hook function Hook function
+---@return boolean|string
 function U.is_hook(hook, ...)
     return type(hook) == 'function' and hook(...)
 end
@@ -154,7 +154,7 @@ end
 ---Check if the given string is commented or not
 ---@param str string Line that needs to be checked
 ---@param rcs_esc string (Escaped) Right side of the commentstring
----@return number|nil
+---@return number
 function U.is_commented(str, rcs_esc)
     return str:find('^%s*' .. rcs_esc)
 end
