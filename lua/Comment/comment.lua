@@ -87,7 +87,7 @@ function C.setup(opts)
             ---LHS of line-comment toggle
             line = 'gcc',
             ---LHS of block-comment toggle
-            block = 'gcb',
+            block = 'gbc',
         },
         ---LHS of operator-mode mapping in NORMAL/VISUAL mode for line and block comment
         ---@type table
