@@ -14,6 +14,9 @@
 -- [ ] Treesitter context commentstring
 -- [ ] Insert mode mapping (also move the cursor after commentstring)
 -- [ ] Port `commentstring` from tcomment
+-- [ ] Header comment
+-- [ ] Ignore line
+-- [ ] Disable `extra` mapping by default
 
 -- FIXME
 -- [x] visual mode not working correctly
@@ -26,10 +29,10 @@
 -- [x] messed up indentation, if the first line has greater indentation than next line (calc min indendation)
 -- [x] `gcc` empty line not toggling comment
 -- [x] Optimize blockwise mode (just modifiy the start and end line)
--- [ ] dot repeat support for visual mode mappings
+-- [x] dot repeat support for visual mode mappings
 -- [ ] conflict when uncommenting interchangebly with line/block wise comment
--- [ ] Weird commenting if the first line is empty
--- [ ] If there is an empty line b/w two blocks and both blocks are commented. It should uncomment instead of commenting again in toggle.
+-- [ ] Weird commenting when the first line is empty and the whole is indented
+-- [ ] When there is an uncommented empty line b/w two commented blocks. It should uncomment instead of commenting again in toggle.
 
 -- THINK:
 -- 1. Should i return the operator's starting and ending position in pre-hook

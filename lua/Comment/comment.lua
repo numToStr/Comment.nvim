@@ -16,17 +16,17 @@ local C = {
 ---@return string string Right side of the commentstring
 ---@return string string Left side of the commentstring
 function C.unwrap_cstr(ctype)
-    local cmstr = U.is_hook(C.config.pre_hook)
+    local cstr = U.is_hook(C.config.pre_hook)
         or require('Comment.lang').get(bo.filetype, ctype or U.ctype.line)
         or bo.commentstring
 
-    if not cmstr or #cmstr == 0 then
+    if not cstr or #cstr == 0 then
         return U.errprint("'commentstring' not found")
     end
 
-    local rhs, lhs = cmstr:match('(.*)%%s(.*)')
+    local rhs, lhs = cstr:match('(.*)%%s(.*)')
     if not rhs then
-        return U.errprint("Invalid 'commentstring': " .. cmstr)
+        return U.errprint("Invalid 'commentstring': " .. cstr)
     end
 
     return U.trim(rhs), U.trim(lhs)
