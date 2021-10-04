@@ -202,10 +202,12 @@ function C.setup(opts)
                 end
 
                 local repls = {}
-                for _, line in ipairs(lines) do
-                    if _cmode == U.cmode.uncomment then
+                if _cmode == U.cmode.uncomment then
+                    for _, line in ipairs(lines) do
                         table.insert(repls, U.uncomment_str(line, rcs_esc, vim.pesc(lcs), C.config.padding))
-                    else
+                    end
+                else
+                    for _, line in ipairs(lines) do
                         table.insert(repls, U.comment_str(line, rcs, lcs, C.config.padding, min_indent or ''))
                     end
                 end
