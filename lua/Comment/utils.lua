@@ -17,6 +17,12 @@ U.ctype = {
     block = 2,
 }
 
+---Print a msg on stderr
+---@param msg string
+function U.errprint(msg)
+    vim.notify('Comment.nvim: ' .. msg, vim.log.levels.ERROR)
+end
+
 ---Replace some char in the give string
 ---@param pos number Position for the replacement
 ---@param str string String that needs to be modified
@@ -24,12 +30,6 @@ U.ctype = {
 ---@return string string Replaced string
 function U.replace(pos, str, rep)
     return str:sub(0, pos) .. rep .. str:sub(pos + 1)
-end
-
----Print a msg on stderr
----@param msg string
-function U.errprint(msg)
-    vim.notify('Comment.nvim: ' .. msg, vim.log.levels.ERROR)
 end
 
 ---Trim leading/trailing whitespace from the given string

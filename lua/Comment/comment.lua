@@ -178,20 +178,23 @@ function C.setup(opts)
                 -- Which will be used to semantically comment rest of the lines
                 local min_indent = nil
 
-                for _, line in ipairs(lines) do
-                    if _cmode == U.cmode.uncomment and cmode == U.cmode.toggle then
-                        local is_cmt = U.is_commented(line, rcs_esc)
-                        if not is_cmt then
-                            _cmode = U.cmode.comment
+                -- If the given comde is uncomment then we actually don't want to compute the cmode or min_indent
+                if cmode ~= U.cmode.uncomment then
+                    for _, line in ipairs(lines) do
+                        if _cmode == U.cmode.uncomment and cmode == U.cmode.toggle then
+                            local is_cmt = U.is_commented(line, rcs_esc)
+                            if not is_cmt then
+                                _cmode = U.cmode.comment
+                            end
                         end
-                    end
 
-                    -- If the internal cmode changes to comment or the given cmode is not uncomment, then only calculate min_indent
-                    -- As calculating min_indent only makes sense when we actually want to comment the lines
-                    if _cmode == U.cmode.comment or cmode ~= U.cmode.uncomment then
-                        local indent, ln = U.split_half(line)
-                        if not min_indent or (#min_indent > #indent) and #ln > 0 then
-                            min_indent = indent
+                        -- If the internal cmode changes to comment or the given cmode is not uncomment, then only calculate min_indent
+                        -- As calculating min_indent only makes sense when we actually want to comment the lines
+                        if _cmode == U.cmode.comment or cmode == U.cmode.comment then
+                            local indent, ln = U.split_half(line)
+                            if not min_indent or (#min_indent > #indent) and #ln > 0 then
+                                min_indent = indent
+                            end
                         end
                     end
                 end
