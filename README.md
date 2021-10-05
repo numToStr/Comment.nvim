@@ -103,7 +103,7 @@ The [`setup()`](#setup) method (optionally) takes a configuration object for whi
 
 ### 🔥 Usage
 
-When you call [`setup()`](#setup) method, `Comment.nvim` sets up some basic mapping which can used in NORMAL and VISUAL mode to get you started with the pleasure of commenting stuff out.
+When you call [`setup()`](#setup) method, `Comment.nvim` sets up some basic mapping which can used in _NORMAL_ and _VISUAL_ mode to get you started with the pleasure of commenting stuff out.
 
 <a id="mappings"></a>
 
@@ -226,7 +226,7 @@ TODO: how to contribute custom commentstring
 
 -   [tcomment]() - To be with me forever and motivated me to write this.
 -   [nvim-comment](https://github.com/terrortylor/nvim-comment) - Awesome but less powerful cousin. Also I took some code from it.
--   [kommentary](https://github.com/b3nj5m1n/kommentary) - Nicely done plugin. Helped me in design this plugin
+-   [kommentary](https://github.com/b3nj5m1n/kommentary) - Nicely done plugin. Helped me to design this plugin.
 
 ### 🚗 Roadmap
 
