@@ -212,11 +212,11 @@ Although, `Comment.nvim` supports neovim's `commentstring` but unfortunately it 
 
 -   [`lang_table`](#languages) - If the current filetype is found in the table, then the string there will be used.
 
--   `commentstring` - Native neovim's commentstring for the filetype
+-   `commentstring` - Neovim's native commentstring for the filetype
 
 <a id="commentstring-caveat"></a>
 
-> There is one caveat with this approach. If someone sets the `commentstring` (w/o returning a string) from the `pre_hook` method but the current filetype is present in the `lang_table` then the commenting will be done using the string in `lang_table` instead of using `commentstring`
+> There is one caveat with this approach. If someone sets the `commentstring` (w/o returning a string) from the `pre_hook` method and also, if the current filetype exists in the `lang_table` then the commenting will be done using the string in `lang_table` instead of using `commentstring`
 
 ## 🤝 Contributing
 
