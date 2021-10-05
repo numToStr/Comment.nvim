@@ -3,7 +3,7 @@
 
 <!-- Image -->
 
-## Features
+## ✨ Features
 
 -   Uses `commentstring`
 -   Prefers single-line/linewise comments
@@ -14,7 +14,7 @@
 -   Dot (`.`) repeat support for `gcc`, `gbc` and friends
 -   Ignore certain lines, powered by Lua regex
 
-## Installation
+## 🚀 Installation
 
 -   With [packer.nvim](https://github.com/wbthomason/packer.nvim)
 
@@ -27,7 +27,9 @@ use {
 }
 ```
 
-## Setup
+<a id="setup"></a>
+
+## ⚒️ Setup
 
 First you need to call the `setup()` method to create the default mappings.
 
@@ -99,9 +101,11 @@ The [`setup()`](#setup) method (optionally) takes a configuration object for whi
 }
 ```
 
-## Usage
+## 🔥 Usage
 
 When you call [`setup()`](#setup) method, `Comment.nvim` sets up some basic mapping which can used in NORMAL and VISUAL mode to get you started with the pleasure of commenting stuff out.
+
+<a id="mappings"></a>
 
 #### Mappings
 
@@ -186,17 +190,21 @@ require('Comment').uncomment()
 require('Comment').toggle()
 ```
 
-## Hooks
+<a id="hooks"></a>
+
+## 🎣 Hooks
 
 TODO: explain pre and post hook
 
-## Ignoring lines
+## 🚫 Ignoring lines
 
 TODO: explain `ignore`
 
-## Languages
+<a id="languages"></a>
 
-## Comment String
+## 🗨️ Languages
+
+## 🧵 Comment-String
 
 Although, `Comment.nvim` supports neovim's `commentstring` but unfortunately it has the least priority. The commentstring is taken from the following place in the respective order.
 
@@ -210,16 +218,16 @@ Although, `Comment.nvim` supports neovim's `commentstring` but unfortunately it 
 
 > There is one caveat with this approach. If someone sets the `commentstring` (w/o returning a string) from the `pre_hook` method but the current filetype is present in the `lang_table` then the commenting will be done using the string in `lang_table` instead of using `commentstring`
 
-## Contributing
+## 🤝 Contributing
 
 TODO: how to contribute custom commentstring
 
-## Credits
+## 💐 Credits
 
 -   [tcomment]() - To be with me forever and motivated me to write this.
 -   [nvim-comment](https://github.com/terrortylor/nvim-comment) - Awesome but less powerful cousin. Also I took some code from it.
 -   [kommentary](https://github.com/b3nj5m1n/kommentary) - Nicely done plugin. Helped me in design this plugin
 
-## Roadmap
+## 🚗 Roadmap
 
 TODO: Just paste `dump.lua`
