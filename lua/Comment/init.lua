@@ -8,20 +8,19 @@ local M = {
 
 ---Comments the current line
 function M.comment()
-    local r_cs, l_cs = C.unwrap_cstr()
+    local rcs, lcs = C.unwrap_cstr()
     local l = vim.api.nvim_get_current_line()
 
-    C.comment_ln(l, r_cs, l_cs)
+    C.comment_ln(l, rcs, lcs)
     U.is_hook(C.config.post_hook, -1)
 end
 
 ---Unomments the current line
 function M.uncomment()
-    local r_cs, l_cs = C.unwrap_cstr()
-    local r_cs_esc = vim.pesc(r_cs)
+    local rcs, lcs = C.unwrap_cstr()
     local line = vim.api.nvim_get_current_line()
 
-    C.uncomment_ln(line, r_cs_esc, vim.pesc(l_cs))
+    C.uncomment_ln(line, vim.pesc(rcs), vim.pesc(lcs))
     U.is_hook(C.config.post_hook, -1)
 end
 
