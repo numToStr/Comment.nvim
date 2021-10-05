@@ -15,7 +15,7 @@
 -- [ ] Insert mode mapping (also move the cursor after commentstring)
 -- [ ] Port `commentstring` from tcomment
 -- [ ] Header comment
--- [ ] Ignore line
+-- [x] Ignore line
 -- [x] Disable `extra` mapping by default
 
 -- FIXME

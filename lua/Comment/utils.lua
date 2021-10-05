@@ -159,4 +159,12 @@ function U.is_commented(str, rcs_esc)
     return str:find('^%s*' .. rcs_esc)
 end
 
+---Check if the given line is ignored or not with the given pattern
+---@param ln string Line to be ignored
+---@param pat string Lua regex
+---@return boolean
+function U.ignore(ln, pat)
+    return pat and ln:find(pat) ~= nil
+end
+
 return U

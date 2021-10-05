@@ -32,7 +32,7 @@ function C.unwrap_cstr(ctype)
     return U.trim(rhs), U.trim(lhs)
 end
 
----Comments a single line
+---Common fn to comment and set the current line
 ---@param ln string Line that needs to be commented
 ---@param rcs string Right side of the commentstring
 ---@param lcs string Left side of the commentstring
@@ -40,7 +40,7 @@ function C.comment_ln(ln, rcs, lcs)
     A.nvim_set_current_line(U.comment_str(ln, rcs, lcs, C.config.padding))
 end
 
----Uncomments a single line
+---Common fn to uncomment and set the current line
 ---@param ln string Line that needs to be uncommented
 ---@param rcs_esc string (Escaped) Right side of the commentstring
 ---@param lcs_esc string (Escaped) Left side of the commentstring
@@ -48,18 +48,44 @@ function C.uncomment_ln(ln, rcs_esc, lcs_esc)
     A.nvim_set_current_line(U.uncomment_str(ln, rcs_esc, lcs_esc, C.config.padding))
 end
 
----Toggle comment of the current line
-function C.toggle_ln()
-    local r_cs, l_cs = C.unwrap_cstr()
+---Comments the current line
+function C.comment()
     local line = A.nvim_get_current_line()
 
-    local r_cs_esc = vim.pesc(r_cs)
-    local is_commented = U.is_commented(line, r_cs_esc)
+    if not U.ignore(line, C.config.ignore) then
+        local rcs, lcs = C.unwrap_cstr()
+        C.comment_ln(line, rcs, lcs)
+    end
 
-    if is_commented then
-        C.uncomment_ln(line, r_cs_esc, vim.pesc(l_cs))
-    else
-        C.comment_ln(line, r_cs, l_cs)
+    U.is_hook(C.config.post_hook, -1)
+end
+
+---Uncomments the current line
+function C.uncomment()
+    local line = A.nvim_get_current_line()
+
+    if not U.ignore(line, C.config.ignore) then
+        local rcs, lcs = C.unwrap_cstr()
+        C.uncomment_ln(line, vim.pesc(rcs), vim.pesc(lcs))
+    end
+
+    U.is_hook(C.config.post_hook, -1)
+end
+
+---Toggle comment of the current line
+function C.toggle()
+    local line = A.nvim_get_current_line()
+
+    if not U.ignore(line, C.config.ignore) then
+        local rcs, lcs = C.unwrap_cstr()
+        local rcs_esc = vim.pesc(rcs)
+        local is_commented = U.is_commented(line, rcs_esc)
+
+        if is_commented then
+            C.uncomment_ln(line, rcs_esc, vim.pesc(lcs))
+        else
+            C.comment_ln(line, rcs, lcs)
+        end
     end
 
     U.is_hook(C.config.post_hook, -1)
@@ -73,6 +99,10 @@ function C.setup(opts)
         ---Add a space b/w comment and the line
         ---@type boolean
         padding = true,
+        ---Line which should be ignored while comment/uncomment
+        ---Example: Use '^$' to ignore empty lines
+        ---@type string Lua regex
+        ignore = nil,
         ---Whether to create basic (operator-pending) and extra mappings
         ---@type table
         mappings = {
@@ -181,19 +211,22 @@ function C.setup(opts)
                 -- If the given comde is uncomment then we actually don't want to compute the cmode or min_indent
                 if cmode ~= U.cmode.uncomment then
                     for _, line in ipairs(lines) do
-                        if _cmode == U.cmode.uncomment and cmode == U.cmode.toggle then
-                            local is_cmt = U.is_commented(line, rcs_esc)
-                            if not is_cmt then
-                                _cmode = U.cmode.comment
+                        -- I wish lua had `continue` statement [sad noises]
+                        if not U.ignore(line, cfg.ignore) then
+                            if _cmode == U.cmode.uncomment and cmode == U.cmode.toggle then
+                                local is_cmt = U.is_commented(line, rcs_esc)
+                                if not is_cmt then
+                                    _cmode = U.cmode.comment
+                                end
                             end
-                        end
 
-                        -- If the internal cmode changes to comment or the given cmode is not uncomment, then only calculate min_indent
-                        -- As calculating min_indent only makes sense when we actually want to comment the lines
-                        if _cmode == U.cmode.comment or cmode == U.cmode.comment then
-                            local indent, ln = U.split_half(line)
-                            if not min_indent or (#min_indent > #indent) and #ln > 0 then
-                                min_indent = indent
+                            -- If the internal cmode changes to comment or the given cmode is not uncomment, then only calculate min_indent
+                            -- As calculating min_indent only makes sense when we actually want to comment the lines
+                            if _cmode == U.cmode.comment or cmode == U.cmode.comment then
+                                local indent, ln = U.split_half(line)
+                                if not min_indent or (#min_indent > #indent) and #ln > 0 then
+                                    min_indent = indent
+                                end
                             end
                         end
                     end
@@ -205,13 +238,17 @@ function C.setup(opts)
                 end
 
                 local repls = {}
-                if _cmode == U.cmode.uncomment then
-                    for _, line in ipairs(lines) do
-                        table.insert(repls, U.uncomment_str(line, rcs_esc, vim.pesc(lcs), C.config.padding))
-                    end
-                else
-                    for _, line in ipairs(lines) do
-                        table.insert(repls, U.comment_str(line, rcs, lcs, C.config.padding, min_indent or ''))
+                local uncomment = _cmode == U.cmode.uncomment
+
+                for _, line in ipairs(lines) do
+                    if U.ignore(line, cfg.ignore) then
+                        table.insert(repls, line)
+                    else
+                        if uncomment then
+                            table.insert(repls, U.uncomment_str(line, rcs_esc, vim.pesc(lcs), C.config.padding))
+                        else
+                            table.insert(repls, U.comment_str(line, rcs, lcs, C.config.padding, min_indent or ''))
+                        end
                     end
                 end
                 A.nvim_buf_set_lines(0, scol, ecol, false, repls)
