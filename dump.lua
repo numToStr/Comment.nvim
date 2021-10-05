@@ -16,7 +16,7 @@
 -- [ ] Port `commentstring` from tcomment
 -- [ ] Header comment
 -- [ ] Ignore line
--- [ ] Disable `extra` mapping by default
+-- [x] Disable `extra` mapping by default
 
 -- FIXME
 -- [x] visual mode not working correctly

@@ -79,7 +79,7 @@ function C.setup(opts)
             ---operator-pending mapping
             basic = true,
             ---extended mapping
-            extra = true,
+            extra = false,
         },
         ---LHS of toggle mapping in NORMAL mode for line and block comment
         ---@type table
