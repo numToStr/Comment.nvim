@@ -17,6 +17,19 @@ U.ctype = {
     block = 2,
 }
 
+---Motion types
+---@class CMotion
+U.cmotion = {
+    ---Compute from vmode
+    _ = 0,
+    ---line
+    line = 1,
+    ---char/left-right
+    char = 2,
+    ---visual line
+    block = 3,
+}
+
 ---Print a msg on stderr
 ---@param msg string
 function U.errprint(msg)
@@ -39,45 +52,70 @@ function U.trim(str)
     return str:gsub('%s+', '')
 end
 
+function U.get_cmotion(vmode)
+    if vmode == 'line' then
+        return U.cmotion.line
+    end
+    if vmode == 'char' then
+        return U.cmotion.char
+    end
+    if vmode == 'block' then
+        return U.cmotion.block
+    end
+    return U.cmotion.line
+end
+
+---Get region for vim mode
+---@param vmode string VIM mode
+---@return number number start column
+---@return number number end column
+---@return number number start row
+---@return number number end row
+function U.get_region(vmode)
+    local m = A.nvim_buf_get_mark
+    local buf = 0
+    local sln, eln
+
+    if vmode:match('[vV]') then
+        sln = m(buf, '<')
+        eln = m(buf, '>')
+    else
+        sln = m(buf, '[')
+        eln = m(buf, ']')
+    end
+
+    return sln[1], eln[1], sln[2], eln[2]
+end
+
 ---Get lines from a NORMAL/VISUAL mode
 ---@param vmode string VIM mode
 ---@param ctype CType Comment string type
 ---@return number number Start index of the lines
 ---@return number number End index of the lines
 ---@return table table List of lines inside the start and end index
+---@return number number Start row
+---@return number number End row
 function U.get_lines(vmode, ctype)
-    local m = A.nvim_buf_get_mark
-    local sln, eln
+    local scol, ecol, srow, erow = U.get_region(vmode)
 
-    local buf = 0
-    if vmode:match('[vV]') then
-        sln = m(buf, '<')[1]
-        eln = m(buf, '>')[1]
-    else
-        sln = m(buf, '[')[1]
-        eln = m(buf, ']')[1]
-    end
-
-    -- decrementing `s_ln` by one bcz marks are 1 based but lines are 0 based
-    -- and `e_ln` is the last line index (exclusive)
-    local scol = sln - 1
+    local sln = scol - 1
 
     -- If start and end is same, then just return the current line
-    if sln == eln then
-        return scol, eln, { A.nvim_get_current_line() }
+    local lines
+    if scol == ecol then
+        lines = { A.nvim_get_current_line() }
+    elseif ctype == U.ctype.block then
+        -- In block we only need the starting and endling line
+        lines = {
+            A.nvim_buf_get_lines(0, sln, scol, false)[1],
+            A.nvim_buf_get_lines(0, ecol - 1, ecol, false)[1],
+        }
+    else
+        -- decrementing `scol` by one bcz marks are 1 based but lines are 0 based
+        lines = A.nvim_buf_get_lines(0, sln, ecol, false)
     end
 
-    -- In block we only need the starting and endling line
-    if ctype == U.ctype.block then
-        return scol,
-            eln,
-            {
-                A.nvim_buf_get_lines(0, scol, sln, false)[1],
-                A.nvim_buf_get_lines(0, eln - 1, eln, false)[1],
-            }
-    end
-
-    return scol, eln, A.nvim_buf_get_lines(0, scol, eln, false)
+    return sln, ecol, lines, srow, erow
 end
 
 ---Separate the given line into two parts ie. indentation, chars
@@ -142,6 +180,14 @@ function U.uncomment_str(str, rcs_esc, lcs_esc, is_pad)
 
     -- When padding is enabled then trim one trailing space char
     return indent .. (is_pad and ln:gsub('%s?$', '') or ln)
+end
+
+function U.comment_block(line, rcs, lcs, srow, erow)
+    local srow1, erow1, erow2 = srow + 1, erow + 1, erow + 2
+    local first = line:sub(0, srow)
+    local mid = line:sub(srow1, erow1)
+    local last = line:sub(erow2, #line)
+    return first .. rcs .. mid .. lcs .. last
 end
 
 ---Check if {pre,post}_hook is present then call it

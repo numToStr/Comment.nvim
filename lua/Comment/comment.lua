@@ -146,7 +146,8 @@ function C.setup(opts)
         ---@param vmode string VIM mode - line|char
         ---@param cmode CMode Comment mode
         ---@param ctype CType Type of the commentstring (line/block)
-        local function opfunc(vmode, cmode, ctype)
+        ---@param cmotion CMotion Motion type
+        local function opfunc(vmode, cmode, ctype, cmotion)
             -- comment/uncomment logic
             --
             -- 1. type == line
@@ -262,22 +263,28 @@ function C.setup(opts)
 
         if cfg.mappings.basic then
             -- OperatorFunc main
-            function _G.___opfunc_toggle_line(vmode)
-                opfunc(vmode, U.cmode.toggle, U.ctype.line)
+            function _G.___opfunc_gcc(vmode)
+                opfunc(vmode, U.cmode.toggle, U.ctype.line, U.cmotion.line)
             end
-            function _G.___opfunc_toggle_block(vmode)
-                opfunc(vmode, U.cmode.toggle, U.ctype.block)
+            function _G.___opfunc_gbc(vmode)
+                opfunc(vmode, U.cmode.toggle, U.ctype.block, U.cmotion.line)
+            end
+            function _G.___opfunc_gc(vmode)
+                opfunc(vmode, U.cmode.toggle, U.ctype.line, U.cmotion._)
+            end
+            function _G.___opfunc_gb(vmode)
+                opfunc(vmode, U.cmode.toggle, U.ctype.block, U.cmotion._)
             end
 
             -- NORMAL mode mappings
-            map('n', cfg.toggler.line, '<CMD>set operatorfunc=v:lua.___opfunc_toggle_line<CR>g@$', mopts)
-            map('n', cfg.toggler.block, '<CMD>set operatorfunc=v:lua.___opfunc_toggle_block<CR>g@$', mopts)
-            map('n', cfg.opleader.line, '<CMD>set operatorfunc=v:lua.___opfunc_toggle_line<CR>g@', mopts)
-            map('n', cfg.opleader.block, '<CMD>set operatorfunc=v:lua.___opfunc_toggle_block<CR>g@', mopts)
+            map('n', cfg.toggler.line, '<CMD>set operatorfunc=v:lua.___opfunc_gcc<CR>g@$', mopts)
+            map('n', cfg.toggler.block, '<CMD>set operatorfunc=v:lua.___opfunc_gbc<CR>g@$', mopts)
+            map('n', cfg.opleader.line, '<CMD>set operatorfunc=v:lua.___opfunc_gc<CR>g@', mopts)
+            map('n', cfg.opleader.block, '<CMD>set operatorfunc=v:lua.___opfunc_gb<CR>g@', mopts)
 
             -- VISUAL mode mappings
-            map('v', cfg.opleader.line, '<CMD>set operatorfunc=v:lua.___opfunc_toggle_line<CR>g@$', mopts)
-            map('v', cfg.opleader.block, '<CMD>set operatorfunc=v:lua.___opfunc_toggle_block<CR>g@$', mopts)
+            map('v', cfg.opleader.line, '<CMD>set operatorfunc=v:lua.___opfunc_gc<CR>g@$', mopts)
+            map('v', cfg.opleader.block, '<CMD>set operatorfunc=v:lua.___opfunc_gb<CR>g@$', mopts)
 
             -- INSERT mode mappings
             -- map('i', '<C-_>', '<CMD>lua require("Comment").toggle()<CR>', opts)
