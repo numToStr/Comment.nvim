@@ -283,8 +283,8 @@ function C.setup(opts)
             map('n', cfg.opleader.block, '<CMD>set operatorfunc=v:lua.___opfunc_gb<CR>g@', mopts)
 
             -- VISUAL mode mappings
-            map('v', cfg.opleader.line, '<CMD>set operatorfunc=v:lua.___opfunc_gc<CR>g@$', mopts)
-            map('v', cfg.opleader.block, '<CMD>set operatorfunc=v:lua.___opfunc_gb<CR>g@$', mopts)
+            map('x', cfg.opleader.line, '<ESC><CMD>lua ___opfunc_gc(vim.fn.visualmode())<CR>', mopts)
+            map('x', cfg.opleader.block, '<ESC><CMD>lua ___opfunc_gb(vim.fn.visualmode())<CR>', mopts)
 
             -- INSERT mode mappings
             -- map('i', '<C-_>', '<CMD>lua require("Comment").toggle()<CR>', opts)
@@ -315,8 +315,8 @@ function C.setup(opts)
             map('n', 'g<b', '<CMD>set operatorfunc=v:lua.___opfunc_uncomment_block<CR>g@$', mopts)
 
             -- VISUAL mode extra
-            map('v', 'g>', '<CMD>set operatorfunc=v:lua.___opfunc_comment_line<CR>g@$', mopts)
-            map('v', 'g<', '<CMD>set operatorfunc=v:lua.___opfunc_uncomment_line<CR>g@$', mopts)
+            map('x', 'g>', '<ESC><CMD>lua ___opfunc_comment_line(vim.fn.visualmode())<CR>', mopts)
+            map('x', 'g<', '<ESC><CMD>lua ___opfunc_uncomment_line(vim.fn.visualmode())<CR>', mopts)
         end
     end
 end
