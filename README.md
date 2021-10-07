@@ -10,7 +10,8 @@
 -   Supports line (`//`) and block (`/* */`) comments
 -   Supports pre and post hooks
 -   Custom language/commentstring support
--   Comment lines using motions (`gc2l`) and text-objects (`gci{`)
+-   Left-right (`gcw` `gc$`) and Up-Down motions (`gc2j` `gc4k`)
+-   Use with text-objects (`gci{` `gcat`)
 -   Dot (`.`) repeat support for `gcc`, `gbc` and friends
 -   Ignore certain lines, powered by Lua regex
 
@@ -162,6 +163,8 @@ When you call [`setup()`](#setup) method, `Comment.nvim` sets up some basic mapp
 ```help
 # Linewise
 
+`gcw` - Toggle from the current cursor position to the next word
+`gc$` - Toggle from the current cursor position to the end of line
 `gc}` - Toggle until the next blank line
 `gc5l` - Toggle 5 lines after the current cursor
 `gc8k` - Toggle 8 lines before the current cursor
@@ -194,15 +197,99 @@ require('Comment').toggle()
 
 ### 🎣 Hooks
 
-TODO: explain pre and post hook
+There are two hook methods i.e `pre_hook` and `post_hook` which are called before comment and after comment respectively. Both should be provided during [`setup()`](#setup).
+
+-   `pre_hook` - This method is called before commenting is started. It can be used to return a custom `commentstring` which will be used for commenting the lines. You can use something like [nvim-ts-context-commentstring](https://github.com/JoosepAlviste/nvim-ts-context-commentstring) to compute the commentstring using treesitter.
+
+```lua
+{
+    pre_hook = function()
+        return require('ts_context_commentstring.internal').calculate_commentstring()
+    end
+}
+```
+
+Also, you can set the `commentstring` from here but [i won't recommend it](#commentstring-caveat) for now.
+
+```lua
+{
+    pre_hook = function()
+        require('ts_context_commentstring.internal').update_commentstring()
+    end
+}
+```
+
+-   `post_hook` - This method is called after commenting is done. It receives the lines range or `-1` for the current line.
+
+```lua
+{
+    post_hook = function(start_col, end_col)
+        if start_col == -1 then
+            -- do something with the current line
+        else
+            -- do something with `start_col` and `end_col` line range
+        end
+    end
+}
+```
 
 ### 🚫 Ignoring lines
 
-TODO: explain `ignore`
+You can use `ignore` to ignore certain lines during comment/uncomment. It takes a lua regex string and should be provided during [`setup()`](#setup).
+
+```lua
+-- ignores empty lines
+ignore = '^$'
+
+-- ignores line that starts with `local` (excluding any leading whitespace)
+ignore = '^(%s*)local'
+
+-- ignores any lines similar to arrow function
+ignore = '^const(.*)=(%s?)%((.*)%)(%s?)=>'
+```
 
 <a id="languages"></a>
 
 ### 🗨️ Languages
+
+Most languages have support for comments via `commentstring` but there might be a language that is not supported. There are two ways to enable commenting for unsupported languages:
+
+1.  You can set `commentstring` for that language like the following
+
+```lua
+vim.bo.commentstring = '//%s'
+
+-- or
+vim.api.nvim_command('set commentstring=//%s')
+```
+
+> Run `:h commentstring` for more help
+
+2. You can also use this plugin interface to store both line and block commentstring. You can treat this as a more powerful version of the `commentstring`
+
+```lua
+local lang = require('Comment.lang')
+
+-- 1. Using set function
+
+-- set both line and block commentstring
+lang.set('javascript', {'//%s', '/*%*/'})
+
+-- Just set only line comment
+lang.set('yaml', '#%s')
+
+-- 2. Metatable magic
+
+-- One lang at a time
+lang.javascript = {'//%s', '/*%*/'}
+lang.yaml = '#%s'
+
+-- Multiple langs
+lang({'go', 'rust'}, {'//%s', '/*%*/'})
+lang({'toml', 'graphql'}, '#%s')
+```
+
+> PR(s) are welcome to add more commentstring inside the plugin
 
 ### 🧵 Comment String
 
