@@ -29,7 +29,7 @@ local op = {}
 ---Linewise commenting
 ---@param p OfnOpts
 function op.linewise(p)
-    local rcs_esc, lcs_esc = vim.pesc(p.rcs), vim.pesc(p.lcs)
+    local lcs_esc, rcs_esc = vim.pesc(p.lcs), vim.pesc(p.rcs)
 
     -- While commenting a block of text, there is a possiblity of lines being both commented and non-commented
     -- In that case, we need to figure out that if any line is uncommented then we should comment the whole block or vise-versa
@@ -46,7 +46,7 @@ function op.linewise(p)
             -- I wish lua had `continue` statement [sad noises]
             if not U.ignore(line, p.cfg.ignore) then
                 if _cmode == U.cmode.uncomment and p.cmode == U.cmode.toggle then
-                    local is_cmt = U.is_commented(line, rcs_esc)
+                    local is_cmt = U.is_commented(line, lcs_esc)
                     if not is_cmt then
                         _cmode = U.cmode.comment
                     end
@@ -77,9 +77,9 @@ function op.linewise(p)
             table.insert(repls, line)
         else
             if uncomment then
-                table.insert(repls, U.uncomment_str(line, rcs_esc, lcs_esc, p.cfg.padding))
+                table.insert(repls, U.uncomment_str(line, lcs_esc, rcs_esc, p.cfg.padding))
             else
-                table.insert(repls, U.comment_str(line, p.rcs, p.lcs, p.cfg.padding, min_indent or ''))
+                table.insert(repls, U.comment_str(line, p.lcs, p.rcs, p.cfg.padding, min_indent or ''))
             end
         end
     end
@@ -92,13 +92,13 @@ end
 function op.blockwise(p, len)
     -- Block wise, only when there are more than 1 lines
     local start_ln, end_ln = p.lines[1], p.lines[len]
-    local rcs_esc, lcs_esc = vim.pesc(p.rcs), vim.pesc(p.lcs)
+    local lcs_esc, rcs_esc = vim.pesc(p.lcs), vim.pesc(p.rcs)
 
     -- If given mode is toggle then determine whether to comment or not
     local _cmode
     if p.cmode == U.cmode.toggle then
-        local is_start_commented = U.is_commented(start_ln, rcs_esc)
-        local is_end_commented = end_ln:find(lcs_esc .. '$')
+        local is_start_commented = U.is_commented(start_ln, lcs_esc)
+        local is_end_commented = end_ln:find(rcs_esc .. '$')
         _cmode = (is_start_commented and is_end_commented) and U.cmode.uncomment or U.cmode.comment
     else
         _cmode = p.cmode
@@ -106,11 +106,11 @@ function op.blockwise(p, len)
 
     local l1, l2
     if _cmode == U.cmode.uncomment then
-        l1 = U.uncomment_str(start_ln, rcs_esc, '', p.cfg.padding)
-        l2 = U.uncomment_str(end_ln, '', lcs_esc, p.cfg.padding)
+        l1 = U.uncomment_str(start_ln, lcs_esc, '', p.cfg.padding)
+        l2 = U.uncomment_str(end_ln, '', rcs_esc, p.cfg.padding)
     else
-        l1 = U.comment_str(start_ln, p.rcs, '', p.cfg.padding)
-        l2 = U.comment_str(end_ln, '', p.lcs, p.cfg.padding)
+        l1 = U.comment_str(start_ln, p.lcs, '', p.cfg.padding)
+        l2 = U.comment_str(end_ln, '', p.rcs, p.cfg.padding)
     end
     A.nvim_buf_set_lines(0, p.scol, p.scol + 1, false, { l1 })
     A.nvim_buf_set_lines(0, p.ecol - 1, p.ecol, false, { l2 })
@@ -118,6 +118,8 @@ end
 
 ---Blockwise (left-right motion) commenting
 ---@param p OfnOpts
+---@param srow number
+---@param erow number
 function op.blockwise_x(p, srow, erow)
     local line = p.lines[1]
     local srow1, erow1, erow2 = srow + 1, erow + 1, erow + 2
@@ -125,7 +127,7 @@ function op.blockwise_x(p, srow, erow)
     local mid = line:sub(srow1, erow1)
     local last = line:sub(erow2)
 
-    local stripped = U.is_block_commented(mid, vim.pesc(p.rcs), vim.pesc(p.lcs))
+    local stripped = U.is_block_commented(mid, vim.pesc(p.lcs), vim.pesc(p.rcs))
 
     local _cmode
     if p.cmode == U.cmode.toggle then
@@ -137,7 +139,7 @@ function op.blockwise_x(p, srow, erow)
     if _cmode == U.cmode.uncomment then
         A.nvim_set_current_line(first .. (stripped or mid) .. last)
     else
-        A.nvim_set_current_line(first .. p.rcs .. mid .. p.lcs .. last)
+        A.nvim_set_current_line(first .. p.lcs .. mid .. p.rcs .. last)
     end
 end
 

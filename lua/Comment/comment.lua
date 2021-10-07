@@ -13,8 +13,8 @@ local C = {
 ---2. lang_table (extra commentstring table in the plugin)
 ---3. commentstring (already set or added in pre_hook)
 ---@param ctype CType (optional) Type of commentstring ie. line | block
----@return string string Right side of the commentstring
 ---@return string string Left side of the commentstring
+---@return string string Right side of the commentstring
 function C.unwrap_cstr(ctype)
     local cstr = U.is_hook(C.config.pre_hook)
         or require('Comment.lang').get(bo.filetype, ctype or U.ctype.line)
@@ -24,28 +24,28 @@ function C.unwrap_cstr(ctype)
         return U.errprint("'commentstring' not found")
     end
 
-    local rhs, lhs = cstr:match('(.*)%%s(.*)')
-    if not rhs then
+    local lcs, rcs = cstr:match('(.*)%%s(.*)')
+    if not lcs then
         return U.errprint("Invalid 'commentstring': " .. cstr)
     end
 
-    return U.trim(rhs), U.trim(lhs)
+    return U.trim(lcs), U.trim(rcs)
 end
 
 ---Common fn to comment and set the current line
 ---@param ln string Line that needs to be commented
----@param rcs string Right side of the commentstring
 ---@param lcs string Left side of the commentstring
-function C.comment_ln(ln, rcs, lcs)
-    A.nvim_set_current_line(U.comment_str(ln, rcs, lcs, C.config.padding))
+---@param rcs string Right side of the commentstring
+function C.comment_ln(ln, lcs, rcs)
+    A.nvim_set_current_line(U.comment_str(ln, lcs, rcs, C.config.padding))
 end
 
 ---Common fn to uncomment and set the current line
 ---@param ln string Line that needs to be uncommented
----@param rcs_esc string (Escaped) Right side of the commentstring
 ---@param lcs_esc string (Escaped) Left side of the commentstring
-function C.uncomment_ln(ln, rcs_esc, lcs_esc)
-    A.nvim_set_current_line(U.uncomment_str(ln, rcs_esc, lcs_esc, C.config.padding))
+---@param rcs_esc string (Escaped) Right side of the commentstring
+function C.uncomment_ln(ln, lcs_esc, rcs_esc)
+    A.nvim_set_current_line(U.uncomment_str(ln, lcs_esc, rcs_esc, C.config.padding))
 end
 
 ---Comments the current line
@@ -53,8 +53,8 @@ function C.comment()
     local line = A.nvim_get_current_line()
 
     if not U.ignore(line, C.config.ignore) then
-        local rcs, lcs = C.unwrap_cstr()
-        C.comment_ln(line, rcs, lcs)
+        local lcs, rcs = C.unwrap_cstr()
+        C.comment_ln(line, lcs, rcs)
     end
 
     U.is_hook(C.config.post_hook, -1)
@@ -65,8 +65,8 @@ function C.uncomment()
     local line = A.nvim_get_current_line()
 
     if not U.ignore(line, C.config.ignore) then
-        local rcs, lcs = C.unwrap_cstr()
-        C.uncomment_ln(line, vim.pesc(rcs), vim.pesc(lcs))
+        local lcs, rcs = C.unwrap_cstr()
+        C.uncomment_ln(line, vim.pesc(lcs), vim.pesc(rcs))
     end
 
     U.is_hook(C.config.post_hook, -1)
@@ -77,14 +77,14 @@ function C.toggle()
     local line = A.nvim_get_current_line()
 
     if not U.ignore(line, C.config.ignore) then
-        local rcs, lcs = C.unwrap_cstr()
-        local rcs_esc = vim.pesc(rcs)
-        local is_commented = U.is_commented(line, rcs_esc)
+        local lcs, rcs = C.unwrap_cstr()
+        local lcs_esc = vim.pesc(lcs)
+        local is_commented = U.is_commented(line, lcs_esc)
 
         if is_commented then
-            C.uncomment_ln(line, rcs_esc, vim.pesc(lcs))
+            C.uncomment_ln(line, lcs_esc, vim.pesc(rcs))
         else
-            C.comment_ln(line, rcs, lcs)
+            C.comment_ln(line, lcs, rcs)
         end
     end
 
@@ -174,15 +174,15 @@ function C.setup(opts)
             local len = #lines
 
             local block_x = (cmotion == U.cmotion.char or cmotion == U.cmotion.v) and len == 1
-            local rcs, lcs = C.unwrap_cstr(block_x and U.ctype.block or ctype)
+            local lcs, rcs = C.unwrap_cstr(block_x and U.ctype.block or ctype)
 
             if block_x then
                 Op.blockwise_x({
                     cfg = cfg,
                     cmode = cmode,
                     lines = lines,
-                    rcs = rcs,
                     lcs = lcs,
+                    rcs = rcs,
                     scol = scol,
                     ecol = ecol,
                 }, srow, erow)
@@ -191,8 +191,8 @@ function C.setup(opts)
                     cfg = cfg,
                     cmode = cmode,
                     lines = lines,
-                    rcs = rcs,
                     lcs = lcs,
+                    rcs = rcs,
                     scol = scol,
                     ecol = ecol,
                 }, len)
@@ -201,8 +201,8 @@ function C.setup(opts)
                     cfg = cfg,
                     cmode = cmode,
                     lines = lines,
-                    rcs = rcs,
                     lcs = lcs,
+                    rcs = rcs,
                     scol = scol,
                     ecol = ecol,
                 })
