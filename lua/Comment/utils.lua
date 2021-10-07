@@ -116,19 +116,19 @@ function U.split_half(ln)
 end
 
 ---Converts the given string into a commented string
----@param str string String that needs to be commented
+---@param ln string String that needs to be commented
 ---@param lcs string Left side of the commentstring
 ---@param rcs string Right side of the commentstring
 ---@param is_pad boolean Whether to add padding b/w comment and line
 ---@param spacing string|nil Pre-determine indentation (useful) when dealing w/ multiple lines
 ---@return string string Commented string
-function U.comment_str(str, lcs, rcs, is_pad, spacing)
-    local indent, ln = U.split_half(str)
+function U.comment_str(ln, lcs, rcs, is_pad, spacing)
+    local indent, chars = U.split_half(ln)
 
     -- if line is empty then use the space argument
     -- this is required if you are to comment multiple lines
     -- and the starting line has indentation
-    local is_empty = #indent == 0 and #ln == 0
+    local is_empty = #indent == 0 and #chars == 0
     local idnt = is_empty and (spacing or '') or indent
 
     if is_pad then
@@ -142,33 +142,33 @@ function U.comment_str(str, lcs, rcs, is_pad, spacing)
         -- (spacing or indent) this is bcz of single `comment` and `uncomment`
         -- In these case, current line might be indented and we don't have spacing
         -- So we can use the original indentation of the line
-        return U.replace(#(spacing or indent), idnt, lcs_new) .. ln .. rcs_new
+        return U.replace(#(spacing or indent), idnt, lcs_new) .. chars .. rcs_new
     end
 
-    return U.replace(#(spacing or indent), idnt, lcs) .. ln .. rcs
+    return U.replace(#(spacing or indent), idnt, lcs) .. chars .. rcs
 end
 
 ---Converts the given string into a uncommented string
----@param str string Line that needs to be uncommented
+---@param ln string Line that needs to be uncommented
 ---@param lcs_esc string (Escaped) Left side of the commentstring
 ---@param rcs_esc string (Escaped) Right side of the commentstring
 ---@param is_pad boolean Whether to add padding b/w comment and line
 ---@return string string Uncommented string
-function U.uncomment_str(str, lcs_esc, rcs_esc, is_pad)
-    if not U.is_commented(str, lcs_esc) then
-        return str
+function U.uncomment_str(ln, lcs_esc, rcs_esc, is_pad)
+    if not U.is_commented(ln, lcs_esc) then
+        return ln
     end
 
-    local indent, _, ln = str:match('(%s*)(' .. lcs_esc .. '%s?)(.*)(' .. rcs_esc .. '$?)')
+    local indent, _, chars = ln:match('(%s*)(' .. lcs_esc .. '%s?)(.*)(' .. rcs_esc .. '$?)')
 
     -- If the line (after cstring) is empty then just return ''
     -- bcz when uncommenting multiline this also doesn't preserve leading whitespace as the line was previously empty
-    if #ln == 0 then
+    if #chars == 0 then
         return ''
     end
 
     -- When padding is enabled then trim one trailing space char
-    return indent .. (is_pad and ln:gsub('%s?$', '') or ln)
+    return indent .. (is_pad and chars:gsub('%s?$', '') or chars)
 end
 
 ---Check if {pre,post}_hook is present then call it
@@ -179,11 +179,11 @@ function U.is_hook(hook, ...)
 end
 
 ---Check if the given string is commented or not
----@param str string Line that needs to be checked
+---@param ln string Line that needs to be checked
 ---@param lcs_esc string (Escaped) Left side of the commentstring
 ---@return number
-function U.is_commented(str, lcs_esc)
-    return str:find('^%s*' .. lcs_esc)
+function U.is_commented(ln, lcs_esc)
+    return ln:find('^%s*' .. lcs_esc)
 end
 
 ---Check if the given line is ignored or not with the given pattern

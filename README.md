@@ -1,5 +1,5 @@
 <h1 align="center">// Comment.nvim </h1>
-<p align="center"><sup>✨ Simple and Powerful commenting plugin for neovim ✨</sup></p>
+<p align="center"><sup>⚡ Smart and Powerful commenting plugin for neovim ⚡</sup></p>
 
 <!-- Image -->
 
@@ -320,7 +320,7 @@ There are multiple ways to contribute reporting/fixing bugs, feature requests. Y
 ### 🚗 Roadmap
 
 -   Live upto the expectation of `tcomment`
-
+-   Basic INSERT mode mappings
 -   Doc comment i.e `/**%s*/` (js), `///%s` (rust)
 
 -   Inbuilt context commentstring using treesitter
