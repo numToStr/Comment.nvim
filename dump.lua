@@ -7,9 +7,9 @@
 --      [x] post
 -- [x] Custom (language) commentstring support
 -- [x] Block comment basic ie. /* */ (for js)
--- [ ] Block comment extended
+-- [-] Block comment extended
 --      [ ] V-BLOCK
---      [ ] left-right-motions
+--      [x] left-right-motions
 -- [ ] Doc comment ie. /** */ (for js)
 -- [ ] Treesitter context commentstring
 -- [ ] Insert mode mapping (also move the cursor after commentstring)
@@ -29,10 +29,11 @@
 -- [x] messed up indentation, if the first line has greater indentation than next line (calc min indendation)
 -- [x] `gcc` empty line not toggling comment
 -- [x] Optimize blockwise mode (just modifiy the start and end line)
--- [x] dot repeat support for visual mode mappings
+-- [ ] dot repeat support for visual mode mappings
 -- [ ] conflict when uncommenting interchangebly with line/block wise comment
 -- [ ] Weird commenting when the first line is empty and the whole is indented
 -- [ ] When there is an uncommented empty line b/w two commented blocks. It should uncomment instead of commenting again in toggle.
+-- [ ] char motion span over mutliple lines
 
 -- THINK:
 -- 1. Should i return the operator's starting and ending position in pre-hook

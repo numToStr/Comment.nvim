@@ -166,17 +166,37 @@ function C.setup(opts)
             --          - add cstr RHS to end of the last line
             --      * update the lines
 
-            local rcs, lcs = C.unwrap_cstr(ctype)
-            local scol, ecol, lines = U.get_lines(vmode, ctype)
-            local rcs_esc = vim.pesc(rcs)
+            local _cmotion = cmotion
+            if cmotion == U.cmotion._ then
+                _cmotion = U.get_cmotion(vmode)
+            end
 
+            local scol, ecol, lines, srow, erow = U.get_lines(vmode, ctype)
             local len = #lines
 
-            -- Block wise, only when there are more than 1 lines
-            if ctype == U.ctype.block and len > 1 then
+            local block_x = (_cmotion == U.cmotion.char or _cmotion == U.cmotion.visual) and len == 1
+            local rcs, lcs = C.unwrap_cstr(block_x and U.ctype.block or ctype)
+            local rcs_esc = vim.pesc(rcs)
+            local lcs_esc = vim.pesc(lcs)
+
+            if block_x then
+                local line = lines[1]
+                local srow1, erow1, erow2 = srow + 1, erow + 1, erow + 2
+                local first = line:sub(0, srow)
+                local mid = line:sub(srow1, erow1)
+                local last = line:sub(erow2, #line)
+
+                local stripped = U.is_block_commented(mid, rcs_esc, lcs_esc)
+
+                if stripped then
+                    A.nvim_set_current_line(first .. stripped .. last)
+                else
+                    A.nvim_set_current_line(first .. rcs .. mid .. lcs .. last)
+                end
+            elseif ctype == U.ctype.block and len > 1 then
+                -- Block wise, only when there are more than 1 lines
                 local start_ln = lines[1]
                 local end_ln = lines[len]
-                local lcs_esc = vim.pesc(lcs)
 
                 local _cmode
 
@@ -246,7 +266,7 @@ function C.setup(opts)
                         table.insert(repls, line)
                     else
                         if uncomment then
-                            table.insert(repls, U.uncomment_str(line, rcs_esc, vim.pesc(lcs), C.config.padding))
+                            table.insert(repls, U.uncomment_str(line, rcs_esc, lcs_esc, C.config.padding))
                         else
                             table.insert(repls, U.comment_str(line, rcs, lcs, C.config.padding, min_indent or ''))
                         end

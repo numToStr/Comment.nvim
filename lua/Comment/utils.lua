@@ -26,8 +26,10 @@ U.cmotion = {
     line = 1,
     ---char/left-right
     char = 2,
+    ---visual
+    visual = 3,
     ---visual line
-    block = 3,
+    block = 4,
 }
 
 ---Print a msg on stderr
@@ -61,6 +63,9 @@ function U.get_cmotion(vmode)
     end
     if vmode == 'block' then
         return U.cmotion.block
+    end
+    if vmode == 'v' then
+        return U.cmotion.visual
     end
     return U.cmotion.line
 end
@@ -182,14 +187,6 @@ function U.uncomment_str(str, rcs_esc, lcs_esc, is_pad)
     return indent .. (is_pad and ln:gsub('%s?$', '') or ln)
 end
 
-function U.comment_block(line, rcs, lcs, srow, erow)
-    local srow1, erow1, erow2 = srow + 1, erow + 1, erow + 2
-    local first = line:sub(0, srow)
-    local mid = line:sub(srow1, erow1)
-    local last = line:sub(erow2, #line)
-    return first .. rcs .. mid .. lcs .. last
-end
-
 ---Check if {pre,post}_hook is present then call it
 ---@param hook function Hook function
 ---@return boolean|string
@@ -211,6 +208,10 @@ end
 ---@return boolean
 function U.ignore(ln, pat)
     return pat and ln:find(pat) ~= nil
+end
+
+function U.is_block_commented(ln, rcs_esc, lcs_esc)
+    return ln:match('^' .. rcs_esc .. '(.*)' .. lcs_esc .. '$')
 end
 
 return U
