@@ -31,8 +31,7 @@
 -- [x] Optimize blockwise mode (just modifiy the start and end line)
 -- [ ] dot repeat support for visual mode mappings
 -- [ ] conflict when uncommenting interchangebly with line/block wise comment
--- [ ] Weird commenting when the first line is empty and the whole is indented
--- [ ] When there is an uncommented empty line b/w two commented blocks. It should uncomment instead of commenting again in toggle.
+-- [x] Weird commenting when the first line is empty and the whole is indented
 -- [ ] char motion span over mutliple lines
 -- [ ] no padding support in block-x
 
@@ -41,3 +40,4 @@
 -- 2. Restore initial cursor position in some motion operator (try `gcip`)
 -- 3. It is possible that, commentstring is updated inside pre-hook as we want to use it but we can't
 --    bcz the filetype is also present in the lang-table (and it has high priority than bo.commentstring)
+-- 4. When there is an uncommented empty line b/w two commented blocks. It should uncomment instead of commenting again in toggle.

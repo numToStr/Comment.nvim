@@ -38,6 +38,13 @@ function U.errprint(msg)
     vim.notify('Comment.nvim: ' .. msg, vim.log.levels.ERROR)
 end
 
+---Check whether the line is empty
+---@param ln string
+---@return boolean
+function U.is_empty(ln)
+    return ln:find('^$') ~= nil
+end
+
 ---Replace some char in the give string
 ---@param pos number Position for the replacement
 ---@param str string String that needs to be modified
@@ -107,14 +114,6 @@ function U.get_lines(vmode, ctype)
     return sln, ecol, lines, srow, erow
 end
 
----Separate the given line into two parts ie. indentation, chars
----@param ln string|table Line that need to be split
----@return string string Indentation chars
----@return string string Remaining chars
-function U.split_half(ln)
-    return ln:match('(%s*)(.*)')
-end
-
 ---Converts the given string into a commented string
 ---@param ln string String that needs to be commented
 ---@param lcs string Left side of the commentstring
@@ -123,29 +122,19 @@ end
 ---@param spacing string|nil Pre-determine indentation (useful) when dealing w/ multiple lines
 ---@return string string Commented string
 function U.comment_str(ln, lcs, rcs, is_pad, spacing)
-    local indent, chars = U.split_half(ln)
-
-    -- if line is empty then use the space argument
-    -- this is required if you are to comment multiple lines
-    -- and the starting line has indentation
-    local is_empty = #indent == 0 and #chars == 0
-    local idnt = is_empty and (spacing or '') or indent
-
-    if is_pad then
-        -- If the rhs of cstring exists and the line is not empty then only add padding
-        -- Bcz if we were to comment multiple lines and there are some empty lines in b/w
-        -- then adding space to the them is not expected
-        local lcs_new = (#lcs > 0 and not is_empty) and lcs .. ' ' or lcs
-
-        local rcs_new = #rcs > 0 and ' ' .. rcs or rcs
-
-        -- (spacing or indent) this is bcz of single `comment` and `uncomment`
-        -- In these case, current line might be indented and we don't have spacing
-        -- So we can use the original indentation of the line
-        return U.replace(#(spacing or indent), idnt, lcs_new) .. chars .. rcs_new
+    if U.is_empty(ln) or not spacing then
+        return (spacing or '') .. lcs
     end
 
-    return U.replace(#(spacing or indent), idnt, lcs) .. chars .. rcs
+    local indent, chars = ln:match('^(%s*)(.*)')
+
+    if is_pad then
+        local lcs_new = #lcs > 0 and lcs .. ' ' or lcs
+        local rcs_new = #rcs > 0 and ' ' .. rcs or rcs
+        return U.replace(#spacing, indent, lcs_new) .. chars .. rcs_new
+    end
+
+    return U.replace(#spacing, indent, lcs) .. chars .. rcs
 end
 
 ---Converts the given string into a uncommented string

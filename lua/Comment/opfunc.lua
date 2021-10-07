@@ -38,7 +38,6 @@ function op.linewise(p)
     -- When commenting multiple line, it is to be expected that indentation should be preserved
     -- So, When looping over multiple lines we need to store the indentation of the mininum length (except empty line)
     -- Which will be used to semantically comment rest of the lines
-    -- FIXME use number
     local min_indent = nil
 
     -- If the given comde is uncomment then we actually don't want to compute the cmode or min_indent
@@ -55,9 +54,9 @@ function op.linewise(p)
 
                 -- If the internal cmode changes to comment or the given cmode is not uncomment, then only calculate min_indent
                 -- As calculating min_indent only makes sense when we actually want to comment the lines
-                if cmode == U.cmode.comment or p.cmode == U.cmode.comment then
-                    local indent, ln = U.split_half(line)
-                    if not min_indent or (#min_indent > #indent) and #ln > 0 then
+                if not U.is_empty(line) and (cmode == U.cmode.comment or p.cmode == U.cmode.comment) then
+                    local indent = line:match('^(%s*).*')
+                    if not min_indent or #min_indent > #indent then
                         min_indent = indent
                     end
                 end
@@ -80,7 +79,7 @@ function op.linewise(p)
             if uncomment then
                 table.insert(repls, U.uncomment_str(line, lcs_esc, rcs_esc, p.cfg.padding))
             else
-                table.insert(repls, U.comment_str(line, p.lcs, p.rcs, p.cfg.padding, min_indent or ''))
+                table.insert(repls, U.comment_str(line, p.lcs, p.rcs, p.cfg.padding, min_indent))
             end
         end
     end
