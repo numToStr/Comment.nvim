@@ -58,7 +58,7 @@ end
 ---@param str string
 ---@return string
 function U.trim(str)
-    return str:gsub('%s+', '')
+    return str:match('^%s?(.-)%s?$')
 end
 
 ---Get region for vim mode
@@ -122,8 +122,8 @@ end
 ---@param spacing string|nil Pre-determine indentation (useful) when dealing w/ multiple lines
 ---@return string string Commented string
 function U.comment_str(ln, lcs, rcs, is_pad, spacing)
-    if U.is_empty(ln) or not spacing then
-        return (spacing or '') .. lcs
+    if U.is_empty(ln) then
+        return spacing .. lcs
     end
 
     local indent, chars = ln:match('^(%s*)(.*)')
@@ -131,10 +131,10 @@ function U.comment_str(ln, lcs, rcs, is_pad, spacing)
     if is_pad then
         local lcs_new = #lcs > 0 and lcs .. ' ' or lcs
         local rcs_new = #rcs > 0 and ' ' .. rcs or rcs
-        return U.replace(#spacing, indent, lcs_new) .. chars .. rcs_new
+        return U.replace(#(spacing or indent), indent, lcs_new) .. chars .. rcs_new
     end
 
-    return U.replace(#spacing, indent, lcs) .. chars .. rcs
+    return U.replace(#(spacing or indent), indent, lcs) .. chars .. rcs
 end
 
 ---Converts the given string into a uncommented string
@@ -148,6 +148,7 @@ function U.uncomment_str(ln, lcs_esc, rcs_esc, is_pad)
         return ln
     end
 
+    -- TODO improve regex
     local indent, _, chars = ln:match('(%s*)(' .. lcs_esc .. '%s?)(.*)(' .. rcs_esc .. '$?)')
 
     -- If the line (after cstring) is empty then just return ''
@@ -189,7 +190,7 @@ end
 ---@param rcs_esc string (Escaped) Right side of the commentstring
 ---@return string
 function U.is_block_commented(ln, lcs_esc, rcs_esc)
-    return ln:match('^' .. lcs_esc .. '(.*)' .. rcs_esc .. '$')
+    return ln:match('^' .. lcs_esc .. '%s?(.-)%s?' .. rcs_esc .. '$')
 end
 
 return U
