@@ -26,10 +26,10 @@ U.cmotion = {
     line = 1,
     ---char/left-right
     char = 2,
-    ---visual
-    visual = 3,
     ---visual line
-    block = 4,
+    block = 3,
+    ---visual
+    v = 4,
 }
 
 ---Print a msg on stderr
@@ -52,22 +52,6 @@ end
 ---@return string
 function U.trim(str)
     return str:gsub('%s+', '')
-end
-
-function U.get_cmotion(vmode)
-    if vmode == 'line' then
-        return U.cmotion.line
-    end
-    if vmode == 'char' then
-        return U.cmotion.char
-    end
-    if vmode == 'block' then
-        return U.cmotion.block
-    end
-    if vmode == 'v' then
-        return U.cmotion.visual
-    end
-    return U.cmotion.line
 end
 
 ---Get region for vim mode

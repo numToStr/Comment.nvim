@@ -166,15 +166,11 @@ function C.setup(opts)
             --          - add cstr RHS to end of the last line
             --      * update the lines
 
-            local _cmotion = cmotion
-            if cmotion == U.cmotion._ then
-                _cmotion = U.get_cmotion(vmode)
-            end
-
+            local _cmotion = cmotion == U.cmotion._ and U.cmotion[vmode] or cmotion
             local scol, ecol, lines, srow, erow = U.get_lines(vmode, ctype)
             local len = #lines
 
-            local block_x = (_cmotion == U.cmotion.char or _cmotion == U.cmotion.visual) and len == 1
+            local block_x = (_cmotion == U.cmotion.char or _cmotion == U.cmotion.v) and len == 1
             local rcs, lcs = C.unwrap_cstr(block_x and U.ctype.block or ctype)
             local rcs_esc = vim.pesc(rcs)
             local lcs_esc = vim.pesc(lcs)
@@ -184,12 +180,19 @@ function C.setup(opts)
                 local srow1, erow1, erow2 = srow + 1, erow + 1, erow + 2
                 local first = line:sub(0, srow)
                 local mid = line:sub(srow1, erow1)
-                local last = line:sub(erow2, #line)
+                local last = line:sub(erow2)
 
                 local stripped = U.is_block_commented(mid, rcs_esc, lcs_esc)
 
-                if stripped then
-                    A.nvim_set_current_line(first .. stripped .. last)
+                local _cmode
+                if cmode == U.cmode.toggle then
+                    _cmode = stripped and U.cmode.uncomment or U.cmode.comment
+                else
+                    _cmode = cmode
+                end
+
+                if _cmode == U.cmode.uncomment then
+                    A.nvim_set_current_line(first .. (stripped or mid) .. last)
                 else
                     A.nvim_set_current_line(first .. rcs .. mid .. lcs .. last)
                 end
@@ -312,31 +315,38 @@ function C.setup(opts)
 
         if cfg.mappings.extra then
             -- OperatorFunc extra
-            function _G.___opfunc_comment_line(vmode)
-                opfunc(vmode, U.cmode.comment, U.ctype.line)
+            function _G.___opfunc_ggt(vmode)
+                opfunc(vmode, U.cmode.comment, U.ctype.line, U.cmotion._)
             end
-            function _G.___opfunc_uncomment_line(mode)
-                opfunc(mode, U.cmode.uncomment, U.ctype.line)
+            function _G.___opfunc_ggtc(vmode)
+                opfunc(vmode, U.cmode.comment, U.ctype.line, U.cmotion.line)
             end
-            function _G.___opfunc_comment_block(vmode)
-                opfunc(vmode, U.cmode.comment, U.ctype.block)
+            function _G.___opfunc_ggtb(vmode)
+                opfunc(vmode, U.cmode.comment, U.ctype.block, U.cmotion.line)
             end
-            function _G.___opfunc_uncomment_block(vmode)
-                opfunc(vmode, U.cmode.uncomment, U.ctype.block)
+
+            function _G.___opfunc_glt(mode)
+                opfunc(mode, U.cmode.uncomment, U.ctype.line, U.cmotion._)
+            end
+            function _G.___opfunc_gltc(mode)
+                opfunc(mode, U.cmode.uncomment, U.ctype.line, U.cmotion.line)
+            end
+            function _G.___opfunc_gltb(vmode)
+                opfunc(vmode, U.cmode.uncomment, U.ctype.block, U.cmotion.line)
             end
 
             -- NORMAL mode extra
-            map('n', 'g>', '<CMD>set operatorfunc=v:lua.___opfunc_comment_line<CR>g@', mopts)
-            map('n', 'g>c', '<CMD>set operatorfunc=v:lua.___opfunc_comment_line<CR>g@$', mopts)
-            map('n', 'g>b', '<CMD>set operatorfunc=v:lua.___opfunc_comment_block<CR>g@$', mopts)
+            map('n', 'g>', '<CMD>set operatorfunc=v:lua.___opfunc_ggt<CR>g@', mopts)
+            map('n', 'g>c', '<CMD>set operatorfunc=v:lua.___opfunc_ggtc<CR>g@$', mopts)
+            map('n', 'g>b', '<CMD>set operatorfunc=v:lua.___opfunc_ggtb<CR>g@$', mopts)
 
-            map('n', 'g<', '<CMD>set operatorfunc=v:lua.___opfunc_uncomment_line<CR>g@', mopts)
-            map('n', 'g<c', '<CMD>set operatorfunc=v:lua.___opfunc_uncomment_line<CR>g@$', mopts)
-            map('n', 'g<b', '<CMD>set operatorfunc=v:lua.___opfunc_uncomment_block<CR>g@$', mopts)
+            map('n', 'g<', '<CMD>set operatorfunc=v:lua.___opfunc_glt<CR>g@', mopts)
+            map('n', 'g<c', '<CMD>set operatorfunc=v:lua.___opfunc_gltc<CR>g@$', mopts)
+            map('n', 'g<b', '<CMD>set operatorfunc=v:lua.___opfunc_gltb<CR>g@$', mopts)
 
             -- VISUAL mode extra
-            map('x', 'g>', '<ESC><CMD>lua ___opfunc_comment_line(vim.fn.visualmode())<CR>', mopts)
-            map('x', 'g<', '<ESC><CMD>lua ___opfunc_uncomment_line(vim.fn.visualmode())<CR>', mopts)
+            map('x', 'g>', '<ESC><CMD>lua ___opfunc_ggt(vim.fn.visualmode())<CR>', mopts)
+            map('x', 'g<', '<ESC><CMD>lua ___opfunc_glt(vim.fn.visualmode())<CR>', mopts)
         end
     end
 end
