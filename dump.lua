@@ -34,6 +34,7 @@
 -- [ ] Weird commenting when the first line is empty and the whole is indented
 -- [ ] When there is an uncommented empty line b/w two commented blocks. It should uncomment instead of commenting again in toggle.
 -- [ ] char motion span over mutliple lines
+-- [ ] no padding support in block-x
 
 -- THINK:
 -- 1. Should i return the operator's starting and ending position in pre-hook
