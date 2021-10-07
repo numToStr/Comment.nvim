@@ -307,7 +307,7 @@ Although, `Comment.nvim` supports neovim's `commentstring` but unfortunately it 
 
 ### 🤝 Contributing
 
-TODO: how to contribute custom commentstring
+There are multiple ways to contribute reporting/fixing bugs, feature requests. You can also submit commentstring to this plugin by updating [lang.lua](./lua/Comment/lang.lua) and sending PR.
 
 ### 💐 Credits
 
@@ -317,4 +317,24 @@ TODO: how to contribute custom commentstring
 
 ### 🚗 Roadmap
 
-TODO: Just paste `dump.lua`
+-   Live upto the expectation of `tcomment`
+
+-   Doc comment i.e `/**%s*/` (js), `///%s` (rust)
+
+-   Inbuilt context commentstring using treesitter
+
+```lua
+{
+    pre_hook = function()
+        return require('Comment.ts').commentstring()
+    end
+}
+```
+
+-   Header comment
+
+```lua
+----------------------
+-- This is a header --
+----------------------
+```
