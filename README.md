@@ -5,14 +5,14 @@
 
 ### ✨ Features
 
--   Uses `commentstring`
+-   Supports `commentstring`. [Read more](#commentstring)
 -   Prefers single-line/linewise comments
 -   Supports line (`//`) and block (`/* */`) comments
--   Supports pre and post hooks
--   Custom language/commentstring support
 -   Left-right (`gcw` `gc$`) and Up-Down motions (`gc2j` `gc4k`)
 -   Use with text-objects (`gci{` `gcat`)
 -   Dot (`.`) repeat support for `gcc`, `gbc` and friends
+-   Supports pre and post hooks
+-   Custom language/commentstring support
 -   Ignore certain lines, powered by Lua regex
 
 ### 🚀 Installation
@@ -291,6 +291,8 @@ lang({'toml', 'graphql'}, '#%s')
 
 > PR(s) are welcome to add more commentstring inside the plugin
 
+<a id="commentstring"></a>
+
 ### 🧵 Comment String
 
 Although, `Comment.nvim` supports neovim's `commentstring` but unfortunately it has the least priority. The commentstring is taken from the following place in the respective order.
@@ -303,7 +305,7 @@ Although, `Comment.nvim` supports neovim's `commentstring` but unfortunately it 
 
 <a id="commentstring-caveat"></a>
 
-> There is one caveat with this approach. If someone sets the `commentstring` (w/o returning a string) from the `pre_hook` method and also, if the current filetype exists in the `lang_table` then the commenting will be done using the string in `lang_table` instead of using `commentstring`
+> There is one caveat with this approach. If someone sets the `commentstring` (w/o returning a string) from the `pre_hook` method and if the current filetype also exists in the `lang_table` then the commenting will be done using the string in `lang_table` instead of using `commentstring`
 
 ### 🤝 Contributing
 
@@ -312,8 +314,8 @@ There are multiple ways to contribute reporting/fixing bugs, feature requests. Y
 ### 💐 Credits
 
 -   [tcomment]() - To be with me forever and motivated me to write this.
--   [nvim-comment](https://github.com/terrortylor/nvim-comment) - Awesome but less powerful cousin. Also I took some code from it.
--   [kommentary](https://github.com/b3nj5m1n/kommentary) - Nicely done plugin. Helped me to design this plugin.
+-   [nvim-comment](https://github.com/terrortylor/nvim-comment) - Little and less powerful cousin. Also I took some code from it.
+-   [kommentary](https://github.com/b3nj5m1n/kommentary) - Nicely done plugin but lacks some features. But it helped me to design this plugin.
 
 ### 🚗 Roadmap
 
