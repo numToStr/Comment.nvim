@@ -33,7 +33,7 @@ function op.linewise(p)
 
     -- While commenting a block of text, there is a possiblity of lines being both commented and non-commented
     -- In that case, we need to figure out that if any line is uncommented then we should comment the whole block or vise-versa
-    local _cmode = U.cmode.uncomment
+    local cmode = U.cmode.uncomment
 
     -- When commenting multiple line, it is to be expected that indentation should be preserved
     -- So, When looping over multiple lines we need to store the indentation of the mininum length (except empty line)
@@ -46,16 +46,16 @@ function op.linewise(p)
         for _, line in ipairs(p.lines) do
             -- I wish lua had `continue` statement [sad noises]
             if not U.ignore(line, p.cfg.ignore) then
-                if _cmode == U.cmode.uncomment and p.cmode == U.cmode.toggle then
+                if cmode == U.cmode.uncomment and p.cmode == U.cmode.toggle then
                     local is_cmt = U.is_commented(line, lcs_esc)
                     if not is_cmt then
-                        _cmode = U.cmode.comment
+                        cmode = U.cmode.comment
                     end
                 end
 
                 -- If the internal cmode changes to comment or the given cmode is not uncomment, then only calculate min_indent
                 -- As calculating min_indent only makes sense when we actually want to comment the lines
-                if _cmode == U.cmode.comment or p.cmode == U.cmode.comment then
+                if cmode == U.cmode.comment or p.cmode == U.cmode.comment then
                     local indent, ln = U.split_half(line)
                     if not min_indent or (#min_indent > #indent) and #ln > 0 then
                         min_indent = indent
@@ -67,11 +67,11 @@ function op.linewise(p)
 
     -- If the comment mode given is not toggle than force that mode
     if p.cmode ~= U.cmode.toggle then
-        _cmode = p.cmode
+        cmode = p.cmode
     end
 
     local repls = {}
-    local uncomment = _cmode == U.cmode.uncomment
+    local uncomment = cmode == U.cmode.uncomment
 
     for _, line in ipairs(p.lines) do
         if U.ignore(line, p.cfg.ignore) then
@@ -95,17 +95,17 @@ function op.blockwise(p)
     local lcs_esc, rcs_esc = vim.pesc(p.lcs), vim.pesc(p.rcs)
 
     -- If given mode is toggle then determine whether to comment or not
-    local _cmode
+    local cmode
     if p.cmode == U.cmode.toggle then
         local is_start_commented = U.is_commented(start_ln, lcs_esc)
         local is_end_commented = end_ln:find(rcs_esc .. '$')
-        _cmode = (is_start_commented and is_end_commented) and U.cmode.uncomment or U.cmode.comment
+        cmode = (is_start_commented and is_end_commented) and U.cmode.uncomment or U.cmode.comment
     else
-        _cmode = p.cmode
+        cmode = p.cmode
     end
 
     local l1, l2
-    if _cmode == U.cmode.uncomment then
+    if cmode == U.cmode.uncomment then
         l1 = U.uncomment_str(start_ln, lcs_esc, '', p.cfg.padding)
         l2 = U.uncomment_str(end_ln, '', rcs_esc, p.cfg.padding)
     else
@@ -129,14 +129,14 @@ function op.blockwise_x(p, srow, erow)
 
     local stripped = U.is_block_commented(mid, vim.pesc(p.lcs), vim.pesc(p.rcs))
 
-    local _cmode
+    local cmode
     if p.cmode == U.cmode.toggle then
-        _cmode = stripped and U.cmode.uncomment or U.cmode.comment
+        cmode = stripped and U.cmode.uncomment or U.cmode.comment
     else
-        _cmode = p.cmode
+        cmode = p.cmode
     end
 
-    if _cmode == U.cmode.uncomment then
+    if cmode == U.cmode.uncomment then
         A.nvim_set_current_line(first .. (stripped or mid) .. last)
     else
         A.nvim_set_current_line(first .. p.lcs .. mid .. p.rcs .. last)
