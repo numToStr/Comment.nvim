@@ -186,7 +186,7 @@ function C.setup(opts)
                     scol = scol,
                     ecol = ecol,
                 }, srow, erow)
-            elseif ctype == U.ctype.block and len > 1 then
+            elseif ctype == U.ctype.block then
                 Op.blockwise({
                     cfg = cfg,
                     cmode = cmode,
@@ -195,7 +195,7 @@ function C.setup(opts)
                     rcs = rcs,
                     scol = scol,
                     ecol = ecol,
-                }, len)
+                })
             else
                 Op.linewise({
                     cfg = cfg,

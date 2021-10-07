@@ -38,6 +38,7 @@ function op.linewise(p)
     -- When commenting multiple line, it is to be expected that indentation should be preserved
     -- So, When looping over multiple lines we need to store the indentation of the mininum length (except empty line)
     -- Which will be used to semantically comment rest of the lines
+    -- FIXME use number
     local min_indent = nil
 
     -- If the given comde is uncomment then we actually don't want to compute the cmode or min_indent
@@ -88,10 +89,9 @@ end
 
 ---Blockwise commenting
 ---@param p OfnOpts
----@param len number
-function op.blockwise(p, len)
+function op.blockwise(p)
     -- Block wise, only when there are more than 1 lines
-    local start_ln, end_ln = p.lines[1], p.lines[len]
+    local start_ln, end_ln = p.lines[1], p.lines[2]
     local lcs_esc, rcs_esc = vim.pesc(p.lcs), vim.pesc(p.rcs)
 
     -- If given mode is toggle then determine whether to comment or not
