@@ -1,22 +1,22 @@
----Common commentstring used in mutliple languages
+---Common commentstring shared b/w mutliple languages
 local M = {
-    cxx_ln = '//%s',
-    cxx_bl = '/*%s*/',
+    cxx_l = '//%s',
+    cxx_b = '/*%s*/',
     hash = '#%s',
 }
 
 ---Lang table that contains commentstring (linewise/blockwise) for mutliple filetypes
 ---@type table { filetype = { linewise, blockwise } }
 local L = {
-    c = { M.cxx_ln, M.cxx_bl },
-    cpp = { M.cxx_ln, M.cxx_bl },
+    c = { M.cxx_l, M.cxx_b },
+    cpp = { M.cxx_l, M.cxx_b },
     lua = { '--%s', '--[[%s--]]' },
-    javascript = { M.cxx_ln, M.cxx_bl },
-    javascriptreact = { M.cxx_ln, M.cxx_bl },
-    typescript = { M.cxx_ln, M.cxx_bl },
-    typescriptreact = { M.cxx_ln, M.cxx_bl },
-    rust = { M.cxx_ln, M.cxx_bl },
-    go = { M.cxx_ln, M.cxx_bl },
+    javascript = { M.cxx_l, M.cxx_b },
+    javascriptreact = { M.cxx_l, M.cxx_b },
+    typescript = { M.cxx_l, M.cxx_b },
+    typescriptreact = { M.cxx_l, M.cxx_b },
+    rust = { M.cxx_l, M.cxx_b },
+    go = { M.cxx_l, M.cxx_b },
     toml = { M.hash },
     yaml = { M.hash },
     graphql = { M.hash },
