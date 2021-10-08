@@ -45,13 +45,11 @@ function U.is_empty(ln)
     return ln:find('^$') ~= nil
 end
 
----Replace some char in the give string
----@param pos number Position for the replacement
----@param str string String that needs to be modified
----@param rep string Replacement chars
----@return string string Replaced string
-function U.replace(pos, str, rep)
-    return str:sub(0, pos) .. rep .. str:sub(pos + 1)
+---Convert the string to a escaped string, if given
+---@param str string
+---@return string|boolean
+function U.escape(str)
+    return str and vim.pesc(str)
 end
 
 ---Trim leading/trailing whitespace from the given string
@@ -123,19 +121,19 @@ end
 ---@return string string Commented string
 function U.comment_str(ln, lcs, rcs, is_pad, spacing)
     if U.is_empty(ln) then
-        -- FIXME on block comment this won't comment the last line if it is empty
-        return (spacing or '') .. lcs
+        return (spacing or '') .. (lcs or rcs)
     end
 
     local indent, chars = ln:match('^(%s*)(.*)')
 
-    if is_pad then
-        local lcs_new = #lcs > 0 and lcs .. ' ' or lcs
-        local rcs_new = #rcs > 0 and ' ' .. rcs or rcs
-        return U.replace(#(spacing or indent), indent, lcs_new) .. chars .. rcs_new
-    end
+    local pad = is_pad and ' ' or ''
+    local lcs_new = lcs and lcs .. pad or ''
+    local rcs_new = rcs and pad .. rcs or ''
 
-    return U.replace(#(spacing or indent), indent, lcs) .. chars .. rcs
+    local pos = #(spacing or indent)
+    local l_indent = indent:sub(0, pos) .. lcs_new .. indent:sub(pos + 1)
+
+    return l_indent .. chars .. rcs_new
 end
 
 ---Converts the given string into a uncommented string
@@ -145,12 +143,14 @@ end
 ---@param is_pad boolean Whether to add padding b/w comment and line
 ---@return string string Uncommented string
 function U.uncomment_str(ln, lcs_esc, rcs_esc, is_pad)
-    if not U.is_commented(ln, lcs_esc) then
+    if not U.is_commented(ln, lcs_esc, rcs_esc, is_pad) then
         return ln
     end
 
-    -- TODO improve lhs cstr and rhs cstr detection
-    local indent, chars = ln:match('(%s*)' .. lcs_esc .. '%s?(.*)' .. rcs_esc .. '$?')
+    local ll = lcs_esc and lcs_esc .. '%s?' or ''
+    local rr = rcs_esc and rcs_esc .. '$?' or ''
+
+    local indent, chars = ln:match('(%s*)' .. ll .. '(.*)' .. rr)
 
     -- If the line (after cstring) is empty then just return ''
     -- bcz when uncommenting multiline this also doesn't preserve leading whitespace as the line was previously empty
@@ -162,19 +162,18 @@ function U.uncomment_str(ln, lcs_esc, rcs_esc, is_pad)
     return indent .. (is_pad and chars:gsub('%s?$', '') or chars)
 end
 
----Call a function if exists
----@param fn function Hook function
----@return boolean|string
-function U.is_fn(fn, ...)
-    return type(fn) == 'function' and fn(...)
-end
-
 ---Check if the given string is commented or not
 ---@param ln string Line that needs to be checked
 ---@param lcs_esc string (Escaped) Left side of the commentstring
+---@param rcs_esc string (Escaped) Right side of the commentstring
+---@param is_pad boolean Whether to add padding b/w comment and line
 ---@return number
-function U.is_commented(ln, lcs_esc)
-    return ln:find('^%s*' .. lcs_esc)
+function U.is_commented(ln, lcs_esc, rcs_esc, is_pad)
+    local pad = is_pad and '%s?' or ''
+    local ll = lcs_esc and '^%s*' .. lcs_esc .. pad or ''
+    local rr = rcs_esc and pad .. rcs_esc .. '$' or ''
+
+    return ln:find(ll .. '(.-)' .. rr)
 end
 
 ---Check if the given line is ignored or not with the given pattern
@@ -183,15 +182,6 @@ end
 ---@return boolean
 function U.ignore(ln, pat)
     return pat and ln:find(pat) ~= nil
-end
-
----Check if the given string is block commented or not
----@param ln string Line that needs to be checked
----@param lcs_esc string (Escaped) Left side of the commentstring
----@param rcs_esc string (Escaped) Right side of the commentstring
----@return string
-function U.is_block_commented(ln, lcs_esc, rcs_esc)
-    return ln:match('^' .. lcs_esc .. '%s?(.-)%s?' .. rcs_esc .. '$')
 end
 
 return U

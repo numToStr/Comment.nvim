@@ -16,20 +16,22 @@ local C = {
 ---@return string string Left side of the commentstring
 ---@return string string Right side of the commentstring
 local function unwrap_cstr(ctype)
-    local cstr = U.is_fn(C.config.pre_hook)
+    local cstr = pcall(C.config.pre_hook)
         or require('Comment.lang').get(bo.filetype, ctype or U.ctype.line)
         or bo.commentstring
 
-    if not cstr or #cstr == 0 then
-        return U.errprint("'commentstring' not found")
+    if U.is_empty(cstr) then
+        return U.errprint("Empty commentstring. Run ':h commentstring' for help.")
     end
 
     local lcs, rcs = cstr:match('(.*)%%s(.*)')
-    if not lcs then
-        return U.errprint("Invalid 'commentstring': " .. cstr)
+    if not (lcs or rcs) then
+        return U.errprint('Invalid commentstring: ' .. cstr .. ". Run ':h commentstring' for help.")
     end
 
-    return U.trim(lcs), U.trim(rcs)
+    -- Return false if a part is empty, otherwise trim it
+    -- Bcz it is better to deal with boolean rather than checking empty string length everywhere
+    return not U.is_empty(lcs) and U.trim(lcs), not U.is_empty(rcs) and U.trim(rcs)
 end
 
 ---Common fn to comment and set the current line
@@ -57,7 +59,7 @@ function C.comment()
         comment_ln(line, lcs, rcs)
     end
 
-    U.is_fn(C.config.post_hook, -1)
+    pcall(C.config.post_hook, -1)
 end
 
 ---Uncomments the current line
@@ -66,10 +68,10 @@ function C.uncomment()
 
     if not U.ignore(line, C.config.ignore) then
         local lcs, rcs = unwrap_cstr()
-        uncomment_ln(line, vim.pesc(lcs), vim.pesc(rcs))
+        uncomment_ln(line, U.escape(lcs), U.escape(rcs))
     end
 
-    U.is_fn(C.config.post_hook, -1)
+    pcall(C.config.post_hook, -1)
 end
 
 ---Toggle comment of the current line
@@ -78,17 +80,17 @@ function C.toggle()
 
     if not U.ignore(line, C.config.ignore) then
         local lcs, rcs = unwrap_cstr()
-        local lcs_esc = vim.pesc(lcs)
-        local is_commented = U.is_commented(line, lcs_esc)
+        local lcs_esc = U.escape(lcs)
+        local is_cmt = U.is_commented(line, lcs_esc, nil, C.config.padding)
 
-        if is_commented then
-            uncomment_ln(line, lcs_esc, vim.pesc(rcs))
+        if is_cmt then
+            uncomment_ln(line, lcs_esc, U.escape(rcs))
         else
             comment_ln(line, lcs, rcs)
         end
     end
 
-    U.is_fn(C.config.post_hook, -1)
+    pcall(C.config.post_hook, -1)
 end
 
 ---Configures the whole plugin
@@ -186,7 +188,7 @@ function C.setup(opts)
                     scol = scol,
                     ecol = ecol,
                 }, srow, erow)
-            elseif ctype == U.ctype.block then
+            elseif ctype == U.ctype.block and len > 1 then
                 Op.blockwise({
                     cfg = cfg,
                     cmode = cmode,
@@ -208,7 +210,7 @@ function C.setup(opts)
                 })
             end
 
-            U.is_fn(cfg.post_hook, scol, ecol)
+            pcall(cfg.post_hook, scol, ecol)
         end
 
         local map = A.nvim_set_keymap
