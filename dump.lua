@@ -17,6 +17,8 @@
 -- [ ] Header comment
 -- [x] Ignore line
 -- [x] Disable `extra` mapping by default
+-- [ ] provide more arguments to pre and post hooks
+-- [ ] ignore as a function
 
 -- FIXME
 -- [x] visual mode not working correctly
