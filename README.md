@@ -28,6 +28,15 @@ use {
 }
 ```
 
+-   With [vim-plug](https://github.com/junegunn/vim-plug)
+
+```vim
+Plug 'numToStr/Comment.nvim'
+
+" Somewhere after plug#end()
+lua require('FTerm').setup()
+```
+
 <a id="setup"></a>
 
 ### ⚒️ Setup
