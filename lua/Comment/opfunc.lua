@@ -2,20 +2,6 @@ local U = require('Comment.utils')
 local A = vim.api
 local op = {}
 
--- Two types of commenting
--- char, block
--- line
-
--- Visual mode commenting
---
--- V-BLOCK: block comment
---      - LHS cstr in every line before the first char (excluding whitespace)
---      - RHS cstr in every line after erow
---
--- V-LINE: line comment
--- VISUAL: line comment
---      - LHS cstr in every line before the first char (excluding whitespace)
-
 ---Opfunc options
 ---@class OfnOpts
 ---@field cfg Config
