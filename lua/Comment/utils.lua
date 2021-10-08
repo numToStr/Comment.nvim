@@ -59,6 +59,13 @@ function U.trim(str)
     return str:match('^%s?(.-)%s?$')
 end
 
+---Call a function if exists
+---@param fn function Hook function
+---@return boolean|string
+function U.is_fn(fn, ...)
+    return type(fn) == 'function' and fn(...)
+end
+
 ---Get region for vim mode
 ---@param vmode string VIM mode
 ---@return number number start column
