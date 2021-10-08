@@ -34,7 +34,7 @@ use {
 Plug 'numToStr/Comment.nvim'
 
 " Somewhere after plug#end()
-lua require('FTerm').setup()
+lua require('Comment').setup()
 ```
 
 <a id="setup"></a>
