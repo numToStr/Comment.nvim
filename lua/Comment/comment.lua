@@ -15,7 +15,7 @@ local C = {
 ---@param ctype CType (optional) Type of commentstring ie. line | block
 ---@return string string Left side of the commentstring
 ---@return string string Right side of the commentstring
-function C.unwrap_cstr(ctype)
+local function unwrap_cstr(ctype)
     local cstr = U.is_hook(C.config.pre_hook)
         or require('Comment.lang').get(bo.filetype, ctype or U.ctype.line)
         or bo.commentstring
@@ -36,7 +36,7 @@ end
 ---@param ln string Line that needs to be commented
 ---@param lcs string Left side of the commentstring
 ---@param rcs string Right side of the commentstring
-function C.comment_ln(ln, lcs, rcs)
+local function comment_ln(ln, lcs, rcs)
     A.nvim_set_current_line(U.comment_str(ln, lcs, rcs, C.config.padding))
 end
 
@@ -44,7 +44,7 @@ end
 ---@param ln string Line that needs to be uncommented
 ---@param lcs_esc string (Escaped) Left side of the commentstring
 ---@param rcs_esc string (Escaped) Right side of the commentstring
-function C.uncomment_ln(ln, lcs_esc, rcs_esc)
+local function uncomment_ln(ln, lcs_esc, rcs_esc)
     A.nvim_set_current_line(U.uncomment_str(ln, lcs_esc, rcs_esc, C.config.padding))
 end
 
@@ -53,8 +53,8 @@ function C.comment()
     local line = A.nvim_get_current_line()
 
     if not U.ignore(line, C.config.ignore) then
-        local lcs, rcs = C.unwrap_cstr()
-        C.comment_ln(line, lcs, rcs)
+        local lcs, rcs = unwrap_cstr()
+        comment_ln(line, lcs, rcs)
     end
 
     U.is_hook(C.config.post_hook, -1)
@@ -65,8 +65,8 @@ function C.uncomment()
     local line = A.nvim_get_current_line()
 
     if not U.ignore(line, C.config.ignore) then
-        local lcs, rcs = C.unwrap_cstr()
-        C.uncomment_ln(line, vim.pesc(lcs), vim.pesc(rcs))
+        local lcs, rcs = unwrap_cstr()
+        uncomment_ln(line, vim.pesc(lcs), vim.pesc(rcs))
     end
 
     U.is_hook(C.config.post_hook, -1)
@@ -77,14 +77,14 @@ function C.toggle()
     local line = A.nvim_get_current_line()
 
     if not U.ignore(line, C.config.ignore) then
-        local lcs, rcs = C.unwrap_cstr()
+        local lcs, rcs = unwrap_cstr()
         local lcs_esc = vim.pesc(lcs)
         local is_commented = U.is_commented(line, lcs_esc)
 
         if is_commented then
-            C.uncomment_ln(line, lcs_esc, vim.pesc(rcs))
+            uncomment_ln(line, lcs_esc, vim.pesc(rcs))
         else
-            C.comment_ln(line, lcs, rcs)
+            comment_ln(line, lcs, rcs)
         end
     end
 
@@ -174,7 +174,7 @@ function C.setup(opts)
             local len = #lines
 
             local block_x = (cmotion == U.cmotion.char or cmotion == U.cmotion.v) and len == 1
-            local lcs, rcs = C.unwrap_cstr(block_x and U.ctype.block or ctype)
+            local lcs, rcs = unwrap_cstr(block_x and U.ctype.block or ctype)
 
             if block_x then
                 Op.blockwise_x({
