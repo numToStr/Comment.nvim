@@ -45,17 +45,11 @@ function U.is_empty(ln)
     return ln:find('^$') ~= nil
 end
 
+---Convert the string to a escaped string, if given
+---@param str string
+---@return string|boolean
 function U.escape(str)
     return str and vim.pesc(str)
-end
-
----Replace some char in the give string
----@param pos number Position for the replacement
----@param str string String that needs to be modified
----@param rep string Replacement chars
----@return string string Replaced string
-function U.replace(pos, str, rep)
-    return str:sub(0, pos) .. rep .. str:sub(pos + 1)
 end
 
 ---Trim leading/trailing whitespace from the given string
@@ -132,10 +126,14 @@ function U.comment_str(ln, lcs, rcs, is_pad, spacing)
 
     local indent, chars = ln:match('^(%s*)(.*)')
 
-    local lcs_new = (lcs and is_pad) and lcs .. ' ' or ''
-    local rcs_new = (rcs and is_pad) and ' ' .. rcs or ''
+    local pad = is_pad and ' ' or ''
+    local lcs_new = lcs and lcs .. pad or ''
+    local rcs_new = rcs and pad .. rcs or ''
 
-    return U.replace(#(spacing or indent), indent, lcs_new) .. chars .. rcs_new
+    local pos = #(spacing or indent)
+    local l_indent = indent:sub(0, pos) .. lcs_new .. indent:sub(pos + 1)
+
+    return l_indent .. chars .. rcs_new
 end
 
 ---Converts the given string into a uncommented string
@@ -171,8 +169,9 @@ end
 ---@param is_pad boolean Whether to add padding b/w comment and line
 ---@return number
 function U.is_commented(ln, lcs_esc, rcs_esc, is_pad)
-    local ll = lcs_esc and '^%s*' .. lcs_esc .. (is_pad and '%s?' or '') or ''
-    local rr = rcs_esc and (is_pad and '%s?' or '') .. rcs_esc .. '$' or ''
+    local pad = is_pad and '%s?' or ''
+    local ll = lcs_esc and '^%s*' .. lcs_esc .. pad or ''
+    local rr = rcs_esc and pad .. rcs_esc .. '$' or ''
 
     return ln:find(ll .. '(.-)' .. rr)
 end
