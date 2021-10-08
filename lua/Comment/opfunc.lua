@@ -124,11 +124,9 @@ function op.blockwise_x(p, srow, erow)
     if cmode == U.cmode.uncomment then
         A.nvim_set_current_line(first .. (stripped or mid) .. last)
     else
-        if p.cfg.padding then
-            p.lcs = p.lcs and p.lcs .. ' ' or ''
-            p.rcs = p.rcs and ' ' .. p.rcs or ''
-        end
-        A.nvim_set_current_line(first .. p.lcs .. mid .. p.rcs .. last)
+        local lcs = (p.lcs and p.cfg.padding) and p.lcs .. ' ' or ''
+        local rcs = (p.rcs and p.cfg.padding) and ' ' .. p.rcs or ''
+        A.nvim_set_current_line(first .. lcs .. mid .. rcs .. last)
     end
 end
 
