@@ -13,10 +13,10 @@ local C = {
 ---2. lang_table (extra commentstring table in the plugin)
 ---3. commentstring (already set or added in pre_hook)
 ---@param ctype CType (optional) Type of commentstring ie. line | block
----@return string string Right side of the commentstring
 ---@return string string Left side of the commentstring
-function C.unwrap_cstr(ctype)
-    local cstr = U.is_hook(C.config.pre_hook)
+---@return string string Right side of the commentstring
+local function unwrap_cstr(ctype)
+    local cstr = U.is_fn(C.config.pre_hook)
         or require('Comment.lang').get(bo.filetype, ctype or U.ctype.line)
         or bo.commentstring
 
@@ -24,28 +24,28 @@ function C.unwrap_cstr(ctype)
         return U.errprint("'commentstring' not found")
     end
 
-    local rhs, lhs = cstr:match('(.*)%%s(.*)')
-    if not rhs then
+    local lcs, rcs = cstr:match('(.*)%%s(.*)')
+    if not lcs then
         return U.errprint("Invalid 'commentstring': " .. cstr)
     end
 
-    return U.trim(rhs), U.trim(lhs)
+    return U.trim(lcs), U.trim(rcs)
 end
 
 ---Common fn to comment and set the current line
 ---@param ln string Line that needs to be commented
----@param rcs string Right side of the commentstring
 ---@param lcs string Left side of the commentstring
-function C.comment_ln(ln, rcs, lcs)
-    A.nvim_set_current_line(U.comment_str(ln, rcs, lcs, C.config.padding))
+---@param rcs string Right side of the commentstring
+local function comment_ln(ln, lcs, rcs)
+    A.nvim_set_current_line(U.comment_str(ln, lcs, rcs, C.config.padding))
 end
 
 ---Common fn to uncomment and set the current line
 ---@param ln string Line that needs to be uncommented
----@param rcs_esc string (Escaped) Right side of the commentstring
 ---@param lcs_esc string (Escaped) Left side of the commentstring
-function C.uncomment_ln(ln, rcs_esc, lcs_esc)
-    A.nvim_set_current_line(U.uncomment_str(ln, rcs_esc, lcs_esc, C.config.padding))
+---@param rcs_esc string (Escaped) Right side of the commentstring
+local function uncomment_ln(ln, lcs_esc, rcs_esc)
+    A.nvim_set_current_line(U.uncomment_str(ln, lcs_esc, rcs_esc, C.config.padding))
 end
 
 ---Comments the current line
@@ -53,11 +53,11 @@ function C.comment()
     local line = A.nvim_get_current_line()
 
     if not U.ignore(line, C.config.ignore) then
-        local rcs, lcs = C.unwrap_cstr()
-        C.comment_ln(line, rcs, lcs)
+        local lcs, rcs = unwrap_cstr()
+        comment_ln(line, lcs, rcs)
     end
 
-    U.is_hook(C.config.post_hook, -1)
+    U.is_fn(C.config.post_hook, -1)
 end
 
 ---Uncomments the current line
@@ -65,11 +65,11 @@ function C.uncomment()
     local line = A.nvim_get_current_line()
 
     if not U.ignore(line, C.config.ignore) then
-        local rcs, lcs = C.unwrap_cstr()
-        C.uncomment_ln(line, vim.pesc(rcs), vim.pesc(lcs))
+        local lcs, rcs = unwrap_cstr()
+        uncomment_ln(line, vim.pesc(lcs), vim.pesc(rcs))
     end
 
-    U.is_hook(C.config.post_hook, -1)
+    U.is_fn(C.config.post_hook, -1)
 end
 
 ---Toggle comment of the current line
@@ -77,18 +77,18 @@ function C.toggle()
     local line = A.nvim_get_current_line()
 
     if not U.ignore(line, C.config.ignore) then
-        local rcs, lcs = C.unwrap_cstr()
-        local rcs_esc = vim.pesc(rcs)
-        local is_commented = U.is_commented(line, rcs_esc)
+        local lcs, rcs = unwrap_cstr()
+        local lcs_esc = vim.pesc(lcs)
+        local is_commented = U.is_commented(line, lcs_esc)
 
         if is_commented then
-            C.uncomment_ln(line, rcs_esc, vim.pesc(lcs))
+            uncomment_ln(line, lcs_esc, vim.pesc(rcs))
         else
-            C.comment_ln(line, rcs, lcs)
+            comment_ln(line, lcs, rcs)
         end
     end
 
-    U.is_hook(C.config.post_hook, -1)
+    U.is_fn(C.config.post_hook, -1)
 end
 
 ---Configures the whole plugin
@@ -142,6 +142,8 @@ function C.setup(opts)
     local cfg = C.config
 
     if cfg.mappings then
+        local Op = require('Comment.opfunc')
+
         ---Common operatorfunc callback
         ---@param vmode string VIM mode - line|char
         ---@param cmode CMode Comment mode
@@ -166,119 +168,47 @@ function C.setup(opts)
             --          - add cstr RHS to end of the last line
             --      * update the lines
 
-            local _cmotion = cmotion == U.cmotion._ and U.cmotion[vmode] or cmotion
+            cmotion = cmotion == U.cmotion._ and U.cmotion[vmode] or cmotion
+
             local scol, ecol, lines, srow, erow = U.get_lines(vmode, ctype)
             local len = #lines
 
-            local block_x = (_cmotion == U.cmotion.char or _cmotion == U.cmotion.v) and len == 1
-            local rcs, lcs = C.unwrap_cstr(block_x and U.ctype.block or ctype)
-            local rcs_esc = vim.pesc(rcs)
-            local lcs_esc = vim.pesc(lcs)
+            local block_x = (cmotion == U.cmotion.char or cmotion == U.cmotion.v) and len == 1
+            local lcs, rcs = unwrap_cstr(block_x and U.ctype.block or ctype)
 
             if block_x then
-                local line = lines[1]
-                local srow1, erow1, erow2 = srow + 1, erow + 1, erow + 2
-                local first = line:sub(0, srow)
-                local mid = line:sub(srow1, erow1)
-                local last = line:sub(erow2)
-
-                local stripped = U.is_block_commented(mid, rcs_esc, lcs_esc)
-
-                local _cmode
-                if cmode == U.cmode.toggle then
-                    _cmode = stripped and U.cmode.uncomment or U.cmode.comment
-                else
-                    _cmode = cmode
-                end
-
-                if _cmode == U.cmode.uncomment then
-                    A.nvim_set_current_line(first .. (stripped or mid) .. last)
-                else
-                    A.nvim_set_current_line(first .. rcs .. mid .. lcs .. last)
-                end
-            elseif ctype == U.ctype.block and len > 1 then
-                -- Block wise, only when there are more than 1 lines
-                local start_ln = lines[1]
-                local end_ln = lines[len]
-
-                local _cmode
-
-                -- If given mode is toggle then determine whether to comment or not
-                if cmode == U.cmode.toggle then
-                    local is_start_commented = U.is_commented(start_ln, rcs_esc)
-                    local is_end_commented = end_ln:find(lcs_esc .. '$')
-                    _cmode = (is_start_commented and is_end_commented) and U.cmode.uncomment or U.cmode.comment
-                else
-                    _cmode = cmode
-                end
-
-                local l1, l2
-                if _cmode == U.cmode.uncomment then
-                    l1 = U.uncomment_str(start_ln, rcs_esc, '', C.config.padding)
-                    l2 = U.uncomment_str(end_ln, '', lcs_esc, C.config.padding)
-                else
-                    l1 = U.comment_str(start_ln, rcs, '', C.config.padding)
-                    l2 = U.comment_str(end_ln, '', lcs, C.config.padding)
-                end
-                A.nvim_buf_set_lines(0, scol, scol + 1, false, { l1 })
-                A.nvim_buf_set_lines(0, ecol - 1, ecol, false, { l2 })
+                Op.blockwise_x({
+                    cfg = cfg,
+                    cmode = cmode,
+                    lines = lines,
+                    lcs = lcs,
+                    rcs = rcs,
+                    scol = scol,
+                    ecol = ecol,
+                }, srow, erow)
+            elseif ctype == U.ctype.block then
+                Op.blockwise({
+                    cfg = cfg,
+                    cmode = cmode,
+                    lines = lines,
+                    lcs = lcs,
+                    rcs = rcs,
+                    scol = scol,
+                    ecol = ecol,
+                })
             else
-                -- While commenting a block of text, there is a possiblity of lines being both commented and non-commented
-                -- In that case, we need to figure out that if any line is uncommented then we should comment the whole block or vise-versa
-                local _cmode = U.cmode.uncomment
-
-                -- When commenting multiple line, it is to be expected that indentation should be preserved
-                -- So, When looping over multiple lines we need to store the indentation of the mininum length (except empty line)
-                -- Which will be used to semantically comment rest of the lines
-                local min_indent = nil
-
-                -- If the given comde is uncomment then we actually don't want to compute the cmode or min_indent
-                if cmode ~= U.cmode.uncomment then
-                    for _, line in ipairs(lines) do
-                        -- I wish lua had `continue` statement [sad noises]
-                        if not U.ignore(line, cfg.ignore) then
-                            if _cmode == U.cmode.uncomment and cmode == U.cmode.toggle then
-                                local is_cmt = U.is_commented(line, rcs_esc)
-                                if not is_cmt then
-                                    _cmode = U.cmode.comment
-                                end
-                            end
-
-                            -- If the internal cmode changes to comment or the given cmode is not uncomment, then only calculate min_indent
-                            -- As calculating min_indent only makes sense when we actually want to comment the lines
-                            if _cmode == U.cmode.comment or cmode == U.cmode.comment then
-                                local indent, ln = U.split_half(line)
-                                if not min_indent or (#min_indent > #indent) and #ln > 0 then
-                                    min_indent = indent
-                                end
-                            end
-                        end
-                    end
-                end
-
-                -- If the comment mode given is not toggle than force that mode
-                if cmode ~= U.cmode.toggle then
-                    _cmode = cmode
-                end
-
-                local repls = {}
-                local uncomment = _cmode == U.cmode.uncomment
-
-                for _, line in ipairs(lines) do
-                    if U.ignore(line, cfg.ignore) then
-                        table.insert(repls, line)
-                    else
-                        if uncomment then
-                            table.insert(repls, U.uncomment_str(line, rcs_esc, lcs_esc, C.config.padding))
-                        else
-                            table.insert(repls, U.comment_str(line, rcs, lcs, C.config.padding, min_indent or ''))
-                        end
-                    end
-                end
-                A.nvim_buf_set_lines(0, scol, ecol, false, repls)
+                Op.linewise({
+                    cfg = cfg,
+                    cmode = cmode,
+                    lines = lines,
+                    lcs = lcs,
+                    rcs = rcs,
+                    scol = scol,
+                    ecol = ecol,
+                })
             end
 
-            U.is_hook(C.config.post_hook, scol, ecol)
+            U.is_fn(cfg.post_hook, scol, ecol)
         end
 
         local map = A.nvim_set_keymap

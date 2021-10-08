@@ -13,10 +13,12 @@
 -- [ ] Doc comment ie. /** */ (for js)
 -- [ ] Treesitter context commentstring
 -- [ ] Insert mode mapping (also move the cursor after commentstring)
--- [ ] Port `commentstring` from tcomment
+-- [-] Port `commentstring` from tcomment
 -- [ ] Header comment
 -- [x] Ignore line
 -- [x] Disable `extra` mapping by default
+-- [ ] provide more arguments to pre and post hooks
+-- [ ] ignore as a function
 
 -- FIXME
 -- [x] visual mode not working correctly
@@ -30,13 +32,14 @@
 -- [x] `gcc` empty line not toggling comment
 -- [x] Optimize blockwise mode (just modifiy the start and end line)
 -- [ ] dot repeat support for visual mode mappings
--- [ ] conflict when uncommenting interchangebly with line/block wise comment
--- [ ] Weird commenting when the first line is empty and the whole is indented
--- [ ] When there is an uncommented empty line b/w two commented blocks. It should uncomment instead of commenting again in toggle.
+-- [x] Weird commenting when the first line is empty and the whole is indented
 -- [ ] char motion span over mutliple lines
+-- [x] no padding support in block-x
 
 -- THINK:
 -- 1. Should i return the operator's starting and ending position in pre-hook
 -- 2. Restore initial cursor position in some motion operator (try `gcip`)
 -- 3. It is possible that, commentstring is updated inside pre-hook as we want to use it but we can't
 --    bcz the filetype is also present in the lang-table (and it has high priority than bo.commentstring)
+-- 4. When there is an uncommented empty line b/w two commented blocks. It should uncomment instead of commenting again in toggle.
+-- 5. Conflict when uncommenting interchangebly with line/block wise comment

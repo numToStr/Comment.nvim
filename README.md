@@ -1,7 +1,7 @@
 <h1 align="center">// Comment.nvim </h1>
-<p align="center"><sup>✨ Simple and Powerful commenting plugin for neovim ✨</sup></p>
+<p align="center"><sup>⚡ Smart and Powerful commenting plugin for neovim ⚡</sup></p>
 
-<!-- Image -->
+![Comment.nvim](https://user-images.githubusercontent.com/42532967/136532939-926a8350-84b7-4e78-b045-fe21b5947388.gif "Commenting go brrrr")
 
 ### ✨ Features
 
@@ -28,6 +28,15 @@ use {
 }
 ```
 
+-   With [vim-plug](https://github.com/junegunn/vim-plug)
+
+```vim
+Plug 'numToStr/Comment.nvim'
+
+" Somewhere after plug#end()
+lua require('FTerm').setup()
+```
+
 <a id="setup"></a>
 
 ### ⚒️ Setup
@@ -48,9 +57,9 @@ require('Comment').setup()
 EOF
 ```
 
-#### Configuration
+#### Configuration (optional)
 
-The [`setup()`](#setup) method (optionally) takes a configuration object for which the default values is given below.
+Following are the **default** config for the [`setup()`](#setup). If you want to override, just modify the option that you want then it will be merged with the default config.
 
 ```lua
 {
@@ -320,7 +329,7 @@ There are multiple ways to contribute reporting/fixing bugs, feature requests. Y
 ### 🚗 Roadmap
 
 -   Live upto the expectation of `tcomment`
-
+-   Basic INSERT mode mappings
 -   Doc comment i.e `/**%s*/` (js), `///%s` (rust)
 
 -   Inbuilt context commentstring using treesitter

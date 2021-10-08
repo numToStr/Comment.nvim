@@ -38,6 +38,13 @@ function U.errprint(msg)
     vim.notify('Comment.nvim: ' .. msg, vim.log.levels.ERROR)
 end
 
+---Check whether the line is empty
+---@param ln string
+---@return boolean
+function U.is_empty(ln)
+    return ln:find('^$') ~= nil
+end
+
 ---Replace some char in the give string
 ---@param pos number Position for the replacement
 ---@param str string String that needs to be modified
@@ -51,7 +58,7 @@ end
 ---@param str string
 ---@return string
 function U.trim(str)
-    return str:gsub('%s+', '')
+    return str:match('^%s?(.-)%s?$')
 end
 
 ---Get region for vim mode
@@ -107,83 +114,67 @@ function U.get_lines(vmode, ctype)
     return sln, ecol, lines, srow, erow
 end
 
----Separate the given line into two parts ie. indentation, chars
----@param ln string|table Line that need to be split
----@return string string Indentation chars
----@return string string Remaining chars
-function U.split_half(ln)
-    return ln:match('(%s*)(.*)')
-end
-
 ---Converts the given string into a commented string
----@param str string String that needs to be commented
----@param rcs string Right side of the commentstring
+---@param ln string String that needs to be commented
 ---@param lcs string Left side of the commentstring
+---@param rcs string Right side of the commentstring
 ---@param is_pad boolean Whether to add padding b/w comment and line
 ---@param spacing string|nil Pre-determine indentation (useful) when dealing w/ multiple lines
 ---@return string string Commented string
-function U.comment_str(str, rcs, lcs, is_pad, spacing)
-    local indent, ln = U.split_half(str)
-
-    -- if line is empty then use the space argument
-    -- this is required if you are to comment multiple lines
-    -- and the starting line has indentation
-    local is_empty = #indent == 0 and #ln == 0
-    local idnt = is_empty and (spacing or '') or indent
-
-    if is_pad then
-        -- If the rhs of cstring exists and the line is not empty then only add padding
-        -- Bcz if we were to comment multiple lines and there are some empty lines in b/w
-        -- then adding space to the them is not expected
-        local new_r_cs = (#rcs > 0 and not is_empty) and rcs .. ' ' or rcs
-
-        local new_l_cs = #lcs > 0 and ' ' .. lcs or lcs
-
-        -- (spacing or indent) this is bcz of single `comment` and `uncomment`
-        -- In these case, current line might be indented and we don't have spacing
-        -- So we can use the original indentation of the line
-        return U.replace(#(spacing or indent), idnt, new_r_cs) .. ln .. new_l_cs
+function U.comment_str(ln, lcs, rcs, is_pad, spacing)
+    if U.is_empty(ln) then
+        -- FIXME on block comment this won't comment the last line if it is empty
+        return (spacing or '') .. lcs
     end
 
-    return U.replace(#(spacing or indent), idnt, rcs) .. ln .. lcs
+    local indent, chars = ln:match('^(%s*)(.*)')
+
+    if is_pad then
+        local lcs_new = #lcs > 0 and lcs .. ' ' or lcs
+        local rcs_new = #rcs > 0 and ' ' .. rcs or rcs
+        return U.replace(#(spacing or indent), indent, lcs_new) .. chars .. rcs_new
+    end
+
+    return U.replace(#(spacing or indent), indent, lcs) .. chars .. rcs
 end
 
 ---Converts the given string into a uncommented string
----@param str string Line that needs to be uncommented
----@param rcs_esc string (Escaped) Right side of the commentstring
+---@param ln string Line that needs to be uncommented
 ---@param lcs_esc string (Escaped) Left side of the commentstring
+---@param rcs_esc string (Escaped) Right side of the commentstring
 ---@param is_pad boolean Whether to add padding b/w comment and line
 ---@return string string Uncommented string
-function U.uncomment_str(str, rcs_esc, lcs_esc, is_pad)
-    if not U.is_commented(str, rcs_esc) then
-        return str
+function U.uncomment_str(ln, lcs_esc, rcs_esc, is_pad)
+    if not U.is_commented(ln, lcs_esc) then
+        return ln
     end
 
-    local indent, _, ln = str:match('(%s*)(' .. rcs_esc .. '%s?)(.*)(' .. lcs_esc .. '$?)')
+    -- TODO improve lhs cstr and rhs cstr detection
+    local indent, chars = ln:match('(%s*)' .. lcs_esc .. '%s?(.*)' .. rcs_esc .. '$?')
 
     -- If the line (after cstring) is empty then just return ''
     -- bcz when uncommenting multiline this also doesn't preserve leading whitespace as the line was previously empty
-    if #ln == 0 then
+    if #chars == 0 then
         return ''
     end
 
     -- When padding is enabled then trim one trailing space char
-    return indent .. (is_pad and ln:gsub('%s?$', '') or ln)
+    return indent .. (is_pad and chars:gsub('%s?$', '') or chars)
 end
 
----Check if {pre,post}_hook is present then call it
----@param hook function Hook function
+---Call a function if exists
+---@param fn function Hook function
 ---@return boolean|string
-function U.is_hook(hook, ...)
-    return type(hook) == 'function' and hook(...)
+function U.is_fn(fn, ...)
+    return type(fn) == 'function' and fn(...)
 end
 
 ---Check if the given string is commented or not
----@param str string Line that needs to be checked
----@param rcs_esc string (Escaped) Right side of the commentstring
+---@param ln string Line that needs to be checked
+---@param lcs_esc string (Escaped) Left side of the commentstring
 ---@return number
-function U.is_commented(str, rcs_esc)
-    return str:find('^%s*' .. rcs_esc)
+function U.is_commented(ln, lcs_esc)
+    return ln:find('^%s*' .. lcs_esc)
 end
 
 ---Check if the given line is ignored or not with the given pattern
@@ -194,8 +185,13 @@ function U.ignore(ln, pat)
     return pat and ln:find(pat) ~= nil
 end
 
-function U.is_block_commented(ln, rcs_esc, lcs_esc)
-    return ln:match('^' .. rcs_esc .. '(.*)' .. lcs_esc .. '$')
+---Check if the given string is block commented or not
+---@param ln string Line that needs to be checked
+---@param lcs_esc string (Escaped) Left side of the commentstring
+---@param rcs_esc string (Escaped) Right side of the commentstring
+---@return string
+function U.is_block_commented(ln, lcs_esc, rcs_esc)
+    return ln:match('^' .. lcs_esc .. '%s?(.-)%s?' .. rcs_esc .. '$')
 end
 
 return U
