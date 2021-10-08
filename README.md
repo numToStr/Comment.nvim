@@ -48,9 +48,9 @@ require('Comment').setup()
 EOF
 ```
 
-#### Configuration
+#### Configuration (optional)
 
-The [`setup()`](#setup) method (optionally) takes a configuration object for which the default values is given below.
+Following are the **default** config for the [`setup()`](#setup). If you want to override, just modify the option that you want then it will be merged with the default config.
 
 ```lua
 {
