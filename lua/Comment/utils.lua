@@ -123,7 +123,8 @@ end
 ---@return string string Commented string
 function U.comment_str(ln, lcs, rcs, is_pad, spacing)
     if U.is_empty(ln) then
-        return spacing .. lcs
+        -- FIXME on block comment this won't comment the last line if it is empty
+        return (spacing or '') .. lcs
     end
 
     local indent, chars = ln:match('^(%s*)(.*)')
@@ -148,8 +149,8 @@ function U.uncomment_str(ln, lcs_esc, rcs_esc, is_pad)
         return ln
     end
 
-    -- TODO improve regex
-    local indent, _, chars = ln:match('(%s*)(' .. lcs_esc .. '%s?)(.*)(' .. rcs_esc .. '$?)')
+    -- TODO improve lhs cstr and rhs cstr detection
+    local indent, chars = ln:match('(%s*)' .. lcs_esc .. '(.*)' .. rcs_esc .. '$?')
 
     -- If the line (after cstring) is empty then just return ''
     -- bcz when uncommenting multiline this also doesn't preserve leading whitespace as the line was previously empty
