@@ -16,7 +16,7 @@ local C = {
 ---@return string string Left side of the commentstring
 ---@return string string Right side of the commentstring
 local function unwrap_cstr(ctype)
-    local cstr = U.is_hook(C.config.pre_hook)
+    local cstr = U.is_fn(C.config.pre_hook)
         or require('Comment.lang').get(bo.filetype, ctype or U.ctype.line)
         or bo.commentstring
 
@@ -57,7 +57,7 @@ function C.comment()
         comment_ln(line, lcs, rcs)
     end
 
-    U.is_hook(C.config.post_hook, -1)
+    U.is_fn(C.config.post_hook, -1)
 end
 
 ---Uncomments the current line
@@ -69,7 +69,7 @@ function C.uncomment()
         uncomment_ln(line, vim.pesc(lcs), vim.pesc(rcs))
     end
 
-    U.is_hook(C.config.post_hook, -1)
+    U.is_fn(C.config.post_hook, -1)
 end
 
 ---Toggle comment of the current line
@@ -88,7 +88,7 @@ function C.toggle()
         end
     end
 
-    U.is_hook(C.config.post_hook, -1)
+    U.is_fn(C.config.post_hook, -1)
 end
 
 ---Configures the whole plugin
@@ -208,7 +208,7 @@ function C.setup(opts)
                 })
             end
 
-            U.is_hook(cfg.post_hook, scol, ecol)
+            U.is_fn(cfg.post_hook, scol, ecol)
         end
 
         local map = A.nvim_set_keymap

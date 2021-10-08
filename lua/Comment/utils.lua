@@ -150,7 +150,7 @@ function U.uncomment_str(ln, lcs_esc, rcs_esc, is_pad)
     end
 
     -- TODO improve lhs cstr and rhs cstr detection
-    local indent, chars = ln:match('(%s*)' .. lcs_esc .. '(.*)' .. rcs_esc .. '$?')
+    local indent, chars = ln:match('(%s*)' .. lcs_esc .. '%s?(.*)' .. rcs_esc .. '$?')
 
     -- If the line (after cstring) is empty then just return ''
     -- bcz when uncommenting multiline this also doesn't preserve leading whitespace as the line was previously empty
@@ -162,11 +162,11 @@ function U.uncomment_str(ln, lcs_esc, rcs_esc, is_pad)
     return indent .. (is_pad and chars:gsub('%s?$', '') or chars)
 end
 
----Check if {pre,post}_hook is present then call it
----@param hook function Hook function
+---Call a function if exists
+---@param fn function Hook function
 ---@return boolean|string
-function U.is_hook(hook, ...)
-    return type(hook) == 'function' and hook(...)
+function U.is_fn(fn, ...)
+    return type(fn) == 'function' and fn(...)
 end
 
 ---Check if the given string is commented or not
