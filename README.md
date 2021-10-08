@@ -1,7 +1,7 @@
 <h1 align="center">// Comment.nvim </h1>
 <p align="center"><sup>⚡ Smart and Powerful commenting plugin for neovim ⚡</sup></p>
 
-<!-- Image -->
+![Comment.nvim](https://user-images.githubusercontent.com/42532967/136532939-926a8350-84b7-4e78-b045-fe21b5947388.gif "Commenting go brrrr")
 
 ### ✨ Features
 
