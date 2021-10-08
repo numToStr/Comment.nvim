@@ -15,7 +15,7 @@ local op = {}
 ---Linewise commenting
 ---@param p OfnOpts
 function op.linewise(p)
-    local lcs_esc, rcs_esc = vim.pesc(p.lcs), vim.pesc(p.rcs)
+    local lcs_esc, rcs_esc = U.escape(p.lcs), U.escape(p.rcs)
 
     -- While commenting a block of text, there is a possiblity of lines being both commented and non-commented
     -- In that case, we need to figure out that if any line is uncommented then we should comment the whole block or vise-versa
@@ -32,7 +32,7 @@ function op.linewise(p)
             -- I wish lua had `continue` statement [sad noises]
             if not U.ignore(line, p.cfg.ignore) then
                 if cmode == U.cmode.uncomment and p.cmode == U.cmode.toggle then
-                    local is_cmt = U.is_commented(line, lcs_esc)
+                    local is_cmt = U.is_commented(line, lcs_esc, nil, p.cfg.padding)
                     if not is_cmt then
                         cmode = U.cmode.comment
                     end
@@ -76,26 +76,26 @@ end
 ---@param p OfnOpts
 function op.blockwise(p)
     -- Block wise, only when there are more than 1 lines
-    local start_ln, end_ln = p.lines[1], p.lines[2]
-    local lcs_esc, rcs_esc = vim.pesc(p.lcs), vim.pesc(p.rcs)
+    local sln, eln = p.lines[1], p.lines[2]
+    local lcs_esc, rcs_esc = U.escape(p.lcs), U.escape(p.rcs)
 
     -- If given mode is toggle then determine whether to comment or not
     local cmode
     if p.cmode == U.cmode.toggle then
-        local is_start_commented = U.is_commented(start_ln, lcs_esc)
-        local is_end_commented = end_ln:find(rcs_esc .. '$')
-        cmode = (is_start_commented and is_end_commented) and U.cmode.uncomment or U.cmode.comment
+        local s_cmt = U.is_commented(sln, lcs_esc, nil, p.cfg.padding)
+        local e_cmt = U.is_commented(eln, nil, rcs_esc, p.cfg.padding)
+        cmode = (s_cmt and e_cmt) and U.cmode.uncomment or U.cmode.comment
     else
         cmode = p.cmode
     end
 
     local l1, l2
     if cmode == U.cmode.uncomment then
-        l1 = U.uncomment_str(start_ln, lcs_esc, '', p.cfg.padding)
-        l2 = U.uncomment_str(end_ln, '', rcs_esc, p.cfg.padding)
+        l1 = U.uncomment_str(sln, lcs_esc, nil, p.cfg.padding)
+        l2 = U.uncomment_str(eln, nil, rcs_esc, p.cfg.padding)
     else
-        l1 = U.comment_str(start_ln, p.lcs, '', p.cfg.padding)
-        l2 = U.comment_str(end_ln, '', p.rcs, p.cfg.padding)
+        l1 = U.comment_str(sln, p.lcs, nil, p.cfg.padding)
+        l2 = U.comment_str(eln, nil, p.rcs, p.cfg.padding)
     end
     A.nvim_buf_set_lines(0, p.scol, p.scol + 1, false, { l1 })
     A.nvim_buf_set_lines(0, p.ecol - 1, p.ecol, false, { l2 })
@@ -112,11 +112,11 @@ function op.blockwise_x(p, srow, erow)
     local mid = line:sub(srow1, erow1)
     local last = line:sub(erow2)
 
-    local stripped = U.is_block_commented(mid, vim.pesc(p.lcs), vim.pesc(p.rcs))
+    local yes, _, stripped = U.is_commented(mid, U.escape(p.lcs), U.escape(p.rcs), p.cfg.padding)
 
     local cmode
     if p.cmode == U.cmode.toggle then
-        cmode = stripped and U.cmode.uncomment or U.cmode.comment
+        cmode = yes and U.cmode.uncomment or U.cmode.comment
     else
         cmode = p.cmode
     end
@@ -125,8 +125,8 @@ function op.blockwise_x(p, srow, erow)
         A.nvim_set_current_line(first .. (stripped or mid) .. last)
     else
         if p.cfg.padding then
-            p.lcs = #p.lcs > 0 and p.lcs .. ' ' or p.lcs
-            p.rcs = #p.rcs > 0 and ' ' .. p.rcs or p.rcs
+            p.lcs = p.lcs and p.lcs .. ' ' or ''
+            p.rcs = p.rcs and ' ' .. p.rcs or ''
         end
         A.nvim_set_current_line(first .. p.lcs .. mid .. p.rcs .. last)
     end
