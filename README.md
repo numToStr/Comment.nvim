@@ -248,7 +248,7 @@ Also, you can set the `commentstring` from here but [**i won't recommend it**](#
 
 -   `post_hook` - This method is called after commenting is done. It receives the same 1) [`ctx`](#comment-context), the lines range 2) `start_col` 3) `end_col` 4) `start_row` 5) `end_row`.
 
-> NOTE: if only [methods](#methods) are used, then this will receives two arguments 1) `ctx` and 2)`-1` indicating the current line
+> NOTE: If [methods](#methods) are used, then `post_hook` will receives only two arguments 1) [`ctx`](#comment-context) and 2) `-1` indicating the current line
 
 ```lua
 {
@@ -267,7 +267,7 @@ Also, you can set the `commentstring` from here but [**i won't recommend it**](#
 }
 ```
 
-> NOTE: When pressing `gc`, `gb` and friends, `cmode` (Comment mode) inside `pre_hook` will always receive toggle status bcz when pre-hook is called, in that moment we don't know whether `gc` or `gb` will comment or uncomment the lines. But luckily, we do know this before `post_hook` and this will always receive comment or uncomment status
+> NOTE: When pressing `gc`, `gb` and friends, `cmode` (Comment mode) inside `pre_hook` will always be toggle because when pre-hook is called, in that moment we don't know whether `gc` or `gb` will comment or uncomment the lines. But luckily, we do know this before `post_hook` and this will always receive either comment or uncomment status
 
 ### 🚫 Ignoring lines
 
@@ -345,7 +345,7 @@ Although, `Comment.nvim` supports neovim's `commentstring` but unfortunately it 
 
 <a id="comment-context"></a>
 
-### Comment Context
+### 🧠 Comment Context
 
 The following object is provided as an argument to `pre_hook` and `post_hook` functions.
 

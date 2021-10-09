@@ -17,8 +17,9 @@
 -- [ ] Header comment
 -- [x] Ignore line
 -- [x] Disable `extra` mapping by default
--- [ ] provide more arguments to pre and post hooks
+-- [x] provide more arguments to pre and post hooks
 -- [ ] ignore as a function
+-- [ ] parse `set comments` if block comment is missing in the plugin
 
 -- FIXME
 -- [x] visual mode not working correctly
@@ -36,6 +37,7 @@
 -- [ ] char motion span over mutliple lines
 -- [x] no padding support in block-x
 -- [ ] Weird comments, if you do comments on already commented lines incl. an extra empty line
+-- [ ] ignore is missing in blockwise and blockwise_x
 
 -- THINK:
 -- 1. Should i return the operator's starting and ending position in pre-hook
