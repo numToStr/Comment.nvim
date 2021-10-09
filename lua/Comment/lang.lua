@@ -3,6 +3,8 @@ local M = {
     cxx_l = '//%s',
     cxx_b = '/*%s*/',
     hash = '#%s',
+    dash = '--%s',
+    haskell_b = '{-%s-}',
 }
 
 ---Lang table that contains commentstring (linewise/blockwise) for mutliple filetypes
@@ -10,7 +12,7 @@ local M = {
 local L = {
     c = { M.cxx_l, M.cxx_b },
     cpp = { M.cxx_l, M.cxx_b },
-    lua = { '--%s', '--[[%s--]]' },
+    lua = { M.dash, '--[[%s--]]' },
     javascript = { M.cxx_l, M.cxx_b },
     javascriptreact = { M.cxx_l, M.cxx_b },
     typescript = { M.cxx_l, M.cxx_b },
@@ -20,6 +22,12 @@ local L = {
     toml = { M.hash },
     yaml = { M.hash },
     graphql = { M.hash },
+    haskell = { M.dash, M.haskell_b },
+    purescript = { M.dash, M.haskell_b },
+    idris = { M.dash, M.haskell_b },
+    lidris = { M.dash, M.haskell_b },
+    elm = { M.dash, M.haskell_b },
+    dhall = { M.dash, M.haskell_b },
 }
 
 return setmetatable({}, {
