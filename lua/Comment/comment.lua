@@ -24,8 +24,8 @@ local function uncomment_ln(ln, lcs_esc, rcs_esc)
     A.nvim_set_current_line(U.uncomment_str(ln, lcs_esc, rcs_esc, C.config.padding))
 end
 
----Hook's context
----@class HCtx
+---Comment context
+---@class Ctx
 ---@field ctype CType
 ---@field cmode CMode
 ---@field cmotion CMotion
@@ -34,7 +34,7 @@ end
 ---1. pre_hook (optionally a string can be returned)
 ---2. lang_table (extra commentstring table in the plugin)
 ---3. commentstring (already set or added in pre_hook)
----@param ctx HCtx Context
+---@param ctx Ctx Context
 ---@return string string Left side of the commentstring
 ---@return string string Right side of the commentstring
 function U.parse_cstr(ctx)
@@ -50,6 +50,7 @@ function C.comment()
     local line = A.nvim_get_current_line()
 
     if not U.ignore(line, C.config.ignore) then
+        ---@type Ctx
         local ctx = {
             cmode = U.cmode.comment,
             cmotion = U.cmotion.line,
@@ -67,6 +68,7 @@ function C.uncomment()
     local line = A.nvim_get_current_line()
 
     if not U.ignore(line, C.config.ignore) then
+        ---@type Ctx
         local ctx = {
             cmode = U.cmode.uncomment,
             cmotion = U.cmotion.line,
@@ -84,6 +86,7 @@ function C.toggle()
     local line = A.nvim_get_current_line()
 
     if not U.ignore(line, C.config.ignore) then
+        ---@type Ctx
         local ctx = {
             cmode = U.cmode.toggle,
             cmotion = U.cmotion.line,
@@ -188,7 +191,7 @@ function C.setup(opts)
 
             local block_x = (cmotion == U.cmotion.char or cmotion == U.cmotion.v) and len == 1
 
-            ---@type HCtx
+            ---@type Ctx
             local ctx = {
                 cmode = cmode,
                 cmotion = cmotion,
