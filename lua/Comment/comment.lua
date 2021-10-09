@@ -47,7 +47,7 @@ function C.comment()
         local ctype = U.ctype.line
         local lcs, rcs = U.parse_cstr(ctype)
         comment_ln(line, lcs, rcs)
-        U.is_fn(C.config.post_hook, -1)
+        U.is_fn(C.config.post_hook, ctype, -1)
     end
 end
 
@@ -59,7 +59,7 @@ function C.uncomment()
         local ctype = U.ctype.line
         local lcs, rcs = U.parse_cstr(ctype)
         uncomment_ln(line, U.escape(lcs), U.escape(rcs))
-        U.is_fn(C.config.post_hook, -1)
+        U.is_fn(C.config.post_hook, ctype, -1)
     end
 end
 
@@ -79,7 +79,7 @@ function C.toggle()
             comment_ln(line, lcs, rcs)
         end
 
-        U.is_fn(C.config.post_hook, -1)
+        U.is_fn(C.config.post_hook, ctype, -1)
     end
 end
 
@@ -200,7 +200,7 @@ function C.setup(opts)
                 })
             end
 
-            U.is_fn(cfg.post_hook, scol, ecol)
+            U.is_fn(cfg.post_hook, ctype, scol, ecol)
         end
 
         local map = A.nvim_set_keymap
