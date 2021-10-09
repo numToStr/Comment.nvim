@@ -208,39 +208,66 @@ require('Comment').toggle()
 
 There are two hook methods i.e `pre_hook` and `post_hook` which are called before comment and after comment respectively. Both should be provided during [`setup()`](#setup).
 
--   `pre_hook` - This method is called before commenting is started. It can be used to return a custom `commentstring` which will be used for commenting the lines. You can use something like [nvim-ts-context-commentstring](https://github.com/JoosepAlviste/nvim-ts-context-commentstring) to compute the commentstring using treesitter.
+-   `pre_hook` - This method is called with a [`ctx`](#comment-context) argument before comment/uncomment is started. It can be used to return a custom `commentstring` which will be used for comment/uncomment the lines. You can use something like [nvim-ts-context-commentstring](https://github.com/JoosepAlviste/nvim-ts-context-commentstring) to compute the commentstring using treesitter.
 
 ```lua
+
 {
-    pre_hook = function()
+    ---@param ctx Ctx
+    pre_hook = function(ctx)
         return require('ts_context_commentstring.internal').calculate_commentstring()
     end
 }
-```
 
-Also, you can set the `commentstring` from here but [i won't recommend it](#commentstring-caveat) for now.
-
-```lua
+-- or with some spicy logic
 {
-    pre_hook = function()
-        require('ts_context_commentstring.internal').update_commentstring()
-    end
-}
-```
-
--   `post_hook` - This method is called after commenting is done. It receives the lines range or `-1` for the current line.
-
-```lua
-{
-    post_hook = function(start_col, end_col)
-        if start_col == -1 then
-            -- do something with the current line
-        else
-            -- do something with `start_col` and `end_col` line range
+    ---@param ctx Ctx
+    pre_hook = function(ctx)
+        local u = require('Comment.utils')
+        if ctx.ctype == u.ctype.line then
+            -- Only comment when we are doing linewise comment
+            return require('ts_context_commentstring.internal').calculate_commentstring()
         end
     end
 }
 ```
+
+Also, you can set the `commentstring` from here but [**i won't recommend it**](#commentstring-caveat) for now.
+
+```lua
+{
+    ---@param ctx Ctx
+    pre_hook = function(ctx)
+        -- Only update commentstring for tsx filetypes
+        if vim.bo.filetype == 'typescriptreact' then
+            require('ts_context_commentstring.internal').update_commentstring()
+        end
+    end
+}
+```
+
+-   `post_hook` - This method is called after commenting is done. It receives the same 1) [`ctx`](#comment-context), the lines range 2) `start_col` 3) `end_col` 4) `start_row` 5) `end_row`.
+
+> NOTE: if only [methods](#methods) are used, then this will receives two arguments 1) `ctx` and 2)`-1` indicating the current line
+
+```lua
+{
+    ---@param ctx Ctx
+    ---@param start_col integar
+    ---@param end_col integar
+    ---@param start_row integar
+    ---@param end_row integar
+    post_hook = function(ctx, start_col, end_col, start_row, end_row)
+        if start_col == -1 then
+            -- do something with the current line
+        else
+            -- do something with lines range
+        end
+    end
+}
+```
+
+> NOTE: When pressing `gc`, `gb` and friends, `cmode` (Comment mode) inside `pre_hook` will always receive toggle status bcz when pre-hook is called, in that moment we don't know whether `gc` or `gb` will comment or uncomment the lines. But luckily, we do know this before `post_hook` and this will always receive comment or uncomment status
 
 ### 🚫 Ignoring lines
 
@@ -315,6 +342,32 @@ Although, `Comment.nvim` supports neovim's `commentstring` but unfortunately it 
 <a id="commentstring-caveat"></a>
 
 > There is one caveat with this approach. If someone sets the `commentstring` (w/o returning a string) from the `pre_hook` method and if the current filetype also exists in the `lang_table` then the commenting will be done using the string in `lang_table` instead of using `commentstring`
+
+<a id="comment-context"></a>
+
+### Comment Context
+
+The following object is provided as an argument to `pre_hook` and `post_hook` functions.
+
+> I am just placing it here just for documentation purpose
+
+```lua
+---Comment context
+---@class Ctx
+---@field ctype CType
+---@field cmode CMode
+---@field cmotion CMotion
+```
+
+`CType` (Comment type), `CMode` (Comment mode) and `CMotion` (Comment motion) all of them are exported from the plugin's utils for reuse
+
+```lua
+require('Comment.utils').ctype.{line,block}
+
+require('Comment.utils').cmode.{toggle,comment,uncomment}
+
+require('Comment.utils').cmotion.{line,char,v}
+```
 
 ### 🤝 Contributing
 

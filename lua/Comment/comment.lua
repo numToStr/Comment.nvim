@@ -99,8 +99,10 @@ function C.toggle()
 
         if is_cmt then
             uncomment_ln(line, lcs_esc, U.escape(rcs))
+            ctx.cmode = U.cmode.uncomment
         else
             comment_ln(line, lcs, rcs)
+            ctx.cmode = U.cmode.comment
         end
 
         U.is_fn(C.config.post_hook, ctx, -1)
