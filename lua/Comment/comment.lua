@@ -8,32 +8,6 @@ local C = {
     config = nil,
 }
 
----Unwraps the commentstring by taking it from the following places in the respective order.
----1. pre_hook (optionally a string can be returned)
----2. lang_table (extra commentstring table in the plugin)
----3. commentstring (already set or added in pre_hook)
----@param ctype CType (optional) Type of commentstring ie. line | block
----@return string string Left side of the commentstring
----@return string string Right side of the commentstring
-local function unwrap_cstr(ctype)
-    local cstr = U.is_fn(C.config.pre_hook)
-        or require('Comment.lang').get(bo.filetype, ctype or U.ctype.line)
-        or bo.commentstring
-
-    if U.is_empty(cstr) then
-        return U.errprint("Empty commentstring. Run ':h commentstring' for help.")
-    end
-
-    local lcs, rcs = cstr:match('(.*)%%s(.*)')
-    if not (lcs or rcs) then
-        return U.errprint('Invalid commentstring: ' .. cstr .. ". Run ':h commentstring' for help.")
-    end
-
-    -- Return false if a part is empty, otherwise trim it
-    -- Bcz it is better to deal with boolean rather than checking empty string length everywhere
-    return not U.is_empty(lcs) and U.trim(lcs), not U.is_empty(rcs) and U.trim(rcs)
-end
-
 ---Common fn to comment and set the current line
 ---@param ln string Line that needs to be commented
 ---@param lcs string Left side of the commentstring
@@ -50,12 +24,27 @@ local function uncomment_ln(ln, lcs_esc, rcs_esc)
     A.nvim_set_current_line(U.uncomment_str(ln, lcs_esc, rcs_esc, C.config.padding))
 end
 
+---Unwraps the commentstring by taking it from the following places in the respective order.
+---1. pre_hook (optionally a string can be returned)
+---2. lang_table (extra commentstring table in the plugin)
+---3. commentstring (already set or added in pre_hook)
+---@param ctype CType (optional) Type of commentstring ie. line | block
+---@return string string Left side of the commentstring
+---@return string string Right side of the commentstring
+function U.parse_cstr(ctype)
+    local cstr = U.is_fn(C.config.pre_hook)
+        or require('Comment.lang').get(bo.filetype, ctype or U.ctype.line)
+        or bo.commentstring
+
+    return U.unwrap_cstr(cstr)
+end
+
 ---Comments the current line
 function C.comment()
     local line = A.nvim_get_current_line()
 
     if not U.ignore(line, C.config.ignore) then
-        local lcs, rcs = unwrap_cstr()
+        local lcs, rcs = U.parse_cstr()
         comment_ln(line, lcs, rcs)
     end
 
@@ -67,7 +56,7 @@ function C.uncomment()
     local line = A.nvim_get_current_line()
 
     if not U.ignore(line, C.config.ignore) then
-        local lcs, rcs = unwrap_cstr()
+        local lcs, rcs = U.parse_cstr()
         uncomment_ln(line, U.escape(lcs), U.escape(rcs))
     end
 
@@ -79,7 +68,7 @@ function C.toggle()
     local line = A.nvim_get_current_line()
 
     if not U.ignore(line, C.config.ignore) then
-        local lcs, rcs = unwrap_cstr()
+        local lcs, rcs = U.parse_cstr()
         local lcs_esc = U.escape(lcs)
         local is_cmt = U.is_commented(line, lcs_esc, nil, C.config.padding)
 
@@ -176,7 +165,7 @@ function C.setup(opts)
             local len = #lines
 
             local block_x = (cmotion == U.cmotion.char or cmotion == U.cmotion.v) and len == 1
-            local lcs, rcs = unwrap_cstr(block_x and U.ctype.block or ctype)
+            local lcs, rcs = U.parse_cstr(block_x and U.ctype.block or ctype)
 
             if block_x then
                 Op.blockwise_x({

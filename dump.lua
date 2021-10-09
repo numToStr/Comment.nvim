@@ -35,6 +35,7 @@
 -- [x] Weird commenting when the first line is empty and the whole is indented
 -- [ ] char motion span over mutliple lines
 -- [x] no padding support in block-x
+-- [ ] Weird comments, if you do comments on already commented lines incl. an extra empty line
 
 -- THINK:
 -- 1. Should i return the operator's starting and ending position in pre-hook

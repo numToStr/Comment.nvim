@@ -119,6 +119,25 @@ function U.get_lines(vmode, ctype)
     return sln, ecol, lines, srow, erow
 end
 
+---Validates and unwraps the given commentstring
+---@param cstr string
+---@return string|boolean
+---@return string|boolean
+function U.unwrap_cstr(cstr)
+    if U.is_empty(cstr) then
+        return U.errprint("Empty commentstring. Run ':h commentstring' for help.")
+    end
+
+    local lcs, rcs = cstr:match('(.*)%%s(.*)')
+    if not (lcs or rcs) then
+        return U.errprint('Invalid commentstring: ' .. cstr .. ". Run ':h commentstring' for help.")
+    end
+
+    -- Return false if a part is empty, otherwise trim it
+    -- Bcz it is better to deal with boolean rather than checking empty string length everywhere
+    return not U.is_empty(lcs) and U.trim(lcs), not U.is_empty(rcs) and U.trim(rcs)
+end
+
 ---Converts the given string into a commented string
 ---@param ln string String that needs to be commented
 ---@param lcs string Left side of the commentstring
