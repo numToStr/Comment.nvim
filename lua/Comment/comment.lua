@@ -32,8 +32,8 @@ end
 ---@return string string Left side of the commentstring
 ---@return string string Right side of the commentstring
 function U.parse_cstr(ctype)
-    local cstr = U.is_fn(C.config.pre_hook)
-        or require('Comment.lang').get(bo.filetype, ctype or U.ctype.line)
+    local cstr = U.is_fn(C.config.pre_hook, ctype)
+        or require('Comment.lang').get(bo.filetype, ctype)
         or bo.commentstring
 
     return U.unwrap_cstr(cstr)
@@ -44,11 +44,11 @@ function C.comment()
     local line = A.nvim_get_current_line()
 
     if not U.ignore(line, C.config.ignore) then
-        local lcs, rcs = U.parse_cstr()
+        local ctype = U.ctype.line
+        local lcs, rcs = U.parse_cstr(ctype)
         comment_ln(line, lcs, rcs)
+        U.is_fn(C.config.post_hook, -1)
     end
-
-    U.is_fn(C.config.post_hook, -1)
 end
 
 ---Uncomments the current line
@@ -56,11 +56,11 @@ function C.uncomment()
     local line = A.nvim_get_current_line()
 
     if not U.ignore(line, C.config.ignore) then
-        local lcs, rcs = U.parse_cstr()
+        local ctype = U.ctype.line
+        local lcs, rcs = U.parse_cstr(ctype)
         uncomment_ln(line, U.escape(lcs), U.escape(rcs))
+        U.is_fn(C.config.post_hook, -1)
     end
-
-    U.is_fn(C.config.post_hook, -1)
 end
 
 ---Toggle comment of the current line
@@ -68,7 +68,8 @@ function C.toggle()
     local line = A.nvim_get_current_line()
 
     if not U.ignore(line, C.config.ignore) then
-        local lcs, rcs = U.parse_cstr()
+        local ctype = U.ctype.line
+        local lcs, rcs = U.parse_cstr(ctype)
         local lcs_esc = U.escape(lcs)
         local is_cmt = U.is_commented(line, lcs_esc, nil, C.config.padding)
 
@@ -77,9 +78,9 @@ function C.toggle()
         else
             comment_ln(line, lcs, rcs)
         end
-    end
 
-    U.is_fn(C.config.post_hook, -1)
+        U.is_fn(C.config.post_hook, -1)
+    end
 end
 
 ---Configures the whole plugin
