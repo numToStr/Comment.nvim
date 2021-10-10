@@ -90,7 +90,7 @@ Following are the **default** config for the [`setup()`](#setup). If you want to
         ---line-comment toggle
         line = 'gcc',
         ---line-comment flipflop, comment uncommented lines and uncomment commented ones
-		line_flipflop = 'gC',
+        line_flipflop = 'gC',
         ---block-comment toggle
         block = 'gbc',
     },
