@@ -224,8 +224,8 @@ There are two hook methods i.e `pre_hook` and `post_hook` which are called befor
     ---@param ctx Ctx
     pre_hook = function(ctx)
         local u = require('Comment.utils')
-        if ctx.ctype == u.ctype.line then
-            -- Only comment when we are doing linewise comment
+        if ctx.ctype == u.ctype.line and ctx.cmotion == u.cmotion.line then
+            -- Only comment when we are doing linewise comment and up-down motion
             return require('ts_context_commentstring.internal').calculate_commentstring()
         end
     end
