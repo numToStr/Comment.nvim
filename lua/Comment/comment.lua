@@ -24,16 +24,22 @@ local function uncomment_ln(ln, lcs_esc, rcs_esc)
     A.nvim_set_current_line(U.uncomment_str(ln, lcs_esc, rcs_esc, C.config.padding))
 end
 
+---Comment context
+---@class Ctx
+---@field ctype CType
+---@field cmode CMode
+---@field cmotion CMotion
+
 ---Unwraps the commentstring by taking it from the following places in the respective order.
 ---1. pre_hook (optionally a string can be returned)
 ---2. lang_table (extra commentstring table in the plugin)
 ---3. commentstring (already set or added in pre_hook)
----@param ctype CType (optional) Type of commentstring ie. line | block
+---@param ctx Ctx Context
 ---@return string string Left side of the commentstring
 ---@return string string Right side of the commentstring
-function C.parse_cstr(ctype)
-    local cstr = U.is_fn(C.config.pre_hook)
-        or require('Comment.lang').get(bo.filetype, ctype or U.ctype.line)
+function C.parse_cstr(ctx)
+    local cstr = U.is_fn(C.config.pre_hook, ctx)
+        or require('Comment.lang').get(bo.filetype, ctx.ctype)
         or bo.commentstring
 
     return U.unwrap_cstr(cstr)
@@ -44,11 +50,17 @@ function C.comment()
     local line = A.nvim_get_current_line()
 
     if not U.ignore(line, C.config.ignore) then
-        local lcs, rcs = U.parse_cstr()
-        comment_ln(line, lcs, rcs)
-    end
+        ---@type Ctx
+        local ctx = {
+            cmode = U.cmode.comment,
+            cmotion = U.cmotion.line,
+            ctype = U.ctype.line,
+        }
 
-    U.is_fn(C.config.post_hook, -1)
+        local lcs, rcs = U.parse_cstr(ctx)
+        comment_ln(line, lcs, rcs)
+        U.is_fn(C.config.post_hook, ctx, -1)
+    end
 end
 
 ---Uncomments the current line
@@ -56,11 +68,17 @@ function C.uncomment()
     local line = A.nvim_get_current_line()
 
     if not U.ignore(line, C.config.ignore) then
-        local lcs, rcs = U.parse_cstr()
-        uncomment_ln(line, U.escape(lcs), U.escape(rcs))
-    end
+        ---@type Ctx
+        local ctx = {
+            cmode = U.cmode.uncomment,
+            cmotion = U.cmotion.line,
+            ctype = U.ctype.line,
+        }
 
-    U.is_fn(C.config.post_hook, -1)
+        local lcs, rcs = U.parse_cstr(ctx)
+        uncomment_ln(line, U.escape(lcs), U.escape(rcs))
+        U.is_fn(C.config.post_hook, ctx, -1)
+    end
 end
 
 ---Toggle comment of the current line
@@ -68,18 +86,27 @@ function C.toggle()
     local line = A.nvim_get_current_line()
 
     if not U.ignore(line, C.config.ignore) then
-        local lcs, rcs = U.parse_cstr()
+        ---@type Ctx
+        local ctx = {
+            cmode = U.cmode.toggle,
+            cmotion = U.cmotion.line,
+            ctype = U.ctype.line,
+        }
+
+        local lcs, rcs = U.parse_cstr(ctx)
         local lcs_esc = U.escape(lcs)
         local is_cmt = U.is_commented(line, lcs_esc, nil, C.config.padding)
 
         if is_cmt then
             uncomment_ln(line, lcs_esc, U.escape(rcs))
+            ctx.cmode = U.cmode.uncomment
         else
             comment_ln(line, lcs, rcs)
+            ctx.cmode = U.cmode.comment
         end
-    end
 
-    U.is_fn(C.config.post_hook, -1)
+        U.is_fn(C.config.post_hook, ctx, -1)
+    end
 end
 
 ---Configures the whole plugin
@@ -165,10 +192,18 @@ function C.setup(opts)
             local len = #lines
 
             local block_x = (cmotion == U.cmotion.char or cmotion == U.cmotion.v) and len == 1
-            local lcs, rcs = U.parse_cstr(block_x and U.ctype.block or ctype)
+
+            ---@type Ctx
+            local ctx = {
+                cmode = cmode,
+                cmotion = cmotion,
+                ctype = block_x and U.ctype.block or ctype,
+            }
+
+            local lcs, rcs = U.parse_cstr(ctx)
 
             if block_x then
-                Op.blockwise_x({
+                ctx.cmode = Op.blockwise_x({
                     cfg = cfg,
                     cmode = cmode,
                     lines = lines,
@@ -178,7 +213,7 @@ function C.setup(opts)
                     ecol = ecol,
                 }, srow, erow)
             elseif ctype == U.ctype.block and len > 1 then
-                Op.blockwise({
+                ctx.cmode = Op.blockwise({
                     cfg = cfg,
                     cmode = cmode,
                     lines = lines,
@@ -188,7 +223,7 @@ function C.setup(opts)
                     ecol = ecol,
                 })
             else
-                Op.linewise({
+                ctx.cmode = Op.linewise({
                     cfg = cfg,
                     cmode = cmode,
                     lines = lines,
@@ -199,7 +234,7 @@ function C.setup(opts)
                 })
             end
 
-            U.is_fn(cfg.post_hook, scol, ecol)
+            U.is_fn(cfg.post_hook, ctx, scol, ecol, srow, erow)
         end
 
         local map = A.nvim_set_keymap

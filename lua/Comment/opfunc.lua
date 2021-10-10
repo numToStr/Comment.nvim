@@ -14,6 +14,7 @@ local op = {}
 
 ---Linewise commenting
 ---@param p OfnOpts
+---@return integer CMode
 function op.linewise(p)
     local lcs_esc, rcs_esc = U.escape(p.lcs), U.escape(p.rcs)
 
@@ -70,10 +71,13 @@ function op.linewise(p)
         end
     end
     A.nvim_buf_set_lines(0, p.scol, p.ecol, false, repls)
+
+    return cmode
 end
 
 ---Blockwise commenting
 ---@param p OfnOpts
+---@return integer CMode
 function op.blockwise(p)
     -- Block wise, only when there are more than 1 lines
     local sln, eln = p.lines[1], p.lines[2]
@@ -99,12 +103,15 @@ function op.blockwise(p)
     end
     A.nvim_buf_set_lines(0, p.scol, p.scol + 1, false, { l1 })
     A.nvim_buf_set_lines(0, p.ecol - 1, p.ecol, false, { l2 })
+
+    return cmode
 end
 
 ---Blockwise (left-right motion) commenting
 ---@param p OfnOpts
 ---@param srow number
 ---@param erow number
+---@return integer CMode
 function op.blockwise_x(p, srow, erow)
     local line = p.lines[1]
     local srow1, erow1, erow2 = srow + 1, erow + 1, erow + 2
@@ -129,6 +136,8 @@ function op.blockwise_x(p, srow, erow)
         local rcs = p.rcs and pad .. p.rcs or ''
         A.nvim_set_current_line(first .. lcs .. mid .. rcs .. last)
     end
+
+    return cmode
 end
 
 return op
