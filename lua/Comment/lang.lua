@@ -5,6 +5,7 @@ local M = {
     hash = '#%s',
     dash = '--%s',
     haskell_b = '{-%s-}',
+    fsharp_b = '(*%s*)',
 }
 
 ---Lang table that contains commentstring (linewise/blockwise) for mutliple filetypes
@@ -28,6 +29,8 @@ local L = {
     lidris = { M.dash, M.haskell_b },
     elm = { M.dash, M.haskell_b },
     dhall = { M.dash, M.haskell_b },
+    fsharp = { M.cxx_l, M.fsharp_b },
+    ocaml = { M.fsharp_b, M.fsharp_b },
 }
 
 return setmetatable({}, {
