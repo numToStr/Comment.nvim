@@ -8,6 +8,7 @@ U.cmode = {
     toggle = 0,
     comment = 1,
     uncomment = 2,
+    flipflop = 3,
 }
 
 ---Comment types

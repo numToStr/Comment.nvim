@@ -30,7 +30,7 @@ function op.linewise(p)
     -- Computed ignore pattern
     local pattern = U.get_pattern(p.cfg.ignore)
 
-    -- If the given comde is uncomment then we actually don't want to compute the cmode or min_indent
+    -- If the given cmode is uncomment then we actually don't want to compute the cmode or min_indent
     if p.cmode ~= U.cmode.uncomment then
         for _, line in ipairs(p.lines) do
             -- I wish lua had `continue` statement [sad noises]
@@ -65,6 +65,12 @@ function op.linewise(p)
     for _, line in ipairs(p.lines) do
         if U.ignore(line, pattern) then
             table.insert(repls, line)
+        elseif p.cmode == U.cmode.flipflop then
+            if U.is_commented(line, lcs_esc, nil, p.cfg.padding) then
+                table.insert(repls, U.uncomment_str(line, lcs_esc, rcs_esc, p.cfg.padding))
+            else
+                table.insert(repls, U.comment_str(line, p.lcs, p.rcs, p.cfg.padding, min_indent))
+            end
         else
             if uncomment then
                 table.insert(repls, U.uncomment_str(line, lcs_esc, rcs_esc, p.cfg.padding))

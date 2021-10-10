@@ -145,6 +145,7 @@ function C.setup(opts)
         opleader = {
             ---LHS of line-comment opfunc mapping
             line = 'gc',
+            line_flipflop = 'gC',
             ---LHS of block-comment opfunc mapping
             block = 'gb',
         },
@@ -254,6 +255,9 @@ function C.setup(opts)
             function _G.___comment_gc(vmode)
                 opfunc(vmode, U.cmode.toggle, U.ctype.line, U.cmotion._)
             end
+            function _G.___comment_gC(vmode)
+                opfunc(vmode, U.cmode.flipflop, U.ctype.line, U.cmotion._)
+            end
             function _G.___comment_gb(vmode)
                 opfunc(vmode, U.cmode.toggle, U.ctype.block, U.cmotion._)
             end
@@ -262,10 +266,12 @@ function C.setup(opts)
             map('n', cfg.toggler.line, '<CMD>set operatorfunc=v:lua.___comment_gcc<CR>g@$', mopts)
             map('n', cfg.toggler.block, '<CMD>set operatorfunc=v:lua.___comment_gbc<CR>g@$', mopts)
             map('n', cfg.opleader.line, '<CMD>set operatorfunc=v:lua.___comment_gc<CR>g@', mopts)
+            map('n', cfg.opleader.line_flipflop, '<CMD>set operatorfunc=v:lua.___comment_gC<CR>g@', mopts)
             map('n', cfg.opleader.block, '<CMD>set operatorfunc=v:lua.___comment_gb<CR>g@', mopts)
 
             -- VISUAL mode mappings
             map('x', cfg.opleader.line, '<ESC><CMD>lua ___comment_gc(vim.fn.visualmode())<CR>', mopts)
+            map('x', cfg.opleader.line_flipflop, '<ESC><CMD>lua ___comment_gC(vim.fn.visualmode())<CR>', mopts)
             map('x', cfg.opleader.block, '<ESC><CMD>lua ___comment_gb(vim.fn.visualmode())<CR>', mopts)
 
             -- INSERT mode mappings
