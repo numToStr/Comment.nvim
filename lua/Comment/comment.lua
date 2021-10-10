@@ -57,7 +57,7 @@ function C.comment()
             ctype = U.ctype.line,
         }
 
-        local lcs, rcs = U.parse_cstr(ctx)
+        local lcs, rcs = C.parse_cstr(ctx)
         comment_ln(line, lcs, rcs)
         U.is_fn(C.config.post_hook, ctx, -1)
     end
@@ -75,7 +75,7 @@ function C.uncomment()
             ctype = U.ctype.line,
         }
 
-        local lcs, rcs = U.parse_cstr(ctx)
+        local lcs, rcs = C.parse_cstr(ctx)
         uncomment_ln(line, U.escape(lcs), U.escape(rcs))
         U.is_fn(C.config.post_hook, ctx, -1)
     end
@@ -93,7 +93,7 @@ function C.toggle()
             ctype = U.ctype.line,
         }
 
-        local lcs, rcs = U.parse_cstr(ctx)
+        local lcs, rcs = C.parse_cstr(ctx)
         local lcs_esc = U.escape(lcs)
         local is_cmt = U.is_commented(line, lcs_esc, nil, C.config.padding)
 
@@ -200,7 +200,7 @@ function C.setup(opts)
                 ctype = block_x and U.ctype.block or ctype,
             }
 
-            local lcs, rcs = U.parse_cstr(ctx)
+            local lcs, rcs = C.parse_cstr(ctx)
 
             if block_x then
                 ctx.cmode = Op.blockwise_x({
