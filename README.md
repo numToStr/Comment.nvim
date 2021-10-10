@@ -119,7 +119,7 @@ When you call [`setup()`](#setup) method, `Comment.nvim` sets up some basic mapp
 
 #### Mappings
 
--   Basic/Toggle mappings (enabled by `config.mappings.basic`)
+-   Basic/Toggle mappings (config: `mappings.basic`)
 
 > _NORMAL_ mode
 
@@ -141,7 +141,7 @@ When you call [`setup()`](#setup) method, `Comment.nvim` sets up some basic mapp
 `gb` - Toggles the region using blockwise comment
 ```
 
--   Extra/Explicit mappings (enabled by `config.mappings.extra`)
+-   Extra/Explicit mappings. These mappings are disabled by default. (config: `mappings.extra`)
 
 > _NORMAL_ mode
 
