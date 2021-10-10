@@ -67,9 +67,9 @@ Following are the **default** config for the [`setup()`](#setup). If you want to
     ---@type boolean
     padding = true,
 
-    ---Line which should be ignored while comment/uncomment
+    ---Lines to be ignored while comment/uncomment. Could be string or a function that returns a string.
     ---Example: Use '^$' to ignore empty lines
-    ---@type string Lua regex
+    ---@type string|function
     ignore = nil,
 
     ---Whether to create basic (operator-pending) and extra mappings for NORMAL/VISUAL mode
