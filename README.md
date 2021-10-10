@@ -67,7 +67,8 @@ Following are the **default** config for the [`setup()`](#setup). If you want to
     ---@type boolean
     padding = true,
 
-    ---Lines to be ignored while comment/uncomment. Could be string or a function that returns a string.
+    ---Lines to be ignored while comment/uncomment.
+    ---Could be a regex string or a function that returns a regex string.
     ---Example: Use '^$' to ignore empty lines
     ---@type string|function
     ignore = nil,
