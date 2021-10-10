@@ -293,7 +293,7 @@ ignore = '^const(.*)=(%s?)%((.*)%)(%s?)=>'
 
 -   With `function`
 
-```
+```lua
 {
     ignore = function()
         -- Only ignore empty lines for lua files
