@@ -206,9 +206,7 @@ end
 ---@param ig string|function
 ---@return boolean|string
 function U.get_pattern(ig)
-    if ig then
-        return type(ig) == 'string' and ig or U.is_fn(ig)
-    end
+    return ig and (type(ig) == 'string' and ig or U.is_fn(ig))
 end
 
 ---Check if the given line is ignored or not with the given pattern
