@@ -3,7 +3,7 @@ local A = vim.api
 local op = {}
 
 ---Opfunc options
----@class OfnOpts
+---@class OpFnParams
 ---@field cfg Config
 ---@field cmode CMode
 ---@field lines table
@@ -11,9 +11,11 @@ local op = {}
 ---@field lcs string
 ---@field scol number
 ---@field ecol number
+---@field srow number
+---@field erow number
 
 ---Linewise commenting
----@param p OfnOpts
+---@param p OpFnParams
 ---@return integer CMode
 function op.linewise(p)
     local lcs_esc, rcs_esc = U.escape(p.lcs), U.escape(p.rcs)
@@ -71,15 +73,15 @@ function op.linewise(p)
             end
         end
     end
-    A.nvim_buf_set_lines(0, p.scol, p.ecol, false, p.lines)
+    A.nvim_buf_set_lines(0, p.scol - 1, p.ecol, false, p.lines)
 
     return cmode
 end
 
----Blockwise commenting
----@param p OfnOpts
+---Full-line Blockwise commenting
+---@param p OpFnParams
 ---@return integer CMode
-function op.blockwise(p)
+function op.blockwise_full(p)
     -- Block wise, only when there are more than 1 lines
     local sln, eln = p.lines[1], p.lines[2]
     local lcs_esc, rcs_esc = U.escape(p.lcs), U.escape(p.rcs)
@@ -108,15 +110,19 @@ function op.blockwise(p)
     return cmode
 end
 
----Blockwise (left-right motion) commenting
----@param p OfnOpts
----@param srow number
----@param erow number
+---Partial-line Blockwise commenting ie. gba{ gc100w
+---@param p OpFnParams
+function op.blockwise_partial(p)
+    print(p)
+end
+
+---Blockwise (left-right/x-axis motion) commenting
+---@param p OpFnParams
 ---@return integer CMode
-function op.blockwise_x(p, srow, erow)
+function op.blockwise_x(p)
     local line = p.lines[1]
-    local srow1, erow1, erow2 = srow + 1, erow + 1, erow + 2
-    local first = line:sub(0, srow)
+    local srow1, erow1, erow2 = p.srow + 1, p.erow + 1, p.erow + 2
+    local first = line:sub(0, p.srow)
     local mid = line:sub(srow1, erow1)
     local last = line:sub(erow2)
 

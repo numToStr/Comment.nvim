@@ -26,7 +26,7 @@ U.cmotion = {
     line = 1,
     ---char/left-right
     char = 2,
-    ---visual line
+    ---visual operator-pending
     block = 3,
     ---visual
     v = 4,
