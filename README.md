@@ -209,8 +209,6 @@ require('Comment').toggle()
 
 There are two hook methods i.e `pre_hook` and `post_hook` which are called before comment and after comment respectively. Both should be provided during [`setup()`](#setup).
 
-<a id="pre-hook"></a>
-
 -   `pre_hook` - This method is called with a [`ctx`](#comment-context) argument before comment/uncomment is started. It can be used to return a custom `commentstring` which will be used for comment/uncomment the lines. You can use something like [nvim-ts-context-commentstring](https://github.com/JoosepAlviste/nvim-ts-context-commentstring) to compute the commentstring using treesitter.
 
 ```lua
