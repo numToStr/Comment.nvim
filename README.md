@@ -89,6 +89,8 @@ Following are the **default** config for the [`setup()`](#setup). If you want to
     toggler = {
         ---line-comment toggle
         line = 'gcc',
+        ---line-comment flipflop, comment uncommented lines and uncomment commented ones
+		line_flipflop = 'gC',
         ---block-comment toggle
         block = 'gbc',
     },
@@ -127,6 +129,8 @@ When you call [`setup()`](#setup) method, `Comment.nvim` sets up some basic mapp
 ```help
 `gc[count]{motion}` - (Operator mode) Toggles the region using linewise comment
 
+`gC[count]{motion}` - (Operator mode) Comment uncommented lines and uncomment commented ones using linewise comment
+
 `gb[count]{motion}` - (Operator mode) Toggles the region using linewise comment
 
 `gcc` - Toggles the current line using linewise comment
@@ -138,6 +142,8 @@ When you call [`setup()`](#setup) method, `Comment.nvim` sets up some basic mapp
 
 ```help
 `gc` - Toggles the region using linewise comment
+
+`gC` - Comment uncommented lines and uncomment commented ones using linewise comment
 
 `gb` - Toggles the region using blockwise comment
 ```
@@ -180,6 +186,8 @@ When you call [`setup()`](#setup) method, `Comment.nvim` sets up some basic mapp
 `gc8k` - Toggle 8 lines before the current cursor
 `gcip` - Toggle inside of paragraph
 `gca}` - Toggle around curly brackets
+
+`gC5j` - FlipFlop 5 lines after the current cursor
 
 # Blockwise
 
