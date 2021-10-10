@@ -192,9 +192,8 @@ function C.setup(opts)
             cmotion = cmotion == U.cmotion._ and U.cmotion[vmode] or cmotion
 
             local scol, ecol, lines, srow, erow = U.get_lines(vmode, ctype)
-            local len = #lines
-
-            local block_x = (cmotion == U.cmotion.char or cmotion == U.cmotion.v) and len == 1
+            local same_line = scol == ecol
+            local block_x = (cmotion == U.cmotion.char or cmotion == U.cmotion.v) and same_line
 
             ---@type Ctx
             local ctx = {
@@ -215,7 +214,7 @@ function C.setup(opts)
                     scol = scol,
                     ecol = ecol,
                 }, srow, erow)
-            elseif ctype == U.ctype.block and len > 1 then
+            elseif ctype == U.ctype.block and not same_line then
                 ctx.cmode = Op.blockwise({
                     cfg = cfg,
                     cmode = cmode,

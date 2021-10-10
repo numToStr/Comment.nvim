@@ -102,7 +102,7 @@ function op.blockwise(p)
         l1 = U.comment_str(sln, p.lcs, nil, p.cfg.padding)
         l2 = U.comment_str(eln, nil, p.rcs, p.cfg.padding)
     end
-    A.nvim_buf_set_lines(0, p.scol, p.scol + 1, false, { l1 })
+    A.nvim_buf_set_lines(0, p.scol - 1, p.scol, false, { l1 })
     A.nvim_buf_set_lines(0, p.ecol - 1, p.ecol, false, { l2 })
 
     return cmode
