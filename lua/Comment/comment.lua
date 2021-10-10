@@ -37,7 +37,7 @@ end
 ---@param ctx Ctx Context
 ---@return string string Left side of the commentstring
 ---@return string string Right side of the commentstring
-function U.parse_cstr(ctx)
+function C.parse_cstr(ctx)
     local cstr = U.is_fn(C.config.pre_hook, ctx)
         or require('Comment.lang').get(bo.filetype, ctx.ctype)
         or bo.commentstring
