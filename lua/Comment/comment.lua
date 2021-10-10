@@ -223,9 +223,8 @@ function C.setup(opts)
                     ecol = ecol,
                 })
             else
-                ctx.cmode = Op.linewise({
+                ctx.cmode = Op.linewise(ctx, {
                     cfg = cfg,
-                    cmode = cmode,
                     lines = lines,
                     lcs = lcs,
                     rcs = rcs,
