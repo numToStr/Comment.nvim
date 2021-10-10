@@ -49,7 +49,8 @@ end
 function C.comment()
     local line = A.nvim_get_current_line()
 
-    if not U.ignore(line, C.config.ignore) then
+    local pattern = U.get_pattern(C.config.ignore)
+    if not U.ignore(line, pattern) then
         ---@type Ctx
         local ctx = {
             cmode = U.cmode.comment,
@@ -67,7 +68,8 @@ end
 function C.uncomment()
     local line = A.nvim_get_current_line()
 
-    if not U.ignore(line, C.config.ignore) then
+    local pattern = U.get_pattern(C.config.ignore)
+    if not U.ignore(line, pattern) then
         ---@type Ctx
         local ctx = {
             cmode = U.cmode.uncomment,
@@ -85,7 +87,8 @@ end
 function C.toggle()
     local line = A.nvim_get_current_line()
 
-    if not U.ignore(line, C.config.ignore) then
+    local pattern = U.get_pattern(C.config.ignore)
+    if not U.ignore(line, pattern) then
         ---@type Ctx
         local ctx = {
             cmode = U.cmode.toggle,
@@ -223,8 +226,9 @@ function C.setup(opts)
                     ecol = ecol,
                 })
             else
-                ctx.cmode = Op.linewise(ctx, {
+                ctx.cmode = Op.linewise({
                     cfg = cfg,
+                    cmode = cmode,
                     lines = lines,
                     lcs = lcs,
                     rcs = rcs,

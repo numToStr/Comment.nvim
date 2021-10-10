@@ -205,9 +205,9 @@ end
 ---Helper to retriev the ignore pattern
 ---@param ig string|function
 ---@return boolean|string
-function U.get_pattern(ig, ...)
+function U.get_pattern(ig)
     if ig then
-        return type(ig) == 'string' and ig or U.is_fn(ig, ...)
+        return type(ig) == 'string' and ig or U.is_fn(ig)
     end
 end
 

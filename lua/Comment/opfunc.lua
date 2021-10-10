@@ -13,10 +13,9 @@ local op = {}
 ---@field ecol number
 
 ---Linewise commenting
----@param ctx Ctx
 ---@param p OfnOpts
 ---@return integer CMode
-function op.linewise(ctx, p)
+function op.linewise(p)
     local lcs_esc, rcs_esc = U.escape(p.lcs), U.escape(p.rcs)
 
     -- While commenting a block of text, there is a possiblity of lines being both commented and non-commented
@@ -29,14 +28,14 @@ function op.linewise(ctx, p)
     local min_indent = nil
 
     -- Computed ignore pattern
-    local pattern = U.get_pattern(p.cfg.ignore, ctx)
+    local pattern = U.get_pattern(p.cfg.ignore)
 
     -- If the given comde is uncomment then we actually don't want to compute the cmode or min_indent
-    if ctx.cmode ~= U.cmode.uncomment then
+    if p.cmode ~= U.cmode.uncomment then
         for _, line in ipairs(p.lines) do
             -- I wish lua had `continue` statement [sad noises]
             if not U.ignore(line, pattern) then
-                if cmode == U.cmode.uncomment and ctx.cmode == U.cmode.toggle then
+                if cmode == U.cmode.uncomment and p.cmode == U.cmode.toggle then
                     local is_cmt = U.is_commented(line, lcs_esc, nil, p.cfg.padding)
                     if not is_cmt then
                         cmode = U.cmode.comment
@@ -45,7 +44,7 @@ function op.linewise(ctx, p)
 
                 -- If the internal cmode changes to comment or the given cmode is not uncomment, then only calculate min_indent
                 -- As calculating min_indent only makes sense when we actually want to comment the lines
-                if not U.is_empty(line) and (cmode == U.cmode.comment or ctx.cmode == U.cmode.comment) then
+                if not U.is_empty(line) and (cmode == U.cmode.comment or p.cmode == U.cmode.comment) then
                     local indent = line:match('^(%s*).*')
                     if not min_indent or #min_indent > #indent then
                         min_indent = indent
@@ -56,8 +55,8 @@ function op.linewise(ctx, p)
     end
 
     -- If the comment mode given is not toggle than force that mode
-    if ctx.cmode ~= U.cmode.toggle then
-        cmode = ctx.cmode
+    if p.cmode ~= U.cmode.toggle then
+        cmode = p.cmode
     end
 
     local repls = {}
