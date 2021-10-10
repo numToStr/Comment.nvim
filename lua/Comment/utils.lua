@@ -202,6 +202,15 @@ function U.is_commented(ln, lcs_esc, rcs_esc, is_pad)
     return ln:find(ll .. '(.-)' .. rr)
 end
 
+---Helper to retriev the ignore pattern
+---@param ig string|function
+---@return boolean|string
+function U.get_pattern(ig, ...)
+    if ig then
+        return type(ig) == 'string' and ig or U.is_fn(ig, ...)
+    end
+end
+
 ---Check if the given line is ignored or not with the given pattern
 ---@param ln string Line to be ignored
 ---@param pat string Lua regex

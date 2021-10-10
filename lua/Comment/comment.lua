@@ -119,7 +119,7 @@ function C.setup(opts)
         padding = true,
         ---Line which should be ignored while comment/uncomment
         ---Example: Use '^$' to ignore empty lines
-        ---@type string Lua regex
+        ---@type string|function Lua regex
         ignore = nil,
         ---Whether to create basic (operator-pending) and extra mappings
         ---@type table
