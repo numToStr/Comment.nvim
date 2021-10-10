@@ -186,6 +186,51 @@ function U.uncomment_str(ln, lcs_esc, rcs_esc, is_pad)
     return indent .. (is_pad and chars:gsub('%s?$', '') or chars)
 end
 
+---Converts the given string into a block commented string
+---@param ln string String that needs to be commented
+---@param lcs string Left side of the commentstring
+---@param rcs string Right side of the commentstring
+---@param is_pad boolean Whether to add padding b/w comment and line
+---@return string string Commented string
+function U.comment_bstr(ln, lcs, rcs, row, is_pad)
+    if U.is_empty(ln) then
+        return lcs or rcs
+    end
+
+    local pad = is_pad and ' ' or ''
+
+    if lcs then
+        local first, last = ln:sub(0, row), ln:sub(row + 1)
+        return first .. (lcs .. pad) .. last
+    end
+
+    local first, last = ln:sub(0, row + 1), ln:sub(row + 2)
+    return first .. (pad .. rcs) .. last
+end
+
+-- function U.uncomment_bstr(ln, lcs_esc, rcs_esc, row, is_pad)
+--     -- If the line is commented by the LHS
+--     if lcs_esc then
+--         local start_i, end_i = U.is_commented(ln, lcs_esc, rcs_esc, is_pad)
+--         if start_i then
+--             print(start_i, end_i)
+--         end
+--     end
+--     -- if U.is_empty(ln) then
+--     --     return lcs or rcs
+--     -- end
+--     --
+--     -- local pad = is_pad and ' ' or ''
+--     --
+--     -- if lcs then
+--     --     local first, last = ln:sub(0, row), ln:sub(row + 1)
+--     --     return first .. (lcs .. pad) .. last
+--     -- end
+--     --
+--     -- local first, last = ln:sub(0, row + 1), ln:sub(row + 2)
+--     -- return first .. (pad .. rcs) .. last
+-- end
+
 ---Check if the given string is commented or not
 ---@param ln string Line that needs to be checked
 ---@param lcs_esc string (Escaped) Left side of the commentstring
