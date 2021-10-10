@@ -31,7 +31,7 @@ end
 ---@param ctype CType (optional) Type of commentstring ie. line | block
 ---@return string string Left side of the commentstring
 ---@return string string Right side of the commentstring
-function U.parse_cstr(ctype)
+function C.parse_cstr(ctype)
     local cstr = U.is_fn(C.config.pre_hook)
         or require('Comment.lang').get(bo.filetype, ctype or U.ctype.line)
         or bo.commentstring
