@@ -27,11 +27,14 @@ function op.linewise(p)
     -- Which will be used to semantically comment rest of the lines
     local min_indent = nil
 
+    -- Computed ignore pattern
+    local pattern = U.get_pattern(p.cfg.ignore)
+
     -- If the given comde is uncomment then we actually don't want to compute the cmode or min_indent
     if p.cmode ~= U.cmode.uncomment then
         for _, line in ipairs(p.lines) do
             -- I wish lua had `continue` statement [sad noises]
-            if not U.ignore(line, p.cfg.ignore) then
+            if not U.ignore(line, pattern) then
                 if cmode == U.cmode.uncomment and p.cmode == U.cmode.toggle then
                     local is_cmt = U.is_commented(line, lcs_esc, nil, p.cfg.padding)
                     if not is_cmt then
@@ -60,7 +63,7 @@ function op.linewise(p)
     local uncomment = cmode == U.cmode.uncomment
 
     for _, line in ipairs(p.lines) do
-        if U.ignore(line, p.cfg.ignore) then
+        if U.ignore(line, pattern) then
             table.insert(repls, line)
         else
             if uncomment then

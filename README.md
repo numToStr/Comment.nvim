@@ -67,9 +67,10 @@ Following are the **default** config for the [`setup()`](#setup). If you want to
     ---@type boolean
     padding = true,
 
-    ---Line which should be ignored while comment/uncomment
+    ---Lines to be ignored while comment/uncomment.
+    ---Could be a regex string or a function that returns a regex string.
     ---Example: Use '^$' to ignore empty lines
-    ---@type string Lua regex
+    ---@type string|function
     ignore = nil,
 
     ---Whether to create basic (operator-pending) and extra mappings for NORMAL/VISUAL mode
@@ -119,7 +120,7 @@ When you call [`setup()`](#setup) method, `Comment.nvim` sets up some basic mapp
 
 #### Mappings
 
--   Basic/Toggle mappings (enabled by `config.mappings.basic`)
+-   Basic/Toggle mappings (config: `mappings.basic`)
 
 > _NORMAL_ mode
 
@@ -141,7 +142,7 @@ When you call [`setup()`](#setup) method, `Comment.nvim` sets up some basic mapp
 `gb` - Toggles the region using blockwise comment
 ```
 
--   Extra/Explicit mappings (enabled by `config.mappings.extra`)
+-   Extra/Explicit mappings. These mappings are disabled by default. (config: `mappings.extra`)
 
 > _NORMAL_ mode
 
@@ -271,7 +272,11 @@ Also, you can set the `commentstring` from here but [**i won't recommend it**](#
 
 ### 🚫 Ignoring lines
 
-You can use `ignore` to ignore certain lines during comment/uncomment. It takes a lua regex string and should be provided during [`setup()`](#setup).
+You can use `ignore` to ignore certain lines during comment/uncomment. It can takes lua regex string or a function that returns a regex string and should be provided during [`setup()`](#setup).
+
+> NOTE: Ignore only works when with linewise comment. This is by design. As ignoring lines in block comments doesn't make that much sense.
+
+-   With `string`
 
 ```lua
 -- ignores empty lines
@@ -282,6 +287,19 @@ ignore = '^(%s*)local'
 
 -- ignores any lines similar to arrow function
 ignore = '^const(.*)=(%s?)%((.*)%)(%s?)=>'
+```
+
+-   With `function`
+
+```lua
+{
+    ignore = function()
+        -- Only ignore empty lines for lua files
+        if vim.bo.filetype == 'lua' then
+            return '^$'
+        end
+    end,
+}
 ```
 
 <a id="languages"></a>

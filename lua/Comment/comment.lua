@@ -49,7 +49,8 @@ end
 function C.comment()
     local line = A.nvim_get_current_line()
 
-    if not U.ignore(line, C.config.ignore) then
+    local pattern = U.get_pattern(C.config.ignore)
+    if not U.ignore(line, pattern) then
         ---@type Ctx
         local ctx = {
             cmode = U.cmode.comment,
@@ -67,7 +68,8 @@ end
 function C.uncomment()
     local line = A.nvim_get_current_line()
 
-    if not U.ignore(line, C.config.ignore) then
+    local pattern = U.get_pattern(C.config.ignore)
+    if not U.ignore(line, pattern) then
         ---@type Ctx
         local ctx = {
             cmode = U.cmode.uncomment,
@@ -85,7 +87,8 @@ end
 function C.toggle()
     local line = A.nvim_get_current_line()
 
-    if not U.ignore(line, C.config.ignore) then
+    local pattern = U.get_pattern(C.config.ignore)
+    if not U.ignore(line, pattern) then
         ---@type Ctx
         local ctx = {
             cmode = U.cmode.toggle,
@@ -119,7 +122,7 @@ function C.setup(opts)
         padding = true,
         ---Line which should be ignored while comment/uncomment
         ---Example: Use '^$' to ignore empty lines
-        ---@type string Lua regex
+        ---@type string|function Lua regex
         ignore = nil,
         ---Whether to create basic (operator-pending) and extra mappings
         ---@type table
