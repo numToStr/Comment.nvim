@@ -8,12 +8,14 @@
 -- [x] Custom (language) commentstring support
 -- [x] Block comment basic ie. /* */ (for js)
 -- [-] Block comment extended
---      [ ] V-BLOCK (IDK, maybe)
 --      [x] left-right-motions
---      [ ] Partial blocks ie. gba{ gbaf
---      [ ] Char motion covering mutliple lines ie. gc300w
+--      [x] Partial blocks ie. gba{ gbaf
+--      [ ] V-BLOCK (IDK, maybe)
+--      [ ] Char motion covering mutliple lines ie. gc300w (level: HARD)
 -- [ ] Doc comment ie. /** */ (for js)
--- [ ] Treesitter context commentstring
+-- [ ] Treesitter Integration
+--      [ ] Better comment detection
+--      [ ] Context commentstring
 -- [ ] Insert mode mapping (also move the cursor after commentstring)
 -- [-] Port `commentstring` from tcomment
 -- [ ] Header comment
