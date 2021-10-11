@@ -233,7 +233,7 @@ function C.setup(opts)
                 }
 
                 if block_motion then
-                    ctx.cmode = Op.blockwise_partial(params)
+                    ctx.cmode = Op.blockwise_partial(params, block_motion)
                 else
                     ctx.cmode = Op.blockwise_full(params)
                 end

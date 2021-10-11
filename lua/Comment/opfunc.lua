@@ -80,8 +80,9 @@ end
 
 ---Full-line Blockwise commenting
 ---@param p OpFnParams
+---@param partial boolean Whether to do a partial or full comment
 ---@return integer CMode
-function op.blockwise_full(p)
+function op.blockwise_full(p, partial)
     -- Block wise, only when there are more than 1 lines
     local sln, eln = p.lines[1], p.lines[2]
     local lcs_esc, rcs_esc = U.escape(p.lcs), U.escape(p.rcs)
@@ -112,8 +113,38 @@ end
 
 ---Partial-line Blockwise commenting ie. gba{ gc100w
 ---@param p OpFnParams
-function op.blockwise_partial(p)
-    print(p)
+---@param partial boolean Whether to do a partial or full comment
+function op.blockwise_partial(p, partial)
+    local sln, eln = p.lines[1], p.lines[2]
+    local lcs_esc, rcs_esc = U.escape(p.lcs), U.escape(p.rcs)
+
+    local before_lcs = sln:sub(0, p.srow)
+    local after_lcs = sln:sub(p.srow + 1)
+
+    local before_rcs = eln:sub(0, p.erow + 1)
+    local after_rcs = eln:sub(p.erow + 2)
+
+    -- If given mode is toggle then determine whether to comment or not
+    local cmode
+    if p.cmode == U.cmode.toggle then
+        local s_cmt = U.is_commented(after_lcs, lcs_esc, nil, p.cfg.padding)
+        local e_cmt = U.is_commented(before_rcs, nil, rcs_esc, p.cfg.padding)
+        cmode = (s_cmt and e_cmt) and U.cmode.uncomment or U.cmode.comment
+    else
+        cmode = p.cmode
+    end
+
+    local l1, l2
+    if cmode == U.cmode.uncomment then
+        l1 = U.uncomment_str(after_lcs, lcs_esc, nil, p.cfg.padding)
+        l2 = U.uncomment_str(before_rcs, nil, rcs_esc, p.cfg.padding)
+    else
+        l1 = U.comment_str(after_lcs, p.lcs, nil, p.cfg.padding)
+        l2 = U.comment_str(before_rcs, nil, p.rcs, p.cfg.padding)
+    end
+
+    A.nvim_buf_set_lines(0, p.scol - 1, p.scol, false, { before_lcs .. l1 })
+    A.nvim_buf_set_lines(0, p.ecol - 1, p.ecol, false, { l2 .. after_rcs })
 end
 
 ---Blockwise (left-right/x-axis motion) commenting
@@ -121,10 +152,9 @@ end
 ---@return integer CMode
 function op.blockwise_x(p)
     local line = p.lines[1]
-    local srow1, erow1, erow2 = p.srow + 1, p.erow + 1, p.erow + 2
     local first = line:sub(0, p.srow)
-    local mid = line:sub(srow1, erow1)
-    local last = line:sub(erow2)
+    local mid = line:sub(p.srow + 1, p.erow + 1)
+    local last = line:sub(p.erow + 2)
 
     local yes, _, stripped = U.is_commented(mid, U.escape(p.lcs), U.escape(p.rcs), p.cfg.padding)
 
