@@ -219,8 +219,7 @@ function C.setup(opts)
                     erow = erow,
                 })
             elseif ctype == U.ctype.block then
-                ---@type OpFnParams
-                local params = {
+                ctx.cmode = Op.blockwise({
                     cfg = cfg,
                     cmode = cmode,
                     lines = lines,
@@ -230,13 +229,7 @@ function C.setup(opts)
                     ecol = ecol,
                     srow = srow,
                     erow = erow,
-                }
-
-                if block_motion then
-                    ctx.cmode = Op.blockwise_partial(params, block_motion)
-                else
-                    ctx.cmode = Op.blockwise_full(params)
-                end
+                }, block_motion)
             else
                 ctx.cmode = Op.linewise({
                     cfg = cfg,

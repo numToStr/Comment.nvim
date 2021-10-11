@@ -78,73 +78,52 @@ function op.linewise(p)
     return cmode
 end
 
----Full-line Blockwise commenting
+---Full/Partial Blockwise commenting
 ---@param p OpFnParams
 ---@param partial boolean Whether to do a partial or full comment
 ---@return integer CMode
-function op.blockwise_full(p, partial)
+function op.blockwise(p, partial)
     -- Block wise, only when there are more than 1 lines
     local sln, eln = p.lines[1], p.lines[2]
     local lcs_esc, rcs_esc = U.escape(p.lcs), U.escape(p.rcs)
 
+    -- These string should be checked for comment/uncomment
+    local sln_check = sln
+    local eln_check = eln
+    if partial then
+        sln_check = sln:sub(p.srow + 1)
+        eln_check = eln:sub(0, p.erow + 1)
+    end
+
     -- If given mode is toggle then determine whether to comment or not
     local cmode
     if p.cmode == U.cmode.toggle then
-        local s_cmt = U.is_commented(sln, lcs_esc, nil, p.cfg.padding)
-        local e_cmt = U.is_commented(eln, nil, rcs_esc, p.cfg.padding)
+        local s_cmt = U.is_commented(sln_check, lcs_esc, nil, p.cfg.padding)
+        local e_cmt = U.is_commented(eln_check, nil, rcs_esc, p.cfg.padding)
         cmode = (s_cmt and e_cmt) and U.cmode.uncomment or U.cmode.comment
     else
         cmode = p.cmode
     end
 
     local l1, l2
+
     if cmode == U.cmode.uncomment then
-        l1 = U.uncomment_str(sln, lcs_esc, nil, p.cfg.padding)
-        l2 = U.uncomment_str(eln, nil, rcs_esc, p.cfg.padding)
+        l1 = U.uncomment_str(sln_check, lcs_esc, nil, p.cfg.padding)
+        l2 = U.uncomment_str(eln_check, nil, rcs_esc, p.cfg.padding)
     else
-        l1 = U.comment_str(sln, p.lcs, nil, p.cfg.padding)
-        l2 = U.comment_str(eln, nil, p.rcs, p.cfg.padding)
+        l1 = U.comment_str(sln_check, p.lcs, nil, p.cfg.padding)
+        l2 = U.comment_str(eln_check, nil, p.rcs, p.cfg.padding)
     end
+
+    if partial then
+        l1 = sln:sub(0, p.srow) .. l1
+        l2 = l2 .. eln:sub(p.erow + 2)
+    end
+
     A.nvim_buf_set_lines(0, p.scol - 1, p.scol, false, { l1 })
     A.nvim_buf_set_lines(0, p.ecol - 1, p.ecol, false, { l2 })
 
     return cmode
-end
-
----Partial-line Blockwise commenting ie. gba{ gc100w
----@param p OpFnParams
----@param partial boolean Whether to do a partial or full comment
-function op.blockwise_partial(p, partial)
-    local sln, eln = p.lines[1], p.lines[2]
-    local lcs_esc, rcs_esc = U.escape(p.lcs), U.escape(p.rcs)
-
-    local before_lcs = sln:sub(0, p.srow)
-    local after_lcs = sln:sub(p.srow + 1)
-
-    local before_rcs = eln:sub(0, p.erow + 1)
-    local after_rcs = eln:sub(p.erow + 2)
-
-    -- If given mode is toggle then determine whether to comment or not
-    local cmode
-    if p.cmode == U.cmode.toggle then
-        local s_cmt = U.is_commented(after_lcs, lcs_esc, nil, p.cfg.padding)
-        local e_cmt = U.is_commented(before_rcs, nil, rcs_esc, p.cfg.padding)
-        cmode = (s_cmt and e_cmt) and U.cmode.uncomment or U.cmode.comment
-    else
-        cmode = p.cmode
-    end
-
-    local l1, l2
-    if cmode == U.cmode.uncomment then
-        l1 = U.uncomment_str(after_lcs, lcs_esc, nil, p.cfg.padding)
-        l2 = U.uncomment_str(before_rcs, nil, rcs_esc, p.cfg.padding)
-    else
-        l1 = U.comment_str(after_lcs, p.lcs, nil, p.cfg.padding)
-        l2 = U.comment_str(before_rcs, nil, p.rcs, p.cfg.padding)
-    end
-
-    A.nvim_buf_set_lines(0, p.scol - 1, p.scol, false, { before_lcs .. l1 })
-    A.nvim_buf_set_lines(0, p.ecol - 1, p.ecol, false, { l2 .. after_rcs })
 end
 
 ---Blockwise (left-right/x-axis motion) commenting
