@@ -59,21 +59,19 @@ function op.linewise(p)
         cmode = p.cmode
     end
 
-    local repls = {}
     local uncomment = cmode == U.cmode.uncomment
-
-    for _, line in ipairs(p.lines) do
+    for i, line in ipairs(p.lines) do
         if U.ignore(line, pattern) then
-            table.insert(repls, line)
+            p.lines[i] = line
         else
             if uncomment then
-                table.insert(repls, U.uncomment_str(line, lcs_esc, rcs_esc, p.cfg.padding))
+                p.lines[i] = U.uncomment_str(line, lcs_esc, rcs_esc, p.cfg.padding)
             else
-                table.insert(repls, U.comment_str(line, p.lcs, p.rcs, p.cfg.padding, min_indent))
+                p.lines[i] = U.comment_str(line, p.lcs, p.rcs, p.cfg.padding, min_indent)
             end
         end
     end
-    A.nvim_buf_set_lines(0, p.scol, p.ecol, false, repls)
+    A.nvim_buf_set_lines(0, p.scol, p.ecol, false, p.lines)
 
     return cmode
 end
