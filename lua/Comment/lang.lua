@@ -31,6 +31,7 @@ local L = {
     dhall = { M.dash, M.haskell_b },
     fsharp = { M.cxx_l, M.fsharp_b },
     ocaml = { M.fsharp_b, M.fsharp_b },
+    zig = { M.cxx_l }, -- Zig doesn't have block comments. waaaattttt!
 }
 
 return setmetatable({}, {
