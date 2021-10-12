@@ -218,7 +218,7 @@ function C.setup(opts)
                     srow = srow,
                     erow = erow,
                 })
-            elseif ctype == U.ctype.block then
+            elseif ctype == U.ctype.block and not same_line then
                 ctx.cmode = Op.blockwise({
                     cfg = cfg,
                     cmode = cmode,
