@@ -26,7 +26,7 @@ U.cmotion = {
     line = 1,
     ---char/left-right
     char = 2,
-    ---visual line
+    ---visual operator-pending
     block = 3,
     ---visual
     v = 4,
@@ -99,8 +99,6 @@ end
 function U.get_lines(vmode, ctype)
     local scol, ecol, srow, erow = U.get_region(vmode)
 
-    local sln = scol - 1
-
     -- If start and end is same, then just return the current line
     local lines
     if scol == ecol then
@@ -108,15 +106,15 @@ function U.get_lines(vmode, ctype)
     elseif ctype == U.ctype.block then
         -- In block we only need the starting and endling line
         lines = {
-            A.nvim_buf_get_lines(0, sln, scol, false)[1],
+            A.nvim_buf_get_lines(0, scol - 1, scol, false)[1],
             A.nvim_buf_get_lines(0, ecol - 1, ecol, false)[1],
         }
     else
         -- decrementing `scol` by one bcz marks are 1 based but lines are 0 based
-        lines = A.nvim_buf_get_lines(0, sln, ecol, false)
+        lines = A.nvim_buf_get_lines(0, scol - 1, ecol, false)
     end
 
-    return sln, ecol, lines, srow, erow
+    return scol, ecol, lines, srow, erow
 end
 
 ---Validates and unwraps the given commentstring
