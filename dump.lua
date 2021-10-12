@@ -24,6 +24,8 @@
 -- [x] Provide more arguments to pre and post hooks
 -- [x] `ignore` as a function
 -- [ ] Parse `set comments` if block comment is missing in the plugin
+-- [ ] Use `nvim_buf_get_text` instead of `nvim_buf_get_lines`. Blocked by https://github.com/neovim/neovim/pull/15181
+-- [ ] Use `nvim_buf_set_text` instead of `nvim_buf_set_lines`
 
 -- FIXME
 -- [x] visual mode not working correctly
