@@ -235,26 +235,8 @@ function C.setup(opts)
         if cfg.mappings.basic then
             -- OperatorFunc main
             function _G.___comment_count_gcc()
-                ---@type Ctx
-                local ctx = {
-                    cmode = U.cmode.toggle,
-                    cmotion = U.cmotion.line,
-                    ctype = U.ctype.line,
-                }
-                local scol, ecol, lines = U.get_count_lines(vim.v.count)
-                local lcs, rcs = U.parse_cstr(cfg, ctx)
-                ctx.cmode = Op.linewise({
-                    cfg = cfg,
-                    cmode = ctx.cmode,
-                    lines = lines,
-                    lcs = lcs,
-                    rcs = rcs,
-                    scol = scol,
-                    ecol = ecol,
-                })
-                U.is_fn(cfg.post_hook, ctx, scol, ecol)
+                require('Comment.extra').count(cfg)
             end
-
             function _G.___comment_gcc(vmode)
                 opfunc(vmode, U.cmode.toggle, U.ctype.line, U.cmotion.line)
             end
