@@ -88,6 +88,19 @@ function U.get_region(vmode)
     return sln[1], eln[1], sln[2], eln[2]
 end
 
+---Get lines from the current position to the given count
+---@param count number
+---@return number number Start index of the lines
+---@return number number End index of the lines
+---@return table table List of lines inside the start and end index
+function U.get_count_lines(count)
+    local pos = A.nvim_win_get_cursor(0)
+    local scol = pos[1]
+    local ecol = (scol + count) - 1
+    local lines = A.nvim_buf_get_lines(0, scol - 1, ecol, false)
+    return scol, ecol, lines
+end
+
 ---Get lines from a NORMAL/VISUAL mode
 ---@param vmode string VIM mode
 ---@param ctype CType Comment string type
