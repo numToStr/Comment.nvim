@@ -149,6 +149,22 @@ function U.unwrap_cstr(cstr)
     return not U.is_empty(lcs) and U.trim(lcs), not U.is_empty(rcs) and U.trim(rcs)
 end
 
+---Unwraps the commentstring by taking it from the following places in the respective order.
+---1. pre_hook (optionally a string can be returned)
+---2. lang_table (extra commentstring table in the plugin)
+---3. commentstring (already set or added in pre_hook)
+---@param cfg Config Context
+---@param ctx Ctx Context
+---@return string string Left side of the commentstring
+---@return string string Right side of the commentstring
+function U.parse_cstr(cfg, ctx)
+    local cstr = U.is_fn(cfg.pre_hook, ctx)
+        or require('Comment.lang').get(vim.bo.filetype, ctx.ctype)
+        or vim.bo.commentstring
+
+    return U.unwrap_cstr(cstr)
+end
+
 ---Converts the given string into a commented string
 ---@param ln string String that needs to be commented
 ---@param lcs string Left side of the commentstring
