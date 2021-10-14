@@ -8,10 +8,10 @@
 -   Supports `commentstring`. [Read more](#commentstring)
 -   Prefers single-line/linewise comments
 -   Supports line (`//`) and block (`/* */`) comments
--   Left-right (`gcw` `gc$`) and Up-Down motions (`gc2j` `gc4k`)
--   Use with text-objects (`gci{` `gbat`)
 -   Dot (`.`) repeat support for `gcc`, `gbc` and friends
 -   Count support (`[count]gcc` only)
+-   Left-right (`gcw` `gc$`) and Up-Down (`gc2j` `gc4k`) motions
+-   Use with text-objects (`gci{` `gbat`)
 -   Supports pre and post hooks
 -   Custom language/filetype support
 -   Ignore certain lines, powered by Lua regex
@@ -313,7 +313,7 @@ ignore = '^const(.*)=(%s?)%((.*)%)(%s?)=>'
 
 <a id="languages"></a>
 
-### 🗨️ Languages + Filetypes
+### 🗨️ Filetypes + Languages
 
 Most languages/filetypes have support for comments via `commentstring` but there might be a filetype that is not supported. There are two ways to enable commenting for unsupported filetypes:
 
@@ -331,25 +331,25 @@ vim.api.nvim_command('set commentstring=//%s')
 2. You can also use this plugin interface to store both line and block commentstring for the filetype. You can treat this as a more powerful version of the `commentstring`
 
 ```lua
-local lang = require('Comment.lang')
+local ft = require('Comment.ft')
 
 -- 1. Using set function
 
 -- set both line and block commentstring
-lang.set('javascript', {'//%s', '/*%*/'})
+ft.set('javascript', {'//%s', '/*%*/'})
 
 -- Just set only line comment
-lang.set('yaml', '#%s')
+ft.set('yaml', '#%s')
 
 -- 2. Metatable magic
 
 -- One filetype at a time
-lang.javascript = {'//%s', '/*%*/'}
-lang.yaml = '#%s'
+ft.javascript = {'//%s', '/*%*/'}
+ft.yaml = '#%s'
 
 -- Multiple filetypes
-lang({'go', 'rust'}, {'//%s', '/*%*/'})
-lang({'toml', 'graphql'}, '#%s')
+ft({'go', 'rust'}, {'//%s', '/*%*/'})
+ft({'toml', 'graphql'}, '#%s')
 ```
 
 > PR(s) are welcome to add more commentstring inside the plugin
@@ -362,13 +362,13 @@ Although, `Comment.nvim` supports neovim's `commentstring` but unfortunately it 
 
 -   [`pre_hook`](#hooks) - If a string is returned from this method then it will be used for commenting.
 
--   [`lang_table`](#languages) - If the current filetype is found in the table, then the string there will be used.
+-   [`ft_table`](#languages) - If the current filetype is found in the table, then the string there will be used.
 
 -   `commentstring` - Neovim's native commentstring for the filetype
 
 <a id="commentstring-caveat"></a>
 
-> There is one caveat with this approach. If someone sets the `commentstring` (w/o returning a string) from the `pre_hook` method and if the current filetype also exists in the `lang_table` then the commenting will be done using the string in `lang_table` instead of using `commentstring`
+> There is one caveat with this approach. If someone sets the `commentstring` (w/o returning a string) from the `pre_hook` method and if the current filetype also exists in the `ft_table` then the commenting will be done using the string in `ft_table` instead of using `commentstring`
 
 <a id="comment-context"></a>
 
@@ -398,7 +398,7 @@ require('Comment.utils').cmotion.{line,char,v}
 
 ### 🤝 Contributing
 
-There are multiple ways to contribute reporting/fixing bugs, feature requests. You can also submit commentstring to this plugin by updating [lang.lua](./lua/Comment/lang.lua) and sending PR.
+There are multiple ways to contribute reporting/fixing bugs, feature requests. You can also submit commentstring to this plugin by updating [ft.lua](./lua/Comment/ft.lua) and sending PR.
 
 ### 💐 Credits
 
