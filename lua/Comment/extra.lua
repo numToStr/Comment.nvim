@@ -7,6 +7,7 @@ local E = {}
 ---Example: `10gl` will comment 10 lines
 ---@param cfg Config
 function E.count(cfg)
+    cfg = cfg or {}
     ---@type Ctx
     local ctx = {
         cmode = U.cmode.toggle,
