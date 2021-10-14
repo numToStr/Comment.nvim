@@ -269,6 +269,17 @@ function C.setup(opts)
             -- map('i', '<C-_>', '<CMD>lua require("Comment").toggle()<CR>', opts)
         end
 
+        if cfg.mappings.extra then
+            function _G.___comment_norm_o()
+                require('Comment.extra').o(U.ctype.line, cfg)
+            end
+            function _G.___comment_norm_O()
+                require('Comment.extra').O(U.ctype.line, cfg)
+            end
+            map('n', 'gco', '<CMD>lua ___comment_norm_o()<CR>', map_opt)
+            map('n', 'gcO', '<CMD>lua ___comment_norm_O()<CR>', map_opt)
+        end
+
         if cfg.mappings.extended then
             -- OperatorFunc extended
             function _G.___comment_ggt(vmode)

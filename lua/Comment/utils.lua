@@ -45,6 +45,29 @@ function U.is_empty(ln)
     return ln:find('^$') ~= nil
 end
 
+---Takes out the leading indent from lines
+---@param s string
+---@return string string Indent chars
+---@return number string Length of the indent chars
+function U.grab_indent(s)
+    local _, len, indent = s:find('^(%s*)')
+    return indent, len
+end
+
+---TODO: use this function everywhere
+---Helper to get padding (I was tired to check this everywhere)
+---NOTE: We can also use function to calculate padding if someone wants more spacing
+---@param flag boolean
+---@return string
+function U.get_padding(flag)
+    return flag and ' ' or ''
+end
+
+---Enter INSERT mode
+function U.ins_mode()
+    A.nvim_feedkeys('a', 'n', true)
+end
+
 ---Convert the string to a escaped string, if given
 ---@param str string
 ---@return string|boolean
