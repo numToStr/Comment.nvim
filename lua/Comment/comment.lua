@@ -1,7 +1,6 @@
 local U = require('Comment.utils')
 
 local A = vim.api
-local bo = vim.bo
 
 local C = {
     ---@type Config|nil
@@ -30,21 +29,6 @@ end
 ---@field cmode CMode
 ---@field cmotion CMotion
 
----Unwraps the commentstring by taking it from the following places in the respective order.
----1. pre_hook (optionally a string can be returned)
----2. lang_table (extra commentstring table in the plugin)
----3. commentstring (already set or added in pre_hook)
----@param ctx Ctx Context
----@return string string Left side of the commentstring
----@return string string Right side of the commentstring
-function C.parse_cstr(ctx)
-    local cstr = U.is_fn(C.config.pre_hook, ctx)
-        or require('Comment.lang').get(bo.filetype, ctx.ctype)
-        or bo.commentstring
-
-    return U.unwrap_cstr(cstr)
-end
-
 ---Comments the current line
 function C.comment()
     local line = A.nvim_get_current_line()
@@ -58,7 +42,7 @@ function C.comment()
             ctype = U.ctype.line,
         }
 
-        local lcs, rcs = C.parse_cstr(ctx)
+        local lcs, rcs = U.parse_cstr(C.config, ctx)
         comment_ln(line, lcs, rcs)
         U.is_fn(C.config.post_hook, ctx, -1)
     end
@@ -77,7 +61,7 @@ function C.uncomment()
             ctype = U.ctype.line,
         }
 
-        local lcs, rcs = C.parse_cstr(ctx)
+        local lcs, rcs = U.parse_cstr(C.config, ctx)
         uncomment_ln(line, U.escape(lcs), U.escape(rcs))
         U.is_fn(C.config.post_hook, ctx, -1)
     end
@@ -96,7 +80,7 @@ function C.toggle()
             ctype = U.ctype.line,
         }
 
-        local lcs, rcs = C.parse_cstr(ctx)
+        local lcs, rcs = U.parse_cstr(C.config, ctx)
         local lcs_esc = U.escape(lcs)
         local is_cmt = U.is_commented(line, lcs_esc, nil, C.config.padding)
 
@@ -194,8 +178,8 @@ function C.setup(opts)
             local scol, ecol, lines, srow, erow = U.get_lines(vmode, ctype)
 
             local same_line = scol == ecol
-            local block_motion = cmotion == U.cmotion.char or cmotion == U.cmotion.v
-            local block_x = block_motion and same_line
+            local partial_block = cmotion == U.cmotion.char or cmotion == U.cmotion.v
+            local block_x = partial_block and same_line
 
             ---@type Ctx
             local ctx = {
@@ -204,7 +188,7 @@ function C.setup(opts)
                 ctype = block_x and U.ctype.block or ctype,
             }
 
-            local lcs, rcs = C.parse_cstr(ctx)
+            local lcs, rcs = U.parse_cstr(cfg, ctx)
 
             if block_x then
                 ctx.cmode = Op.blockwise_x({
@@ -229,7 +213,7 @@ function C.setup(opts)
                     ecol = ecol,
                     srow = srow,
                     erow = erow,
-                }, block_motion)
+                }, partial_block)
             else
                 ctx.cmode = Op.linewise({
                     cfg = cfg,
@@ -246,10 +230,13 @@ function C.setup(opts)
         end
 
         local map = A.nvim_set_keymap
-        local mopts = { noremap = true, silent = true }
+        local map_opt = { noremap = true, silent = true }
 
         if cfg.mappings.basic then
             -- OperatorFunc main
+            function _G.___comment_count_gcc()
+                require('Comment.extra').count(cfg)
+            end
             function _G.___comment_gcc(vmode)
                 opfunc(vmode, U.cmode.toggle, U.ctype.line, U.cmotion.line)
             end
@@ -264,14 +251,19 @@ function C.setup(opts)
             end
 
             -- NORMAL mode mappings
-            map('n', cfg.toggler.line, '<CMD>set operatorfunc=v:lua.___comment_gcc<CR>g@$', mopts)
-            map('n', cfg.toggler.block, '<CMD>set operatorfunc=v:lua.___comment_gbc<CR>g@$', mopts)
-            map('n', cfg.opleader.line, '<CMD>set operatorfunc=v:lua.___comment_gc<CR>g@', mopts)
-            map('n', cfg.opleader.block, '<CMD>set operatorfunc=v:lua.___comment_gb<CR>g@', mopts)
+            map(
+                'n',
+                cfg.toggler.line,
+                [[v:count == 0 ? '<CMD>set operatorfunc=v:lua.___comment_gcc<CR>g@$' : '<CMD>lua ___comment_count_gcc()<CR>']],
+                { noremap = true, silent = true, expr = true }
+            )
+            map('n', cfg.toggler.block, '<CMD>set operatorfunc=v:lua.___comment_gbc<CR>g@$', map_opt)
+            map('n', cfg.opleader.line, '<CMD>set operatorfunc=v:lua.___comment_gc<CR>g@', map_opt)
+            map('n', cfg.opleader.block, '<CMD>set operatorfunc=v:lua.___comment_gb<CR>g@', map_opt)
 
             -- VISUAL mode mappings
-            map('x', cfg.opleader.line, '<ESC><CMD>lua ___comment_gc(vim.fn.visualmode())<CR>', mopts)
-            map('x', cfg.opleader.block, '<ESC><CMD>lua ___comment_gb(vim.fn.visualmode())<CR>', mopts)
+            map('x', cfg.opleader.line, '<ESC><CMD>lua ___comment_gc(vim.fn.visualmode())<CR>', map_opt)
+            map('x', cfg.opleader.block, '<ESC><CMD>lua ___comment_gb(vim.fn.visualmode())<CR>', map_opt)
 
             -- INSERT mode mappings
             -- map('i', '<C-_>', '<CMD>lua require("Comment").toggle()<CR>', opts)
@@ -300,17 +292,17 @@ function C.setup(opts)
             end
 
             -- NORMAL mode extra
-            map('n', 'g>', '<CMD>set operatorfunc=v:lua.___comment_ggt<CR>g@', mopts)
-            map('n', 'g>c', '<CMD>set operatorfunc=v:lua.___comment_ggtc<CR>g@$', mopts)
-            map('n', 'g>b', '<CMD>set operatorfunc=v:lua.___comment_ggtb<CR>g@$', mopts)
+            map('n', 'g>', '<CMD>set operatorfunc=v:lua.___comment_ggt<CR>g@', map_opt)
+            map('n', 'g>c', '<CMD>set operatorfunc=v:lua.___comment_ggtc<CR>g@$', map_opt)
+            map('n', 'g>b', '<CMD>set operatorfunc=v:lua.___comment_ggtb<CR>g@$', map_opt)
 
-            map('n', 'g<', '<CMD>set operatorfunc=v:lua.___comment_glt<CR>g@', mopts)
-            map('n', 'g<c', '<CMD>set operatorfunc=v:lua.___comment_gltc<CR>g@$', mopts)
-            map('n', 'g<b', '<CMD>set operatorfunc=v:lua.___comment_gltb<CR>g@$', mopts)
+            map('n', 'g<', '<CMD>set operatorfunc=v:lua.___comment_glt<CR>g@', map_opt)
+            map('n', 'g<c', '<CMD>set operatorfunc=v:lua.___comment_gltc<CR>g@$', map_opt)
+            map('n', 'g<b', '<CMD>set operatorfunc=v:lua.___comment_gltb<CR>g@$', map_opt)
 
             -- VISUAL mode extra
-            map('x', 'g>', '<ESC><CMD>lua ___comment_ggt(vim.fn.visualmode())<CR>', mopts)
-            map('x', 'g<', '<ESC><CMD>lua ___comment_glt(vim.fn.visualmode())<CR>', mopts)
+            map('x', 'g>', '<ESC><CMD>lua ___comment_ggt(vim.fn.visualmode())<CR>', map_opt)
+            map('x', 'g<', '<ESC><CMD>lua ___comment_glt(vim.fn.visualmode())<CR>', map_opt)
         end
     end
 end

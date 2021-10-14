@@ -9,10 +9,11 @@
 -   Prefers single-line/linewise comments
 -   Supports line (`//`) and block (`/* */`) comments
 -   Left-right (`gcw` `gc$`) and Up-Down motions (`gc2j` `gc4k`)
--   Use with text-objects (`gci{` `gcat`)
+-   Use with text-objects (`gci{` `gbat`)
 -   Dot (`.`) repeat support for `gcc`, `gbc` and friends
+-   Count support (`[count]gcc` only)
 -   Supports pre and post hooks
--   Custom language/commentstring support
+-   Custom language/filetype support
 -   Ignore certain lines, powered by Lua regex
 
 ### 🚀 Installation
@@ -73,7 +74,7 @@ Following are the **default** config for the [`setup()`](#setup). If you want to
     ---@type string|function
     ignore = nil,
 
-    ---Whether to create basic (operator-pending) and extra mappings for NORMAL/VISUAL mode
+    ---Create basic (operator-pending) and extra mappings for NORMAL + VISUAL mode
     ---@type table
     mappings = {
         ---operator-pending mapping
@@ -84,21 +85,21 @@ Following are the **default** config for the [`setup()`](#setup). If you want to
         extra = false,
     },
 
-    ---LHS of line and block comment toggle mapping in NORMAL/VISUAL mode
+    ---LHS of toggle mapping in NORMAL + VISUAL mode
     ---@type table
     toggler = {
-        ---line-comment toggle
+        ---line-comment keymap
         line = 'gcc',
-        ---block-comment toggle
+        ---block-comment keymap
         block = 'gbc',
     },
 
-    ---LHS of line and block comment operator-mode mapping in NORMAL/VISUAL mode
+    ---LHS of operator-pending mapping in NORMAL + VISUAL mode
     ---@type table
     opleader = {
-        ---line-comment opfunc mapping
+        ---line-comment keymap
         line = 'gc',
-        ---block-comment opfunc mapping
+        ---block-comment keymap
         block = 'gb',
     },
 
@@ -133,6 +134,14 @@ When you call [`setup()`](#setup) method, `Comment.nvim` sets up some basic mapp
 
 `gbc` - Toggles the current line using blockwise comment
 ```
+
+<a id="count-prefix">
+
+---
+
+`gcc` also supports count-prefix like `[count]gcc` but with this dot-repeat is not supported.
+
+---
 
 > _VISUAL_ mode
 
@@ -304,11 +313,11 @@ ignore = '^const(.*)=(%s?)%((.*)%)(%s?)=>'
 
 <a id="languages"></a>
 
-### 🗨️ Languages
+### 🗨️ Languages + Filetypes
 
-Most languages have support for comments via `commentstring` but there might be a language that is not supported. There are two ways to enable commenting for unsupported languages:
+Most languages/filetypes have support for comments via `commentstring` but there might be a filetype that is not supported. There are two ways to enable commenting for unsupported filetypes:
 
-1.  You can set `commentstring` for that language like the following
+1.  You can set `commentstring` for that particular filetype like the following
 
 ```lua
 vim.bo.commentstring = '//%s'
@@ -319,7 +328,7 @@ vim.api.nvim_command('set commentstring=//%s')
 
 > Run `:h commentstring` for more help
 
-2. You can also use this plugin interface to store both line and block commentstring. You can treat this as a more powerful version of the `commentstring`
+2. You can also use this plugin interface to store both line and block commentstring for the filetype. You can treat this as a more powerful version of the `commentstring`
 
 ```lua
 local lang = require('Comment.lang')
@@ -334,11 +343,11 @@ lang.set('yaml', '#%s')
 
 -- 2. Metatable magic
 
--- One lang at a time
+-- One filetype at a time
 lang.javascript = {'//%s', '/*%*/'}
 lang.yaml = '#%s'
 
--- Multiple langs
+-- Multiple filetypes
 lang({'go', 'rust'}, {'//%s', '/*%*/'})
 lang({'toml', 'graphql'}, '#%s')
 ```

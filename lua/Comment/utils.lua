@@ -88,6 +88,19 @@ function U.get_region(vmode)
     return sln[1], eln[1], sln[2], eln[2]
 end
 
+---Get lines from the current position to the given count
+---@param count number
+---@return number number Start index of the lines
+---@return number number End index of the lines
+---@return table table List of lines inside the start and end index
+function U.get_count_lines(count)
+    local pos = A.nvim_win_get_cursor(0)
+    local scol = pos[1]
+    local ecol = (scol + count) - 1
+    local lines = A.nvim_buf_get_lines(0, scol - 1, ecol, false)
+    return scol, ecol, lines
+end
+
 ---Get lines from a NORMAL/VISUAL mode
 ---@param vmode string VIM mode
 ---@param ctype CType Comment string type
@@ -134,6 +147,22 @@ function U.unwrap_cstr(cstr)
     -- Return false if a part is empty, otherwise trim it
     -- Bcz it is better to deal with boolean rather than checking empty string length everywhere
     return not U.is_empty(lcs) and U.trim(lcs), not U.is_empty(rcs) and U.trim(rcs)
+end
+
+---Unwraps the commentstring by taking it from the following places in the respective order.
+---1. pre_hook (optionally a string can be returned)
+---2. lang_table (extra commentstring table in the plugin)
+---3. commentstring (already set or added in pre_hook)
+---@param cfg Config Context
+---@param ctx Ctx Context
+---@return string string Left side of the commentstring
+---@return string string Right side of the commentstring
+function U.parse_cstr(cfg, ctx)
+    local cstr = U.is_fn(cfg.pre_hook, ctx)
+        or require('Comment.lang').get(vim.bo.filetype, ctx.ctype)
+        or vim.bo.commentstring
+
+    return U.unwrap_cstr(cstr)
 end
 
 ---Converts the given string into a commented string
