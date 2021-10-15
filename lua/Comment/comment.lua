@@ -178,9 +178,9 @@ function C.setup(opts)
 
             cmotion = cmotion == U.cmotion._ and U.cmotion[vmode] or cmotion
 
-            local scol, ecol, lines, srow, erow = U.get_lines(vmode, ctype)
+            local srow, erow, lines, scol, ecol = U.get_lines(vmode, ctype)
 
-            local same_line = scol == ecol
+            local same_line = srow == erow
             local partial_block = cmotion == U.cmotion.char or cmotion == U.cmotion.v
             local block_x = partial_block and same_line
 
@@ -200,10 +200,10 @@ function C.setup(opts)
                     lines = lines,
                     lcs = lcs,
                     rcs = rcs,
-                    scol = scol,
-                    ecol = ecol,
                     srow = srow,
                     erow = erow,
+                    scol = scol,
+                    ecol = ecol,
                 })
             elseif ctype == U.ctype.block and not same_line then
                 ctx.cmode = Op.blockwise({
@@ -212,10 +212,10 @@ function C.setup(opts)
                     lines = lines,
                     lcs = lcs,
                     rcs = rcs,
-                    scol = scol,
-                    ecol = ecol,
                     srow = srow,
                     erow = erow,
+                    scol = scol,
+                    ecol = ecol,
                 }, partial_block)
             else
                 ctx.cmode = Op.linewise({
@@ -224,12 +224,12 @@ function C.setup(opts)
                     lines = lines,
                     lcs = lcs,
                     rcs = rcs,
-                    scol = scol,
-                    ecol = ecol,
+                    srow = srow,
+                    erow = erow,
                 })
             end
 
-            U.is_fn(cfg.post_hook, ctx, scol, ecol, srow, erow)
+            U.is_fn(cfg.post_hook, ctx, srow, erow, scol, ecol)
         end
 
         local map = A.nvim_set_keymap

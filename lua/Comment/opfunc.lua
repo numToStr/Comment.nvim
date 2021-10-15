@@ -9,10 +9,10 @@ local op = {}
 ---@field lines table
 ---@field rcs string
 ---@field lcs string
----@field scol number
----@field ecol number
 ---@field srow number
 ---@field erow number
+---@field scol number
+---@field ecol number
 
 ---Linewise commenting
 ---@param p OpFnParams

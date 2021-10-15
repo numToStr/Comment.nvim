@@ -66,8 +66,10 @@ function U.get_padding(flag)
 end
 
 ---Moves the cursor and enters INSERT mode
-function U.move_n_insert(col, row)
-    A.nvim_win_set_cursor(0, { col, row })
+---@param row number Starting row
+---@param col number Ending column
+function U.move_n_insert(row, col)
+    A.nvim_win_set_cursor(0, { row, col })
     A.nvim_feedkeys('a', 'n', true)
 end
 
@@ -94,10 +96,10 @@ end
 
 ---Get region for vim mode
 ---@param vmode string VIM mode
----@return number number start column
----@return number number end column
 ---@return number number start row
 ---@return number number end row
+---@return number number start column
+---@return number number end column
 function U.get_region(vmode)
     local m = A.nvim_buf_get_mark
     local buf = 0
@@ -116,44 +118,44 @@ end
 
 ---Get lines from the current position to the given count
 ---@param count number
----@return number number Start index of the lines
----@return number number End index of the lines
+---@return number number Starting row
+---@return number number Ending row
 ---@return table table List of lines inside the start and end index
 function U.get_count_lines(count)
     local pos = A.nvim_win_get_cursor(0)
-    local scol = pos[1]
-    local ecol = (scol + count) - 1
-    local lines = A.nvim_buf_get_lines(0, scol - 1, ecol, false)
-    return scol, ecol, lines
+    local srow = pos[1]
+    local erow = (srow + count) - 1
+    local lines = A.nvim_buf_get_lines(0, srow - 1, erow, false)
+    return srow, erow, lines
 end
 
 ---Get lines from a NORMAL/VISUAL mode
 ---@param vmode string VIM mode
 ---@param ctype CType Comment string type
----@return number number Start index of the lines
----@return number number End index of the lines
+---@return number number Starting row
+---@return number number Ending row
 ---@return table table List of lines inside the start and end index
----@return number number Start row
----@return number number End row
+---@return number number Starting columnn
+---@return number number Ending column
 function U.get_lines(vmode, ctype)
-    local scol, ecol, srow, erow = U.get_region(vmode)
+    local srow, erow, scol, ecol = U.get_region(vmode)
 
     -- If start and end is same, then just return the current line
     local lines
-    if scol == ecol then
+    if srow == erow then
         lines = { A.nvim_get_current_line() }
     elseif ctype == U.ctype.block then
         -- In block we only need the starting and endling line
         lines = {
-            A.nvim_buf_get_lines(0, scol - 1, scol, false)[1],
-            A.nvim_buf_get_lines(0, ecol - 1, ecol, false)[1],
+            A.nvim_buf_get_lines(0, srow - 1, srow, false)[1],
+            A.nvim_buf_get_lines(0, erow - 1, erow, false)[1],
         }
     else
         -- decrementing `scol` by one bcz marks are 1 based but lines are 0 based
-        lines = A.nvim_buf_get_lines(0, scol - 1, ecol, false)
+        lines = A.nvim_buf_get_lines(0, srow - 1, erow, false)
     end
 
-    return scol, ecol, lines, srow, erow
+    return srow, erow, lines, scol, ecol
 end
 
 ---Validates and unwraps the given commentstring
