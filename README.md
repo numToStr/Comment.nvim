@@ -340,7 +340,7 @@ local ft = require('Comment.ft')
 -- 1. Using set function
 
 -- set both line and block commentstring
-ft.set('javascript', {'//%s', '/*%*/'})
+ft.set('javascript', {'//%s', '/*%s*/'})
 
 -- Just set only line comment
 ft.set('yaml', '#%s')
@@ -348,11 +348,11 @@ ft.set('yaml', '#%s')
 -- 2. Metatable magic
 
 -- One filetype at a time
-ft.javascript = {'//%s', '/*%*/'}
+ft.javascript = {'//%s', '/*%s*/'}
 ft.yaml = '#%s'
 
 -- Multiple filetypes
-ft({'go', 'rust'}, {'//%s', '/*%*/'})
+ft({'go', 'rust'}, {'//%s', '/*%s*/'})
 ft({'toml', 'graphql'}, '#%s')
 ```
 
