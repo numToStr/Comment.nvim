@@ -129,11 +129,11 @@ These mappings are enabled by default. (config: `mappings.basic`)
 -   NORMAL mode
 
 ```help
-`gc[count]{motion}` - (Operator mode) Toggles the region using linewise comment
-`gb[count]{motion}` - (Operator mode) Toggles the region using linewise comment
-`[count]gcc` - Toggles the number of line given as a prefix-count
 `gcc` - Toggles the current line using linewise comment
 `gbc` - Toggles the current line using blockwise comment
+`[count]gcc` - Toggles the number of line given as a prefix-count
+`gc[count]{motion}` - (Op-pending) Toggles the region using linewise comment
+`gb[count]{motion}` - (Op-pending) Toggles the region using linewise comment
 ```
 
 <a id="count-prefix">
@@ -166,10 +166,10 @@ These mappings are disabled by default. (config: `mappings.extended`)
 -   NORMAL mode
 
 ```help
-`g>[count]{motion}` - (Operator Mode) Comments the region using linewise comment
+`g>[count]{motion}` - (Op-pending) Comments the region using linewise comment
 `g>c` - Comments the current line using linewise comment
 `g>b` - Comments the current line using blockwise comment
-`g<[count]{motion}` - (Operator mode) Uncomments the region using linewise comment
+`g<[count]{motion}` - (Op-pending) Uncomments the region using linewise comment
 `g<c` - Uncomments the current line using linewise comment
 `g<b`- Uncomments the current line using blockwise comment
 ```
