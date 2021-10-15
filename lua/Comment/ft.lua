@@ -37,10 +37,7 @@ local L = {
 return setmetatable({}, {
     __index = {
         set = function(k, v)
-            if type(v) == 'string' then
-                v = { v }
-            end
-            L[k] = v
+            L[k] = type(v) == 'string' and { v } or v
         end,
         get = function(lang, ctype)
             local l = L[lang]

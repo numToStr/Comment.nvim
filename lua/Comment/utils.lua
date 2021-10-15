@@ -30,6 +30,8 @@ U.cmotion = {
     block = 3,
     ---visual
     v = 4,
+    ---visual-line
+    V = 5,
 }
 
 ---Print a msg on stderr

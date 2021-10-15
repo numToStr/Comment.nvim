@@ -397,7 +397,7 @@ require('Comment.utils').ctype.{line,block}
 
 require('Comment.utils').cmode.{toggle,comment,uncomment}
 
-require('Comment.utils').cmotion.{line,char,v}
+require('Comment.utils').cmotion.{line,char,v,V}
 ```
 
 ### 🤝 Contributing
