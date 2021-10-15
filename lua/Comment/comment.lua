@@ -113,6 +113,8 @@ function C.setup(opts)
         mappings = {
             ---operator-pending mapping
             basic = true,
+            ---extra mapping
+            extra = true,
             ---extended mapping
             extended = false,
         },
@@ -149,6 +151,7 @@ function C.setup(opts)
     if cfg.mappings then
         local Op = require('Comment.opfunc')
 
+        -- FIXME move this fn inside the `opfunc` module
         ---Common operatorfunc callback
         ---@param vmode string VIM mode - line|char
         ---@param cmode CMode Comment mode
@@ -232,8 +235,8 @@ function C.setup(opts)
         local map = A.nvim_set_keymap
         local map_opt = { noremap = true, silent = true }
 
+        -- Basic Mappings
         if cfg.mappings.basic then
-            -- OperatorFunc main
             function _G.___comment_count_gcc()
                 require('Comment.extra').count(cfg)
             end
@@ -264,13 +267,29 @@ function C.setup(opts)
             -- VISUAL mode mappings
             map('x', cfg.opleader.line, '<ESC><CMD>lua ___comment_gc(vim.fn.visualmode())<CR>', map_opt)
             map('x', cfg.opleader.block, '<ESC><CMD>lua ___comment_gb(vim.fn.visualmode())<CR>', map_opt)
-
-            -- INSERT mode mappings
-            -- map('i', '<C-_>', '<CMD>lua require("Comment").toggle()<CR>', opts)
         end
 
+        -- Extra Mappings
+        if cfg.mappings.extra then
+            local E = require('Comment.extra')
+
+            function _G.___comment_norm_o()
+                E.norm_o(U.ctype.line, cfg)
+            end
+            function _G.___comment_norm_O()
+                E.norm_O(U.ctype.line, cfg)
+            end
+            function _G.___comment_norm_A()
+                E.norm_A(U.ctype.line, cfg)
+            end
+
+            map('n', 'gco', '<CMD>lua ___comment_norm_o()<CR>', map_opt)
+            map('n', 'gcO', '<CMD>lua ___comment_norm_O()<CR>', map_opt)
+            map('n', 'gcA', '<CMD>lua ___comment_norm_A()<CR>', map_opt)
+        end
+
+        -- Extended Mappings
         if cfg.mappings.extended then
-            -- OperatorFunc extended
             function _G.___comment_ggt(vmode)
                 opfunc(vmode, U.cmode.comment, U.ctype.line, U.cmotion._)
             end
