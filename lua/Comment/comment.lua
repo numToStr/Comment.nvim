@@ -113,6 +113,8 @@ function C.setup(opts)
         mappings = {
             ---operator-pending mapping
             basic = true,
+            ---extra mapping
+            extra = false,
             ---extended mapping
             extended = false,
         },
