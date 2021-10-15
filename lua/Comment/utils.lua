@@ -63,8 +63,9 @@ function U.get_padding(flag)
     return flag and ' ' or ''
 end
 
----Enter INSERT mode
-function U.ins_mode()
+---Moves the cursor and enters INSERT mode
+function U.move_n_insert(col, row)
+    A.nvim_win_set_cursor(0, { col, row })
     A.nvim_feedkeys('a', 'n', true)
 end
 

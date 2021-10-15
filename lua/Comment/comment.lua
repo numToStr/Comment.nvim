@@ -271,13 +271,17 @@ function C.setup(opts)
 
         if cfg.mappings.extra then
             function _G.___comment_norm_o()
-                require('Comment.extra').o(U.ctype.line, cfg)
+                require('Comment.extra').norm_o(U.ctype.line, cfg)
             end
             function _G.___comment_norm_O()
-                require('Comment.extra').O(U.ctype.line, cfg)
+                require('Comment.extra').norm_O(U.ctype.line, cfg)
+            end
+            function _G.___comment_norm_A()
+                require('Comment.extra').norm_A(U.ctype.line, cfg)
             end
             map('n', 'gco', '<CMD>lua ___comment_norm_o()<CR>', map_opt)
             map('n', 'gcO', '<CMD>lua ___comment_norm_O()<CR>', map_opt)
+            map('n', 'gcA', '<CMD>lua ___comment_norm_A()<CR>', map_opt)
         end
 
         if cfg.mappings.extended then
