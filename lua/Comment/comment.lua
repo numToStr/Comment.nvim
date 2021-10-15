@@ -108,13 +108,13 @@ function C.setup(opts)
         ---Example: Use '^$' to ignore empty lines
         ---@type string|function Lua regex
         ignore = nil,
-        ---Whether to create basic (operator-pending) and extra mappings
+        ---Whether to create basic (operator-pending) and extended mappings
         ---@type table
         mappings = {
             ---operator-pending mapping
             basic = true,
             ---extended mapping
-            extra = false,
+            extended = false,
         },
         ---LHS of toggle mapping in NORMAL mode for line and block comment
         ---@type table
@@ -269,8 +269,8 @@ function C.setup(opts)
             -- map('i', '<C-_>', '<CMD>lua require("Comment").toggle()<CR>', opts)
         end
 
-        if cfg.mappings.extra then
-            -- OperatorFunc extra
+        if cfg.mappings.extended then
+            -- OperatorFunc extended
             function _G.___comment_ggt(vmode)
                 opfunc(vmode, U.cmode.comment, U.ctype.line, U.cmotion._)
             end
@@ -291,7 +291,7 @@ function C.setup(opts)
                 opfunc(vmode, U.cmode.uncomment, U.ctype.block, U.cmotion.line)
             end
 
-            -- NORMAL mode extra
+            -- NORMAL mode extended
             map('n', 'g>', '<CMD>set operatorfunc=v:lua.___comment_ggt<CR>g@', map_opt)
             map('n', 'g>c', '<CMD>set operatorfunc=v:lua.___comment_ggtc<CR>g@$', map_opt)
             map('n', 'g>b', '<CMD>set operatorfunc=v:lua.___comment_ggtb<CR>g@$', map_opt)
@@ -300,7 +300,7 @@ function C.setup(opts)
             map('n', 'g<c', '<CMD>set operatorfunc=v:lua.___comment_gltc<CR>g@$', map_opt)
             map('n', 'g<b', '<CMD>set operatorfunc=v:lua.___comment_gltb<CR>g@$', map_opt)
 
-            -- VISUAL mode extra
+            -- VISUAL mode extended
             map('x', 'g>', '<ESC><CMD>lua ___comment_ggt(vim.fn.visualmode())<CR>', map_opt)
             map('x', 'g<', '<ESC><CMD>lua ___comment_glt(vim.fn.visualmode())<CR>', map_opt)
         end

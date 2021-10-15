@@ -74,7 +74,7 @@ Following are the **default** config for the [`setup()`](#setup). If you want to
     ---@type string|function
     ignore = nil,
 
-    ---Create basic (operator-pending) and extra mappings for NORMAL + VISUAL mode
+    ---Create basic (operator-pending) and extended mappings for NORMAL + VISUAL mode
     ---@type table
     mappings = {
         ---operator-pending mapping
@@ -82,7 +82,7 @@ Following are the **default** config for the [`setup()`](#setup). If you want to
         basic = true,
         ---extended mapping
         ---Includes `g>`, `g<`, `g>[count]{motion}` and `g<[count]{motion}`
-        extra = false,
+        extended = false,
     },
 
     ---LHS of toggle mapping in NORMAL + VISUAL mode
@@ -151,7 +151,7 @@ When you call [`setup()`](#setup) method, `Comment.nvim` sets up some basic mapp
 `gb` - Toggles the region using blockwise comment
 ```
 
--   Extra/Explicit mappings. These mappings are disabled by default. (config: `mappings.extra`)
+-   Extended/Explicit mappings. These mappings are disabled by default. (config: `mappings.extended`)
 
 > _NORMAL_ mode
 
