@@ -41,7 +41,7 @@ local function ins_on_line(count, ctype, cfg)
     }
 
     local pos = A.nvim_win_get_cursor(0)
-    local scol, srow = pos[1] + count, pos[2]
+    local srow, scol = pos[1] + count, pos[2]
     local line = A.nvim_get_current_line()
     local indent = U.grab_indent(line)
     local lcs, rcs = U.parse_cstr(cfg, ctx)
@@ -52,10 +52,10 @@ local function ins_on_line(count, ctype, cfg)
     local if_rcs = (ctype == U.ctype.block or rcs) and padding .. rcs or ''
 
     local ll = indent .. lcs .. padding
-    A.nvim_buf_set_lines(0, scol, scol, false, { ll .. if_rcs })
-    local ecol, erow = scol + 1, #ll - 1
-    U.move_n_insert(ecol, erow)
-    U.is_fn(cfg.post_hook, ctx, scol, ecol, srow, erow)
+    A.nvim_buf_set_lines(0, srow, srow, false, { ll .. if_rcs })
+    local erow, ecol = srow + 1, #ll - 1
+    U.move_n_insert(erow, ecol)
+    U.is_fn(cfg.post_hook, ctx, srow, erow, scol, ecol)
 end
 
 ---Add a comment below the current line and goes to INSERT mode
@@ -95,11 +95,11 @@ function E.norm_A(ctype, cfg)
     -- because even in line comment RHS do exists for some filetypes like jsx_element, ocaml
     local if_rcs = (ctype == U.ctype.block or rcs) and padding .. rcs or ''
 
-    local scol, srow = pos[1], pos[2]
-    local ecol, erow = scol - 1, #ll - 1
-    A.nvim_buf_set_lines(0, ecol, scol, false, { ll .. if_rcs })
-    U.move_n_insert(scol, erow)
-    U.is_fn(cfg.post_hook, ctx, scol, ecol, srow, erow)
+    local srow, scol = pos[1], pos[2]
+    local erow, ecol = srow - 1, #ll - 1
+    A.nvim_buf_set_lines(0, erow, srow, false, { ll .. if_rcs })
+    U.move_n_insert(srow, ecol)
+    U.is_fn(cfg.post_hook, ctx, srow, erow, scol, ecol)
 end
 
 return E
