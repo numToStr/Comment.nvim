@@ -80,6 +80,9 @@ Following are the **default** config for the [`setup()`](#setup). If you want to
         ---operator-pending mapping
         ---Includes `gcc`, `gcb`, `gc[count]{motion}` and `gb[count]{motion}`
         basic = true,
+        ---extra mapping
+        ---Includes `gco`, `gcO`, `gcA`
+        extra = true,
         ---extended mapping
         ---Includes `g>`, `g<`, `g>[count]{motion}` and `g<[count]{motion}`
         extended = false,
@@ -119,61 +122,62 @@ When you call [`setup()`](#setup) method, `Comment.nvim` sets up some basic mapp
 
 <a id="mappings"></a>
 
-#### Mappings
+#### Basic mappings
 
--   Basic/Toggle mappings (config: `mappings.basic`)
+These mappings are enabled by default. (config: `mappings.basic`)
 
-> _NORMAL_ mode
+-   NORMAL mode
 
 ```help
 `gc[count]{motion}` - (Operator mode) Toggles the region using linewise comment
-
 `gb[count]{motion}` - (Operator mode) Toggles the region using linewise comment
-
+`[count]gcc` - Toggles the number of line given as a prefix-count
 `gcc` - Toggles the current line using linewise comment
-
 `gbc` - Toggles the current line using blockwise comment
 ```
 
 <a id="count-prefix">
 
----
+> NOTE: Dot repeat is not supported with `[count]gcc`
 
-`gcc` also supports count-prefix like `[count]gcc` but with this dot-repeat is not supported.
-
----
-
-> _VISUAL_ mode
+-   VISUAL mode
 
 ```help
 `gc` - Toggles the region using linewise comment
-
 `gb` - Toggles the region using blockwise comment
 ```
 
--   Extended/Explicit mappings. These mappings are disabled by default. (config: `mappings.extended`)
+#### Extra mappings
 
-> _NORMAL_ mode
+These mappings are enabled by default. (config: `mappings.extra`)
+
+-   NORMAL mode
+
+```help
+`gco` - Insert comment to the next line and enters INSERT mode
+`gcO` - Insert comment to the previous line and enters INSERT mode
+`gcA` - Insert comment to end of the current line and enters INSERT mode
+```
+
+#### Extended mappings
+
+These mappings are disabled by default. (config: `mappings.extended`)
+
+-   NORMAL mode
 
 ```help
 `g>[count]{motion}` - (Operator Mode) Comments the region using linewise comment
-
 `g>c` - Comments the current line using linewise comment
-
 `g>b` - Comments the current line using blockwise comment
-
 `g<[count]{motion}` - (Operator mode) Uncomments the region using linewise comment
-
 `g<c` - Uncomments the current line using linewise comment
-
 `g<b`- Uncomments the current line using blockwise comment
 ```
 
-> _VISUAL_ mode
+-   VISUAL mode
 
 ```help
 `g>` - Comments the region using single line
-
 `g<` - Unomments the region using single line
 ```
 
