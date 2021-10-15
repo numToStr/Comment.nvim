@@ -6,13 +6,13 @@ local op = {}
 ---@class OpFnParams
 ---@field cfg Config
 ---@field cmode CMode
----@field lines table
----@field rcs string
----@field lcs string
----@field srow number
----@field erow number
----@field scol number
----@field ecol number
+---@field lines table List of lines
+---@field rcs string RHS of commentstring
+---@field lcs string LHS of commentstring
+---@field srow number Starting row
+---@field erow number Ending row
+---@field scol number Starting column
+---@field ecol number Ending column
 
 ---Linewise commenting
 ---@param p OpFnParams
@@ -73,7 +73,7 @@ function op.linewise(p)
             end
         end
     end
-    A.nvim_buf_set_lines(0, p.scol - 1, p.ecol, false, p.lines)
+    A.nvim_buf_set_lines(0, p.srow - 1, p.erow, false, p.lines)
 
     return cmode
 end
@@ -91,8 +91,8 @@ function op.blockwise(p, partial)
     local sln_check = sln
     local eln_check = eln
     if partial then
-        sln_check = sln:sub(p.srow + 1)
-        eln_check = eln:sub(0, p.erow + 1)
+        sln_check = sln:sub(p.scol + 1)
+        eln_check = eln:sub(0, p.ecol + 1)
     end
 
     -- If given mode is toggle then determine whether to comment or not
@@ -116,12 +116,12 @@ function op.blockwise(p, partial)
     end
 
     if partial then
-        l1 = sln:sub(0, p.srow) .. l1
-        l2 = l2 .. eln:sub(p.erow + 2)
+        l1 = sln:sub(0, p.scol) .. l1
+        l2 = l2 .. eln:sub(p.ecol + 2)
     end
 
-    A.nvim_buf_set_lines(0, p.scol - 1, p.scol, false, { l1 })
-    A.nvim_buf_set_lines(0, p.ecol - 1, p.ecol, false, { l2 })
+    A.nvim_buf_set_lines(0, p.srow - 1, p.srow, false, { l1 })
+    A.nvim_buf_set_lines(0, p.erow - 1, p.erow, false, { l2 })
 
     return cmode
 end
@@ -131,9 +131,9 @@ end
 ---@return integer CMode
 function op.blockwise_x(p)
     local line = p.lines[1]
-    local first = line:sub(0, p.srow)
-    local mid = line:sub(p.srow + 1, p.erow + 1)
-    local last = line:sub(p.erow + 2)
+    local first = line:sub(0, p.scol)
+    local mid = line:sub(p.scol + 1, p.ecol + 1)
+    local last = line:sub(p.ecol + 2)
 
     local yes, _, stripped = U.is_commented(mid, U.escape(p.lcs), U.escape(p.rcs), p.cfg.padding)
 
