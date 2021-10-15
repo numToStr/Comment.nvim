@@ -32,6 +32,7 @@ local L = {
     fsharp = { M.cxx_l, M.fsharp_b },
     ocaml = { M.fsharp_b, M.fsharp_b },
     zig = { M.cxx_l }, -- Zig doesn't have block comments. waaaattttt!
+    swift = { M.cxx_l, M.cxx_b },
 }
 
 return setmetatable({}, {
