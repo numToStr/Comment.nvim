@@ -260,19 +260,19 @@ Also, you can set the `commentstring` from here but [**i won't recommend it**](#
 }
 ```
 
--   `post_hook` - This method is called after commenting is done. It receives the same 1) [`ctx`](#comment-context), the lines range 2) `start_col` 3) `end_col` 4) `start_row` 5) `end_row`.
+-   `post_hook` - This method is called after commenting is done. It receives the same 1) [`ctx`](#comment-context), the lines range 2) `start_row` 3) `end_row` 4) `start_col` 5) `end_col`.
 
 > NOTE: If [methods](#methods) are used, then `post_hook` will receives only two arguments 1) [`ctx`](#comment-context) and 2) `-1` indicating the current line
 
 ```lua
 {
     ---@param ctx Ctx
-    ---@param start_col integar
-    ---@param end_col integar
     ---@param start_row integar
     ---@param end_row integar
-    post_hook = function(ctx, start_col, end_col, start_row, end_row)
-        if start_col == -1 then
+    ---@param start_col integar
+    ---@param end_col integar
+    post_hook = function(ctx, start_row, end_row, start_col, end_col)
+        if start_row == -1 then
             -- do something with the current line
         else
             -- do something with lines range
