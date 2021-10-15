@@ -39,7 +39,6 @@ local function ins_on_line(count, ctype, cfg)
         ctype = ctype,
     }
 
-    -- Computing the new line and setting it up
     local pos = A.nvim_win_get_cursor(0)
     local scol, srow = pos[1] + count, pos[2]
     local line = A.nvim_get_current_line()
@@ -53,11 +52,8 @@ local function ins_on_line(count, ctype, cfg)
 
     local ll = indent .. lcs .. padding
     A.nvim_buf_set_lines(0, scol, scol, false, { ll .. if_rcs })
-
-    -- From here cursor starts to dance :)
     local ecol, erow = scol + 1, #ll - 1
     U.move_n_insert(ecol, erow)
-
     U.is_fn(cfg.post_hook, ctx, scol, ecol, srow, erow)
 end
 
