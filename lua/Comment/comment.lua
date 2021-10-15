@@ -237,7 +237,6 @@ function C.setup(opts)
 
         -- Basic Mappings
         if cfg.mappings.basic then
-            -- OperatorFunc main
             function _G.___comment_count_gcc()
                 require('Comment.extra').count(cfg)
             end
@@ -268,9 +267,6 @@ function C.setup(opts)
             -- VISUAL mode mappings
             map('x', cfg.opleader.line, '<ESC><CMD>lua ___comment_gc(vim.fn.visualmode())<CR>', map_opt)
             map('x', cfg.opleader.block, '<ESC><CMD>lua ___comment_gb(vim.fn.visualmode())<CR>', map_opt)
-
-            -- INSERT mode mappings
-            -- map('i', '<C-_>', '<CMD>lua require("Comment").toggle()<CR>', opts)
         end
 
         -- Extra Mappings

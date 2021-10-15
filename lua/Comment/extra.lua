@@ -28,6 +28,7 @@ function E.count(cfg)
     U.is_fn(cfg.post_hook, ctx, scol, ecol)
 end
 
+-- FIXME This prints `a` in i_CTRL-o
 ---@param count number Line index
 ---@param ctype CType
 ---@param cfg Config
