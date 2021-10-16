@@ -34,6 +34,10 @@ function T.query()
     return ts.parse_query(bo.ft, [[(comment) @comment]])
 end
 
+function T.get_text(node)
+    return ts.query.get_node_text(node, 0)
+end
+
 function T.comment_in_range(row, col, srow, scol, erow, ecol)
     row = row - 1
 
@@ -83,38 +87,59 @@ local setup = { --[[ {
 } --]]
 }
 
-local function walk_ahead(node)
-    local curr = node:next_sibling()
-    if not curr or curr:type() ~= 'comment' then
+local function last_comment_node(node)
+    local next = node:next_sibling()
+    if not next then
         return node
     end
-    return walk_ahead(curr)
+
+    local curr_row = node:range()
+    local next_row = next:range()
+    if (curr_row + 1 ~= next_row) or next:type() ~= 'comment' then
+        return node
+    end
+
+    return last_comment_node(next)
 end
 
-local function walk_back(node)
-    local curr = node:prev_sibling()
-    if not curr or curr:type() ~= 'comment' then
+local function first_comment_node(node)
+    local prev = node:prev_sibling()
+    if not prev then
         return node
     end
-    return walk_back(curr)
+
+    local curr_row = node:range()
+    local prev_row = prev:range()
+    if (prev_row + 1 ~= curr_row) or prev:type() ~= 'comment' then
+        return node
+    end
+
+    return first_comment_node(prev)
 end
 
 local parser = T.get_parser()
 local root = T.get_root(parser)
 
 local query = T.query()
-local cur_node, ctype = T.get_node_at_cursor(query, root)
+local curr_node, ctype = T.get_node_at_cursor(query, root)
 
-if cur_node then
+if curr_node then
+    print(T.get_text(curr_node), ctype)
+
+    -- FIXME this is broken for subline block comment
+    -- Solution
+    -- 1. get_text and test it against block comment
+    -- 2. if match, then treat it as a block comment
     if ctype == U.ctype.line then
-        local first_node = walk_back(cur_node)
-        local last_node = walk_ahead(cur_node)
-        print(ts.query.get_node_text(first_node, 0))
-        print(ts.query.get_node_text(last_node, 0))
+        local first_node = first_comment_node(curr_node)
+        local last_node --[[ hello --]] = last_comment_node(curr_node)
+        print(T.get_text(first_node))
+        print(T.get_text(last_node))
         -- print(first_node:range())
         -- print(last_node:range())
     else
-        print(ts.query.get_node_text(cur_node, 0) or 'block')
+        print(curr_node:range())
+        print(T.get_text(curr_node) or 'block')
     end
 end
 
@@ -125,6 +150,6 @@ end
 -- so we can catch
 -- them at once
 
--- --[[
---     One block comment
--- --]]
+--[[
+    One block comment
+--]]
