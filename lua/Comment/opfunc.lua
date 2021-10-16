@@ -1,6 +1,7 @@
 local U = require('Comment.utils')
 local A = vim.api
-local op = {}
+
+local O = {}
 
 ---Opfunc options
 ---@class OpFnParams
@@ -14,10 +15,91 @@ local op = {}
 ---@field scol number Starting column
 ---@field ecol number Ending column
 
+---Common operatorfunc callback
+---@param cfg Config Plugin config
+---@param vmode string VIM mode - line|char
+---@param cmode CMode Comment mode
+---@param ctype CType Type of the commentstring (line/block)
+---@param cmotion CMotion Motion type
+function O.opfunc(cfg, vmode, cmode, ctype, cmotion)
+    -- comment/uncomment logic
+    --
+    -- 1. type == line
+    --      * decide whether to comment or not, if all the lines are commented then uncomment otherwise comment
+    --      * also, store the minimum indent from all the lines (exclude empty line)
+    --      * if comment the line, use cstr LHS and also considering the min indent
+    --      * if uncomment the line, remove cstr LHS from lines
+    --      * update the lines
+    -- 2. type == block
+    --      * check if the first and last is commented or not with cstr LHS and RHS respectively.
+    --      * if both lines commented
+    --          - remove cstr LHS from the first line
+    --          - remove cstr RHS to end of the last line
+    --      * if both lines uncommented
+    --          - add cstr LHS after the leading whitespace and before the first char of the first line
+    --          - add cstr RHS to end of the last line
+    --      * update the lines
+
+    cmotion = cmotion == U.cmotion._ and U.cmotion[vmode] or cmotion
+
+    local srow, erow, lines, scol, ecol = U.get_lines(vmode, ctype)
+
+    local same_line = srow == erow
+    local partial_block = cmotion == U.cmotion.char or cmotion == U.cmotion.v
+    local block_x = partial_block and same_line
+
+    ---@type Ctx
+    local ctx = {
+        cmode = cmode,
+        cmotion = cmotion,
+        ctype = block_x and U.ctype.block or ctype,
+    }
+
+    local lcs, rcs = U.parse_cstr(cfg, ctx)
+
+    if block_x then
+        ctx.cmode = O.blockwise_x({
+            cfg = cfg,
+            cmode = cmode,
+            lines = lines,
+            lcs = lcs,
+            rcs = rcs,
+            srow = srow,
+            erow = erow,
+            scol = scol,
+            ecol = ecol,
+        })
+    elseif ctype == U.ctype.block and not same_line then
+        ctx.cmode = O.blockwise({
+            cfg = cfg,
+            cmode = cmode,
+            lines = lines,
+            lcs = lcs,
+            rcs = rcs,
+            srow = srow,
+            erow = erow,
+            scol = scol,
+            ecol = ecol,
+        }, partial_block)
+    else
+        ctx.cmode = O.linewise({
+            cfg = cfg,
+            cmode = cmode,
+            lines = lines,
+            lcs = lcs,
+            rcs = rcs,
+            srow = srow,
+            erow = erow,
+        })
+    end
+
+    U.is_fn(cfg.post_hook, ctx, srow, erow, scol, ecol)
+end
+
 ---Linewise commenting
 ---@param p OpFnParams
 ---@return integer CMode
-function op.linewise(p)
+function O.linewise(p)
     local lcs_esc, rcs_esc = U.escape(p.lcs), U.escape(p.rcs)
 
     -- While commenting a block of text, there is a possiblity of lines being both commented and non-commented
@@ -82,7 +164,7 @@ end
 ---@param p OpFnParams
 ---@param partial boolean Whether to do a partial or full comment
 ---@return integer CMode
-function op.blockwise(p, partial)
+function O.blockwise(p, partial)
     -- Block wise, only when there are more than 1 lines
     local sln, eln = p.lines[1], p.lines[2]
     local lcs_esc, rcs_esc = U.escape(p.lcs), U.escape(p.rcs)
@@ -129,7 +211,7 @@ end
 ---Blockwise (left-right/x-axis motion) commenting
 ---@param p OpFnParams
 ---@return integer CMode
-function op.blockwise_x(p)
+function O.blockwise_x(p)
     local line = p.lines[1]
     local first = line:sub(0, p.scol)
     local mid = line:sub(p.scol + 1, p.ecol + 1)
@@ -156,4 +238,28 @@ function op.blockwise_x(p)
     return cmode
 end
 
-return op
+---Toggle line comment with count
+---Example: `10gl` will comment 10 lines
+---@param cfg Config
+function O.count(cfg)
+    ---@type Ctx
+    local ctx = {
+        cmode = U.cmode.toggle,
+        cmotion = U.cmotion.line,
+        ctype = U.ctype.line,
+    }
+    local lcs, rcs = U.parse_cstr(cfg, ctx)
+    local srow, erow, lines = U.get_count_lines(vim.v.count)
+    ctx.cmode = O.linewise({
+        cfg = cfg,
+        cmode = ctx.cmode,
+        lines = lines,
+        lcs = lcs,
+        rcs = rcs,
+        srow = srow,
+        erow = erow,
+    })
+    U.is_fn(cfg.post_hook, ctx, srow, erow)
+end
+
+return O

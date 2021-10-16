@@ -65,6 +65,7 @@ function U.get_padding(flag)
     return flag and ' ' or ''
 end
 
+-- FIXME This prints `a` in i_CTRL-o
 ---Moves the cursor and enters INSERT mode
 ---@param row number Starting row
 ---@param col number Ending column
