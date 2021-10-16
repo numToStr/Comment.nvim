@@ -151,106 +151,25 @@ function C.setup(opts)
     if cfg.mappings then
         local Op = require('Comment.opfunc')
 
-        -- FIXME move this fn inside the `opfunc` module
-        ---Common operatorfunc callback
-        ---@param vmode string VIM mode - line|char
-        ---@param cmode CMode Comment mode
-        ---@param ctype CType Type of the commentstring (line/block)
-        ---@param cmotion CMotion Motion type
-        local function opfunc(vmode, cmode, ctype, cmotion)
-            -- comment/uncomment logic
-            --
-            -- 1. type == line
-            --      * decide whether to comment or not, if all the lines are commented then uncomment otherwise comment
-            --      * also, store the minimum indent from all the lines (exclude empty line)
-            --      * if comment the line, use cstr LHS and also considering the min indent
-            --      * if uncomment the line, remove cstr LHS from lines
-            --      * update the lines
-            -- 2. type == block
-            --      * check if the first and last is commented or not with cstr LHS and RHS respectively.
-            --      * if both lines commented
-            --          - remove cstr LHS from the first line
-            --          - remove cstr RHS to end of the last line
-            --      * if both lines uncommented
-            --          - add cstr LHS after the leading whitespace and before the first char of the first line
-            --          - add cstr RHS to end of the last line
-            --      * update the lines
-
-            cmotion = cmotion == U.cmotion._ and U.cmotion[vmode] or cmotion
-
-            local srow, erow, lines, scol, ecol = U.get_lines(vmode, ctype)
-
-            local same_line = srow == erow
-            local partial_block = cmotion == U.cmotion.char or cmotion == U.cmotion.v
-            local block_x = partial_block and same_line
-
-            ---@type Ctx
-            local ctx = {
-                cmode = cmode,
-                cmotion = cmotion,
-                ctype = block_x and U.ctype.block or ctype,
-            }
-
-            local lcs, rcs = U.parse_cstr(cfg, ctx)
-
-            if block_x then
-                ctx.cmode = Op.blockwise_x({
-                    cfg = cfg,
-                    cmode = cmode,
-                    lines = lines,
-                    lcs = lcs,
-                    rcs = rcs,
-                    srow = srow,
-                    erow = erow,
-                    scol = scol,
-                    ecol = ecol,
-                })
-            elseif ctype == U.ctype.block and not same_line then
-                ctx.cmode = Op.blockwise({
-                    cfg = cfg,
-                    cmode = cmode,
-                    lines = lines,
-                    lcs = lcs,
-                    rcs = rcs,
-                    srow = srow,
-                    erow = erow,
-                    scol = scol,
-                    ecol = ecol,
-                }, partial_block)
-            else
-                ctx.cmode = Op.linewise({
-                    cfg = cfg,
-                    cmode = cmode,
-                    lines = lines,
-                    lcs = lcs,
-                    rcs = rcs,
-                    srow = srow,
-                    erow = erow,
-                })
-            end
-
-            U.is_fn(cfg.post_hook, ctx, srow, erow, scol, ecol)
-        end
-
         local map = A.nvim_set_keymap
         local map_opt = { noremap = true, silent = true }
 
         -- Basic Mappings
         if cfg.mappings.basic then
             function _G.___comment_count_gcc()
-                require('Comment.extra').count(cfg)
+                Op.count(cfg)
             end
             function _G.___comment_gcc(vmode)
-                opfunc(vmode, U.cmode.toggle, U.ctype.line, U.cmotion.line)
+                Op.opfunc(cfg, vmode, U.cmode.toggle, U.ctype.line, U.cmotion.line)
             end
             function _G.___comment_gbc(vmode)
-                opfunc(vmode, U.cmode.toggle, U.ctype.block, U.cmotion.line)
+                Op.opfunc(cfg, vmode, U.cmode.toggle, U.ctype.block, U.cmotion.line)
             end
             function _G.___comment_gc(vmode)
-                opfunc(vmode, U.cmode.toggle, U.ctype.line, U.cmotion._)
+                Op.opfunc(cfg, vmode, U.cmode.toggle, U.ctype.line, U.cmotion._)
             end
             function _G.___comment_gb(vmode)
-                opfunc(vmode, U.cmode.toggle, U.ctype.block, U.cmotion._)
+                Op.opfunc(cfg, vmode, U.cmode.toggle, U.ctype.block, U.cmotion._)
             end
 
             -- NORMAL mode mappings
@@ -291,23 +210,23 @@ function C.setup(opts)
         -- Extended Mappings
         if cfg.mappings.extended then
             function _G.___comment_ggt(vmode)
-                opfunc(vmode, U.cmode.comment, U.ctype.line, U.cmotion._)
+                Op.opfunc(cfg, vmode, U.cmode.comment, U.ctype.line, U.cmotion._)
             end
             function _G.___comment_ggtc(vmode)
-                opfunc(vmode, U.cmode.comment, U.ctype.line, U.cmotion.line)
+                Op.opfunc(cfg, vmode, U.cmode.comment, U.ctype.line, U.cmotion.line)
             end
             function _G.___comment_ggtb(vmode)
-                opfunc(vmode, U.cmode.comment, U.ctype.block, U.cmotion.line)
+                Op.opfunc(cfg, vmode, U.cmode.comment, U.ctype.block, U.cmotion.line)
             end
 
-            function _G.___comment_glt(mode)
-                opfunc(mode, U.cmode.uncomment, U.ctype.line, U.cmotion._)
+            function _G.___comment_glt(vmode)
+                Op.opfunc(cfg, vmode, U.cmode.uncomment, U.ctype.line, U.cmotion._)
             end
-            function _G.___comment_gltc(mode)
-                opfunc(mode, U.cmode.uncomment, U.ctype.line, U.cmotion.line)
+            function _G.___comment_gltc(vmode)
+                Op.opfunc(cfg, vmode, U.cmode.uncomment, U.ctype.line, U.cmotion.line)
             end
             function _G.___comment_gltb(vmode)
-                opfunc(vmode, U.cmode.uncomment, U.ctype.block, U.cmotion.line)
+                Op.opfunc(cfg, vmode, U.cmode.uncomment, U.ctype.block, U.cmotion.line)
             end
 
             -- NORMAL mode extended
