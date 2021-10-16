@@ -15,6 +15,7 @@
 -- [ ] Doc comment ie. /** */ (for js)
 -- [ ] Treesitter Integration
 --      [ ] Better comment detection
+--      [ ] Text objects
 --      [ ] Context commentstring
 -- [ ] Insert mode mapping (also move the cursor after commentstring)
 -- [-] Port `commentstring` from tcomment
