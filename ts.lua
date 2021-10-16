@@ -35,7 +35,7 @@ function T.query()
 end
 
 function T.get_text(node)
-    return ts.query.get_node_text(node, 0)
+    return node and ts.query.get_node_text(node, 0)
 end
 
 function T.comment_in_range(row, col, srow, scol, erow, ecol)
@@ -124,17 +124,24 @@ local query = T.query()
 local curr_node, ctype = T.get_node_at_cursor(query, root)
 
 if curr_node then
-    print(T.get_text(curr_node), ctype)
+    -- print(T.get_text(curr_node), ctype)
 
-    -- FIXME this is broken for subline block comment
-    -- Solution
-    -- 1. get_text and test it against block comment
-    -- 2. if match, then treat it as a block comment
+    -- FIXME: this is broken for subline block comment
+    --
+    -- PROBLEM
+    -- Bcz they both exists on a single line, identifying them different is hard in the sense of treesitter.
+    -- We should work on subline block comment if we are inside it
+    --
+    -- WORKAROUND
+    -- 1. get_text and test it against subline block comment
+    -- 2. if match, then treat it as a subline block comment
+
+    -- NOTE: When a region only consists of a single line comment then first/last node both will be same
     if ctype == U.ctype.line then
         local first_node = first_comment_node(curr_node)
         local last_node --[[ hello --]] = last_comment_node(curr_node)
-        print(T.get_text(first_node))
-        print(T.get_text(last_node))
+        print(1, T.get_text(first_node))
+        print(2, T.get_text(last_node))
         -- print(first_node:range())
         -- print(last_node:range())
     else
