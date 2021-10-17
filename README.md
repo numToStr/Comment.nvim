@@ -83,6 +83,7 @@ Following are the **default** config for the [`setup()`](#setup). If you want to
         ---extra mapping
         ---Includes `gco`, `gcO`, `gcA`
         extra = true,
+        use_opleader = false,
         ---extended mapping
         ---Includes `g>`, `g<`, `g>[count]{motion}` and `g<[count]{motion}`
         extended = false,

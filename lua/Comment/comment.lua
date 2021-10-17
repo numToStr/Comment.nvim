@@ -115,6 +115,7 @@ function C.setup(opts)
             basic = true,
             ---extra mapping
             extra = true,
+            use_opleader = false,
             ---extended mapping
             extended = false,
         },
@@ -202,9 +203,15 @@ function C.setup(opts)
                 E.norm_A(U.ctype.line, cfg)
             end
 
-            map('n', 'gco', '<CMD>lua ___comment_norm_o()<CR>', map_opt)
-            map('n', 'gcO', '<CMD>lua ___comment_norm_O()<CR>', map_opt)
-            map('n', 'gcA', '<CMD>lua ___comment_norm_A()<CR>', map_opt)
+            if cfg.mappings.use_opleader then
+                    map('n', cfg.opleader.line .. 'o', '<CMD>lua ___comment_norm_o()<CR>', map_opt)
+                    map('n', cfg.opleader.line .. 'O', '<CMD>lua ___comment_norm_O()<CR>', map_opt)
+                    map('n', cfg.opleader.line .. 'A', '<CMD>lua ___comment_norm_A()<CR>', map_opt)
+            else
+                    map('n', 'gco', '<CMD>lua ___comment_norm_o()<CR>', map_opt)
+                    map('n', 'gcO', '<CMD>lua ___comment_norm_O()<CR>', map_opt)
+                    map('n', 'gcA', '<CMD>lua ___comment_norm_A()<CR>', map_opt)
+            end
         end
 
         -- Extended Mappings
