@@ -116,6 +116,12 @@ Following are the **default** config for the [`setup()`](#setup). If you want to
 }
 ```
 
+The configuration is also exported by the following method. But make to sure to call [setup](#setup) first.
+
+```lua
+require('Comment').get_config()
+```
+
 ### 🔥 Usage
 
 When you call [`setup()`](#setup) method, `Comment.nvim` sets up some basic mapping which can used in NORMAL and VISUAL mode to get you started with the pleasure of commenting stuff out.
@@ -215,6 +221,12 @@ require('Comment').uncomment()
 -- Toggles the current lines
 require('Comment').toggle()
 ```
+
+<a id="api"></a>
+
+### ⚙️ API
+
+Read [API](./API.md) for more crazy stuff.
 
 <a id="hooks"></a>
 
