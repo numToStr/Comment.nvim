@@ -12,6 +12,7 @@ local function ins_on_line(count, ctype, cfg)
         cmode = U.cmode.comment,
         cmotion = U.cmotion.line,
         ctype = ctype,
+        cfg = cfg,
     }
 
     local pos = A.nvim_win_get_cursor(0)
@@ -55,6 +56,7 @@ function E.norm_A(ctype, cfg)
         cmode = U.cmode.comment,
         cmotion = U.cmotion.line,
         ctype = ctype,
+        cfg = cfg,
     }
 
     local pos = A.nvim_win_get_cursor(0)

@@ -53,6 +53,7 @@ function O.opfunc(cfg, vmode, cmode, ctype, cmotion)
         cmode = cmode,
         cmotion = cmotion,
         ctype = block_x and U.ctype.block or ctype,
+        cfg = cfg,
     }
 
     local lcs, rcs = U.parse_cstr(cfg, ctx)
@@ -247,6 +248,7 @@ function O.count(cfg)
         cmode = U.cmode.toggle,
         cmotion = U.cmotion.line,
         ctype = U.ctype.line,
+        cfg = cfg,
     }
     local lcs, rcs = U.parse_cstr(cfg, ctx)
     local srow, erow, lines = U.get_count_lines(vim.v.count)

@@ -40,6 +40,7 @@ function C.comment()
             cmode = U.cmode.comment,
             cmotion = U.cmotion.line,
             ctype = U.ctype.line,
+            cfg = C.config,
         }
 
         local lcs, rcs = U.parse_cstr(C.config, ctx)
@@ -59,6 +60,7 @@ function C.uncomment()
             cmode = U.cmode.uncomment,
             cmotion = U.cmotion.line,
             ctype = U.ctype.line,
+            cfg = C.config,
         }
 
         local lcs, rcs = U.parse_cstr(C.config, ctx)
@@ -78,6 +80,7 @@ function C.toggle()
             cmode = U.cmode.toggle,
             cmotion = U.cmotion.line,
             ctype = U.ctype.line,
+            cfg = C.config,
         }
 
         local lcs, rcs = U.parse_cstr(C.config, ctx)
