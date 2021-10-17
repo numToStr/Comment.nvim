@@ -5,4 +5,7 @@ return {
     toggle = C.toggle,
     comment = C.comment,
     uncomment = C.uncomment,
+    get_config = function()
+        return C.config
+    end,
 }
