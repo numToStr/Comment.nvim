@@ -176,12 +176,12 @@ function C.setup(opts)
             map(
                 'n',
                 cfg.toggler.line,
-                [[v:count == 0 ? '<CMD>set operatorfunc=v:lua.___comment_gcc<CR>g@$' : '<CMD>lua ___comment_count_gcc()<CR>']],
+                [[v:count == 0 ? '<CMD>let b:comment_pos = getpos(".") <BAR> set operatorfunc=v:lua.___comment_gcc<CR>g@$' : '<CMD>lua ___comment_count_gcc()<CR>']],
                 { noremap = true, silent = true, expr = true }
             )
-            map('n', cfg.toggler.block, '<CMD>set operatorfunc=v:lua.___comment_gbc<CR>g@$', map_opt)
-            map('n', cfg.opleader.line, '<CMD>set operatorfunc=v:lua.___comment_gc<CR>g@', map_opt)
-            map('n', cfg.opleader.block, '<CMD>set operatorfunc=v:lua.___comment_gb<CR>g@', map_opt)
+            map('n', cfg.toggler.block, '<CMD>let b:comment_pos = getpos(".") <BAR> set operatorfunc=v:lua.___comment_gbc<CR>g@$', map_opt)
+            map('n', cfg.opleader.line, '<CMD>let b:comment_pos = getpos(".") <BAR> set operatorfunc=v:lua.___comment_gc<CR>g@', map_opt)
+            map('n', cfg.opleader.block, '<CMD>let b:comment_pos = getpos(".") <BAR> set operatorfunc=v:lua.___comment_gb<CR>g@', map_opt)
 
             -- VISUAL mode mappings
             map('x', cfg.opleader.line, '<ESC><CMD>lua ___comment_gc(vim.fn.visualmode())<CR>', map_opt)
@@ -230,13 +230,13 @@ function C.setup(opts)
             end
 
             -- NORMAL mode extended
-            map('n', 'g>', '<CMD>set operatorfunc=v:lua.___comment_ggt<CR>g@', map_opt)
-            map('n', 'g>c', '<CMD>set operatorfunc=v:lua.___comment_ggtc<CR>g@$', map_opt)
-            map('n', 'g>b', '<CMD>set operatorfunc=v:lua.___comment_ggtb<CR>g@$', map_opt)
+            map('n', 'g>', '<CMD>let b:comment_pos = getpos(".") <BAR> set operatorfunc=v:lua.___comment_ggt<CR>g@', map_opt)
+            map('n', 'g>c', '<CMD>let b:comment_pos = getpos(".") <BAR> set operatorfunc=v:lua.___comment_ggtc<CR>g@$', map_opt)
+            map('n', 'g>b', '<CMD>let b:comment_pos = getpos(".") <BAR> set operatorfunc=v:lua.___comment_ggtb<CR>g@$', map_opt)
 
-            map('n', 'g<', '<CMD>set operatorfunc=v:lua.___comment_glt<CR>g@', map_opt)
-            map('n', 'g<c', '<CMD>set operatorfunc=v:lua.___comment_gltc<CR>g@$', map_opt)
-            map('n', 'g<b', '<CMD>set operatorfunc=v:lua.___comment_gltb<CR>g@$', map_opt)
+            map('n', 'g<', '<CMD>let b:comment_pos = getpos(".") <BAR> set operatorfunc=v:lua.___comment_glt<CR>g@', map_opt)
+            map('n', 'g<c', '<CMD>let b:comment_pos = getpos(".") <BAR> set operatorfunc=v:lua.___comment_gltc<CR>g@$', map_opt)
+            map('n', 'g<b', '<CMD>let b:comment_pos = getpos(".") <BAR> set operatorfunc=v:lua.___comment_gltb<CR>g@$', map_opt)
 
             -- VISUAL mode extended
             map('x', 'g>', '<ESC><CMD>lua ___comment_ggt(vim.fn.visualmode())<CR>', map_opt)
