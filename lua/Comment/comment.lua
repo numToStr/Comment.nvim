@@ -115,6 +115,13 @@ function C.setup(opts)
             basic = true,
             ---extra mapping
             extra = true,
+            ---mark mapping
+            marks = {
+                f = 'FIXME',
+                n = 'NOTE',
+                m = 'MARK',
+                t = 'TODO',
+            },
             ---extended mapping
             extended = false,
         },
@@ -205,6 +212,17 @@ function C.setup(opts)
             map('n', 'gco', '<CMD>lua ___comment_norm_o()<CR>', map_opt)
             map('n', 'gcO', '<CMD>lua ___comment_norm_O()<CR>', map_opt)
             map('n', 'gcA', '<CMD>lua ___comment_norm_A()<CR>', map_opt)
+        end
+
+        if cfg.mappings.marks then
+            function _G.___comment_mark(word)
+                local E = require('Comment.extra')
+                E.norm_O(U.ctype.line, cfg)
+                vim.fn.feedkeys(word .. ': ')
+            end
+            for key, value in pairs(cfg.mappings.marks) do
+                map('n', 'gcm' .. key, '<CMD>lua ___comment_mark("' .. value .. '")<CR>', map_opt)
+            end
         end
 
         -- Extended Mappings
