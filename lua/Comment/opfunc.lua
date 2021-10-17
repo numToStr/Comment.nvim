@@ -145,9 +145,7 @@ function O.linewise(p)
 
     local uncomment = cmode == U.cmode.uncomment
     for i, line in ipairs(p.lines) do
-        if U.ignore(line, pattern) then
-            p.lines[i] = line
-        else
+        if not U.ignore(line, pattern) then
             if uncomment then
                 p.lines[i] = U.uncomment_str(line, lcs_esc, rcs_esc, p.cfg.padding)
             else
