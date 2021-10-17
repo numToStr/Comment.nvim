@@ -118,6 +118,9 @@ function C.setup(opts)
             ---extended mapping
             extended = false,
         },
+        ---Whether the cursor should stay at its position when using mappings
+        ---@type boolean
+        sticky = true,
         ---LHS of toggle mapping in NORMAL mode for line and block comment
         ---@type table
         toggler = {
@@ -153,6 +156,7 @@ function C.setup(opts)
 
         local map = A.nvim_set_keymap
         local map_opt = { noremap = true, silent = true }
+        local sticky = cfg.sticky and 'vim.w.comment_pos = vim.api.nvim_win_get_cursor(0); ' or ''
 
         -- Basic Mappings
         if cfg.mappings.basic then
@@ -176,12 +180,12 @@ function C.setup(opts)
             map(
                 'n',
                 cfg.toggler.line,
-                [[v:count == 0 ? '<CMD>let b:comment_pos = getpos(".") <BAR> set operatorfunc=v:lua.___comment_gcc<CR>g@$' : '<CMD>lua ___comment_count_gcc()<CR>']],
+                [[v:count == 0 ? '<CMD>lua ]] .. sticky .. [[vim.o.operatorfunc = "v:lua.___comment_gcc"<CR>g@$' : '<CMD>lua ___comment_count_gcc()<CR>']],
                 { noremap = true, silent = true, expr = true }
             )
-            map('n', cfg.toggler.block, '<CMD>let b:comment_pos = getpos(".") <BAR> set operatorfunc=v:lua.___comment_gbc<CR>g@$', map_opt)
-            map('n', cfg.opleader.line, '<CMD>let b:comment_pos = getpos(".") <BAR> set operatorfunc=v:lua.___comment_gc<CR>g@', map_opt)
-            map('n', cfg.opleader.block, '<CMD>let b:comment_pos = getpos(".") <BAR> set operatorfunc=v:lua.___comment_gb<CR>g@', map_opt)
+            map('n', cfg.toggler.block, '<CMD>lua ' .. sticky .. 'vim.o.operatorfunc = "v:lua.___comment_gbc"<CR>g@$', map_opt)
+            map('n', cfg.opleader.line, '<CMD>lua ' .. sticky .. 'vim.o.operatorfunc = "v:lua.___comment_gc"<CR>g@', map_opt)
+            map('n', cfg.opleader.block, '<CMD>lua ' .. sticky .. 'vim.o.operatorfunc = "v:lua.___comment_gb"<CR>g@', map_opt)
 
             -- VISUAL mode mappings
             map('x', cfg.opleader.line, '<ESC><CMD>lua ___comment_gc(vim.fn.visualmode())<CR>', map_opt)
@@ -230,13 +234,13 @@ function C.setup(opts)
             end
 
             -- NORMAL mode extended
-            map('n', 'g>', '<CMD>let b:comment_pos = getpos(".") <BAR> set operatorfunc=v:lua.___comment_ggt<CR>g@', map_opt)
-            map('n', 'g>c', '<CMD>let b:comment_pos = getpos(".") <BAR> set operatorfunc=v:lua.___comment_ggtc<CR>g@$', map_opt)
-            map('n', 'g>b', '<CMD>let b:comment_pos = getpos(".") <BAR> set operatorfunc=v:lua.___comment_ggtb<CR>g@$', map_opt)
+            map('n', 'g>', '<CMD>lua ' .. sticky .. 'vim.o.operatorfunc = "v:lua.___comment_ggt"<CR>g@', map_opt)
+            map('n', 'g>c', '<CMD>lua ' .. sticky .. 'vim.o.operatorfunc = "v:lua.___comment_ggtc"<CR>g@$', map_opt)
+            map('n', 'g>b', '<CMD>lua ' .. sticky .. 'vim.o.operatorfunc = "v:lua.___comment_ggtb"<CR>g@$', map_opt)
 
-            map('n', 'g<', '<CMD>let b:comment_pos = getpos(".") <BAR> set operatorfunc=v:lua.___comment_glt<CR>g@', map_opt)
-            map('n', 'g<c', '<CMD>let b:comment_pos = getpos(".") <BAR> set operatorfunc=v:lua.___comment_gltc<CR>g@$', map_opt)
-            map('n', 'g<b', '<CMD>let b:comment_pos = getpos(".") <BAR> set operatorfunc=v:lua.___comment_gltb<CR>g@$', map_opt)
+            map('n', 'g<', '<CMD>lua ' .. sticky .. 'vim.o.operatorfunc = "v:lua.___comment_glt"<CR>g@', map_opt)
+            map('n', 'g<c', '<CMD>lua ' .. sticky .. 'vim.o.operatorfunc = "v:lua.___comment_gltc"<CR>g@$', map_opt)
+            map('n', 'g<b', '<CMD>lua ' .. sticky .. 'vim.o.operatorfunc = "v:lua.___comment_gltb"<CR>g@$', map_opt)
 
             -- VISUAL mode extended
             map('x', 'g>', '<ESC><CMD>lua ___comment_ggt(vim.fn.visualmode())<CR>', map_opt)

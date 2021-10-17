@@ -95,10 +95,12 @@ function O.opfunc(cfg, vmode, cmode, ctype, cmotion)
 
     U.is_fn(cfg.post_hook, ctx, srow, erow, scol, ecol)
 
-    local ok, pos = pcall(vim.api.nvim_buf_get_var, 0, 'comment_pos')
-    if ok then
-        vim.fn.setpos('.', pos)
-        vim.api.nvim_buf_set_var(0, 'comment_pos', nil)
+    if cfg.sticky then
+        local ok, pos = pcall(vim.api.nvim_win_get_var, 0, 'comment_pos')
+        if ok then
+            vim.api.nvim_win_set_cursor(0, pos)
+            vim.api.nvim_win_set_var(0, 'comment_pos', nil)
+        end
     end
 end
 

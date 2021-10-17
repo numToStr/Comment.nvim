@@ -88,6 +88,11 @@ Following are the **default** config for the [`setup()`](#setup). If you want to
         extended = false,
     },
 
+
+    ---Whether the cursor should stay at its position when using mappings
+    ---@type boolean
+    sticky = true,
+
     ---LHS of toggle mapping in NORMAL + VISUAL mode
     ---@type table
     toggler = {
