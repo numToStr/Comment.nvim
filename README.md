@@ -68,6 +68,11 @@ Following are the **default** config for the [`setup()`](#setup). If you want to
     ---@type boolean
     padding = true,
 
+    ---Whether the cursor should stay at its position
+    ---This only affects NORMAL mode mappings
+    ---@type boolean
+    sticky = true,
+
     ---Lines to be ignored while comment/uncomment.
     ---Could be a regex string or a function that returns a regex string.
     ---Example: Use '^$' to ignore empty lines
@@ -87,11 +92,6 @@ Following are the **default** config for the [`setup()`](#setup). If you want to
         ---Includes `g>`, `g<`, `g>[count]{motion}` and `g<[count]{motion}`
         extended = false,
     },
-
-
-    ---Whether the cursor should stay at its position when using mappings
-    ---@type boolean
-    sticky = true,
 
     ---LHS of toggle mapping in NORMAL + VISUAL mode
     ---@type table

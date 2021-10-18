@@ -104,7 +104,8 @@ function C.setup(opts)
         ---Add a space b/w comment and the line
         ---@type boolean
         padding = true,
-        ---Whether the cursor should stay at its position when using mappings
+        ---Whether the cursor should stay at its position
+        ---This only affects NORMAL mode mappings
         ---@type boolean
         sticky = true,
         ---Line which should be ignored while comment/uncomment
