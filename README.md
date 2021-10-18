@@ -293,6 +293,8 @@ Also, you can set the `commentstring` from here but [**i won't recommend it**](#
 }
 ```
 
+The `post_hook` can be implemented to use newlines instead of padding e.g. for commenting out code in C with `#if 0`. You can find an example [here](https://github.com/numToStr/Comment.nvim/issues/38#issuecomment-945082507).
+
 > NOTE: When pressing `gc`, `gb` and friends, `cmode` (Comment mode) inside `pre_hook` will always be toggle because when pre-hook is called, in that moment we don't know whether `gc` or `gb` will comment or uncomment the lines. But luckily, we do know this before `post_hook` and this will always receive either comment or uncomment status
 
 ### 🚫 Ignoring lines
