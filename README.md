@@ -69,7 +69,7 @@ Following are the **default** config for the [`setup()`](#setup). If you want to
     padding = true,
 
     ---Whether the cursor should stay at its position
-    ---This only affects NORMAL mode mappings
+    ---NOTE: This only affects NORMAL mode mappings and doesn't work with dot-repeat
     ---@type boolean
     sticky = true,
 
