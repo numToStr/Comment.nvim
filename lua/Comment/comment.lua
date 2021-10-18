@@ -104,6 +104,10 @@ function C.setup(opts)
         ---Add a space b/w comment and the line
         ---@type boolean
         padding = true,
+        ---Whether the cursor should stay at its position
+        ---This only affects NORMAL mode mappings
+        ---@type boolean
+        sticky = true,
         ---Line which should be ignored while comment/uncomment
         ---Example: Use '^$' to ignore empty lines
         ---@type string|function Lua regex
@@ -154,6 +158,13 @@ function C.setup(opts)
         local map = A.nvim_set_keymap
         local map_opt = { noremap = true, silent = true }
 
+        -- Callback function to save cursor position and set operatorfunc
+        -- NOTE: We are using cfg to store the position as the cfg is tossed around in most places
+        function _G.___comment_call(cb)
+            cfg.___pos = cfg.sticky and A.nvim_win_get_cursor(0)
+            vim.o.operatorfunc = 'v:lua.___comment_' .. cb
+        end
+
         -- Basic Mappings
         if cfg.mappings.basic then
             function _G.___comment_count_gcc()
@@ -176,12 +187,12 @@ function C.setup(opts)
             map(
                 'n',
                 cfg.toggler.line,
-                [[v:count == 0 ? '<CMD>set operatorfunc=v:lua.___comment_gcc<CR>g@$' : '<CMD>lua ___comment_count_gcc()<CR>']],
+                [[v:count == 0 ? '<CMD>lua ___comment_call("gcc")<CR>g@$' : '<CMD>lua ___comment_count_gcc()<CR>']],
                 { noremap = true, silent = true, expr = true }
             )
-            map('n', cfg.toggler.block, '<CMD>set operatorfunc=v:lua.___comment_gbc<CR>g@$', map_opt)
-            map('n', cfg.opleader.line, '<CMD>set operatorfunc=v:lua.___comment_gc<CR>g@', map_opt)
-            map('n', cfg.opleader.block, '<CMD>set operatorfunc=v:lua.___comment_gb<CR>g@', map_opt)
+            map('n', cfg.toggler.block, '<CMD>lua ___comment_call("gbc")<CR>g@$', map_opt)
+            map('n', cfg.opleader.line, '<CMD>lua ___comment_call("gc")<CR>g@', map_opt)
+            map('n', cfg.opleader.block, '<CMD>lua ___comment_call("gb")<CR>g@', map_opt)
 
             -- VISUAL mode mappings
             map('x', cfg.opleader.line, '<ESC><CMD>lua ___comment_gc(vim.fn.visualmode())<CR>', map_opt)
@@ -230,13 +241,13 @@ function C.setup(opts)
             end
 
             -- NORMAL mode extended
-            map('n', 'g>', '<CMD>set operatorfunc=v:lua.___comment_ggt<CR>g@', map_opt)
-            map('n', 'g>c', '<CMD>set operatorfunc=v:lua.___comment_ggtc<CR>g@$', map_opt)
-            map('n', 'g>b', '<CMD>set operatorfunc=v:lua.___comment_ggtb<CR>g@$', map_opt)
+            map('n', 'g>', '<CMD>lua ___comment_call("ggt")<CR>g@', map_opt)
+            map('n', 'g>c', '<CMD>lua ___comment_call("ggtc")<CR>g@$', map_opt)
+            map('n', 'g>b', '<CMD>lua ___comment_call("ggtb")<CR>g@$', map_opt)
 
-            map('n', 'g<', '<CMD>set operatorfunc=v:lua.___comment_glt<CR>g@', map_opt)
-            map('n', 'g<c', '<CMD>set operatorfunc=v:lua.___comment_gltc<CR>g@$', map_opt)
-            map('n', 'g<b', '<CMD>set operatorfunc=v:lua.___comment_gltb<CR>g@$', map_opt)
+            map('n', 'g<', '<CMD>lua ___comment_call("glt")<CR>g@', map_opt)
+            map('n', 'g<c', '<CMD>lua ___comment_call("gltc")<CR>g@$', map_opt)
+            map('n', 'g<b', '<CMD>lua ___comment_call("gltb")<CR>g@$', map_opt)
 
             -- VISUAL mode extended
             map('x', 'g>', '<ESC><CMD>lua ___comment_ggt(vim.fn.visualmode())<CR>', map_opt)
