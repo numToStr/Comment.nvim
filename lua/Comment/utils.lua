@@ -53,7 +53,7 @@ end
 ---@return number string Length of the indent chars
 function U.grab_indent(s)
     local _, len, indent = s:find('^(%s*)')
-    return indent, len
+    return len, indent
 end
 
 ---TODO: use this function everywhere

@@ -82,7 +82,7 @@ function O.opfunc(cfg, vmode, cmode, ctype, cmotion)
             ecol = ecol,
         }, partial_block)
     else
-        ctx.cmode = O.linewise({
+        ctx.cmode = require('Comment.opfunc2').linewise({
             cfg = cfg,
             cmode = cmode,
             lines = lines,

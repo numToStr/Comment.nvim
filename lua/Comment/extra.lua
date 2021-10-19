@@ -17,7 +17,7 @@ local function ins_on_line(count, ctype, cfg)
     local pos = A.nvim_win_get_cursor(0)
     local srow, scol = pos[1] + count, pos[2]
     local line = A.nvim_get_current_line()
-    local indent = U.grab_indent(line)
+    local _, indent = U.grab_indent(line)
     local lcs, rcs = U.parse_cstr(cfg, ctx)
     local padding = U.get_padding(cfg.padding)
 
