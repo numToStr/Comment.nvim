@@ -121,8 +121,8 @@ function O.blockwise(p, partial)
     end
 
     local eln_len = #eln
-    U2.add_comment(srow, space_len, space_len, p.lcs .. padding)
-    U2.add_comment(erow, eln_len, eln_len, padding .. p.rcs)
+    U2.add_comment(srow, space_len, space_len, p.lcs .. (#sln == 0 and '' or padding))
+    U2.add_comment(erow, eln_len, eln_len, (eln_len == 0 and '' or padding) .. p.rcs)
 
     return cmode
 end
