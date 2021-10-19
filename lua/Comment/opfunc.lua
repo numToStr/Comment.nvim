@@ -70,7 +70,7 @@ function O.opfunc(cfg, vmode, cmode, ctype, cmotion)
             ecol = ecol,
         })
     elseif ctype == U.ctype.block and not same_line then
-        ctx.cmode = O.blockwise({
+        ctx.cmode = require('Comment.opfunc2').blockwise({
             cfg = cfg,
             cmode = cmode,
             lines = lines,
