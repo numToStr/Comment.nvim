@@ -62,7 +62,7 @@ end
 ---@param flag boolean
 ---@return string
 function U.get_padding(flag)
-    return flag and ' ' or ''
+    return flag and ' ', '%s?' or '', ''
 end
 
 -- FIXME This prints `a` in i_CTRL-o
