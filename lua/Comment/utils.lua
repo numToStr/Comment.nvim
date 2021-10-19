@@ -60,9 +60,13 @@ end
 ---Helper to get padding (I was tired to check this everywhere)
 ---NOTE: We can also use function to calculate padding if someone wants more spacing
 ---@param flag boolean
----@return string
+---@return string string Whitespace chars
+---@return string string Corresponding regex pattern
 function U.get_padding(flag)
-    return flag and ' ', '%s?' or '', ''
+    if flag then
+        return ' ', '%s?'
+    end
+    return '', ''
 end
 
 -- FIXME This prints `a` in i_CTRL-o
