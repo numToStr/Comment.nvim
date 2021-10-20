@@ -81,13 +81,6 @@ function U.escape(str)
     return str and vim.pesc(str)
 end
 
----Trim leading/trailing whitespace from the given string
----@param str string
----@return string
-function U.trim(str)
-    return str:match('^%s?(.-)%s?$')
-end
-
 ---Call a function if exists
 ---@param fn function Hook function
 ---@return boolean|string
@@ -175,7 +168,7 @@ function U.unwrap_cstr(cstr)
 
     -- Return false if a part is empty, otherwise trim it
     -- Bcz it is better to deal with boolean rather than checking empty string length everywhere
-    return not U.is_empty(lcs) and U.trim(lcs), not U.is_empty(rcs) and U.trim(rcs)
+    return not U.is_empty(lcs) and vim.trim(lcs), not U.is_empty(rcs) and vim.trim(rcs)
 end
 
 ---Unwraps the commentstring by taking it from the following places in the respective order.
