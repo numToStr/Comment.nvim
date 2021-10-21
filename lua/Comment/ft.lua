@@ -29,6 +29,7 @@ local L = {
     julia = { M.hash, '#=%s=#' },
     lidris = { M.dash, M.haskell_b },
     lua = { M.dash, '--[[%s--]]' },
+    nix = { M.hash, M.cxx_b },
     ocaml = { M.fsharp_b, M.fsharp_b },
     plantuml = { "'%s", "/'%s'/" },
     purescript = { M.dash, M.haskell_b },
