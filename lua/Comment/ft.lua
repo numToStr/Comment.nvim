@@ -34,6 +34,7 @@ local L = {
     purescript = { M.dash, M.haskell_b },
     rust = { M.cxx_l, M.cxx_b },
     scala = { M.cxx_l, M.cxx_b },
+    sh = { M.hash },
     swift = { M.cxx_l, M.cxx_b },
     terraform = { M.hash, M.cxx_b },
     toml = { M.hash },
