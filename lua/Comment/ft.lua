@@ -22,6 +22,7 @@ local L = {
     graphql = { M.hash },
     groovy = { M.cxx_l, M.cxx_b },
     haskell = { M.dash, M.haskell_b },
+    html = { '%s', '<!--%s-->' },
     idris = { M.dash, M.haskell_b },
     java = { M.cxx_l, M.cxx_b },
     javascript = { M.cxx_l, M.cxx_b },
@@ -31,15 +32,19 @@ local L = {
     lua = { M.dash, '--[[%s--]]' },
     ocaml = { M.fsharp_b, M.fsharp_b },
     plantuml = { "'%s", "/'%s'/" },
+    python = { M.hash, '"""%s"""' },
     purescript = { M.dash, M.haskell_b },
     rust = { M.cxx_l, M.cxx_b },
     scala = { M.cxx_l, M.cxx_b },
+    sh = { M.hash },
+    sql = { M.dash, M.cxx_b },
     swift = { M.cxx_l, M.cxx_b },
     terraform = { M.hash, M.cxx_b },
     toml = { M.hash },
     typescript = { M.cxx_l, M.cxx_b },
     typescriptreact = { M.cxx_l, M.cxx_b },
     yaml = { M.hash },
+    vim = { "\"%s" },
     zig = { M.cxx_l }, -- Zig doesn't have block comments. waaaattttt!
 }
 
