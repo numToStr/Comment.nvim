@@ -36,8 +36,8 @@ U.cmotion = {
 
 ---Print a msg on stderr
 ---@param msg string
-function U.errprint(msg)
-    vim.notify('Comment.nvim: ' .. msg, vim.log.levels.ERROR)
+function U.eprint(msg)
+    vim.notify('Comment :: ' .. msg, vim.log.levels.ERROR)
 end
 
 ---Check whether the line is empty
@@ -158,12 +158,12 @@ end
 ---@return string|boolean
 function U.unwrap_cstr(cstr)
     if U.is_empty(cstr) then
-        return U.errprint("Empty commentstring. Run ':h commentstring' for help.")
+        return U.eprint("Empty commentstring. Run ':h commentstring' for help.")
     end
 
     local lcs, rcs = cstr:match('(.*)%%s(.*)')
     if not (lcs or rcs) then
-        return U.errprint('Invalid commentstring: ' .. cstr .. ". Run ':h commentstring' for help.")
+        return U.eprint('Invalid commentstring ' .. cstr .. ". Run ':h commentstring' for help.")
     end
 
     -- Return false if a part is empty, otherwise trim it
