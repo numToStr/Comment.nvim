@@ -44,7 +44,7 @@ end
 ---@param ln string
 ---@return boolean
 function U.is_empty(ln)
-    return ln:find('^$') ~= nil
+    return #ln == 0
 end
 
 ---Takes out the leading indent from lines
