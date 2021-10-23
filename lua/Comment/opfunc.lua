@@ -111,6 +111,9 @@ end
 ---@return integer CMode
 function O.linewise(p)
     local lcs_esc, rcs_esc = U.escape(p.lcs), U.escape(p.rcs)
+    local pattern = U.get_pattern(p.cfg.ignore)
+    local padding, pp = U.get_padding(p.cfg.padding)
+    local is_commented = U.is_commented(lcs_esc, rcs_esc, pp)
 
     -- While commenting a block of text, there is a possiblity of lines being both commented and non-commented
     -- In that case, we need to figure out that if any line is uncommented then we should comment the whole block or vise-versa
@@ -121,16 +124,13 @@ function O.linewise(p)
     -- Which will be used to semantically comment rest of the lines
     local min_indent = nil
 
-    -- Computed ignore pattern
-    local pattern = U.get_pattern(p.cfg.ignore)
-
     -- If the given comde is uncomment then we actually don't want to compute the cmode or min_indent
     if p.cmode ~= U.cmode.uncomment then
         for _, line in ipairs(p.lines) do
             -- I wish lua had `continue` statement [sad noises]
             if not U.ignore(line, pattern) then
                 if cmode == U.cmode.uncomment and p.cmode == U.cmode.toggle then
-                    local is_cmt = U.is_commented(line, lcs_esc, nil, p.cfg.padding)
+                    local is_cmt = is_commented(line)
                     if not is_cmt then
                         cmode = U.cmode.comment
                     end
@@ -139,7 +139,7 @@ function O.linewise(p)
                 -- If the internal cmode changes to comment or the given cmode is not uncomment, then only calculate min_indent
                 -- As calculating min_indent only makes sense when we actually want to comment the lines
                 if not U.is_empty(line) and (cmode == U.cmode.comment or p.cmode == U.cmode.comment) then
-                    local indent = line:match('^(%s*).*')
+                    local indent = U.grab_indent(line)
                     if not min_indent or #min_indent > #indent then
                         min_indent = indent
                     end
@@ -157,9 +157,9 @@ function O.linewise(p)
     for i, line in ipairs(p.lines) do
         if not U.ignore(line, pattern) then
             if uncomment then
-                p.lines[i] = U.uncomment_str(line, lcs_esc, rcs_esc, p.cfg.padding)
+                p.lines[i] = U.uncomment_str(line, lcs_esc, rcs_esc, pp)
             else
-                p.lines[i] = U.comment_str(line, p.lcs, p.rcs, p.cfg.padding, min_indent)
+                p.lines[i] = U.comment_str(line, p.lcs, p.rcs, padding, min_indent)
             end
         end
     end
@@ -176,6 +176,7 @@ function O.blockwise(p, partial)
     -- Block wise, only when there are more than 1 lines
     local sln, eln = p.lines[1], p.lines[2]
     local lcs_esc, rcs_esc = U.escape(p.lcs), U.escape(p.rcs)
+    local padding, pp = U.get_padding(p.cfg.padding)
 
     -- These string should be checked for comment/uncomment
     local sln_check = sln
@@ -188,8 +189,8 @@ function O.blockwise(p, partial)
     -- If given mode is toggle then determine whether to comment or not
     local cmode
     if p.cmode == U.cmode.toggle then
-        local s_cmt = U.is_commented(sln_check, lcs_esc, nil, p.cfg.padding)
-        local e_cmt = U.is_commented(eln_check, nil, rcs_esc, p.cfg.padding)
+        local s_cmt = U.is_lcs_commented(lcs_esc, pp)(sln_check)
+        local e_cmt = U.is_rcs_commented(rcs_esc, pp)(eln_check)
         cmode = (s_cmt and e_cmt) and U.cmode.uncomment or U.cmode.comment
     else
         cmode = p.cmode
@@ -198,11 +199,11 @@ function O.blockwise(p, partial)
     local l1, l2
 
     if cmode == U.cmode.uncomment then
-        l1 = U.uncomment_str(sln_check, lcs_esc, nil, p.cfg.padding)
-        l2 = U.uncomment_str(eln_check, nil, rcs_esc, p.cfg.padding)
+        l1 = U.uncomment_str(sln_check, lcs_esc, nil, pp)
+        l2 = U.uncomment_str(eln_check, nil, rcs_esc, pp)
     else
-        l1 = U.comment_str(sln_check, p.lcs, nil, p.cfg.padding)
-        l2 = U.comment_str(eln_check, nil, p.rcs, p.cfg.padding)
+        l1 = U.comment_str(sln_check, p.lcs, nil, padding)
+        l2 = U.comment_str(eln_check, nil, p.rcs, padding)
     end
 
     if partial then
@@ -225,7 +226,9 @@ function O.blockwise_x(p)
     local mid = line:sub(p.scol + 1, p.ecol + 1)
     local last = line:sub(p.ecol + 2)
 
-    local yes, _, stripped = U.is_commented(mid, U.escape(p.lcs), U.escape(p.rcs), p.cfg.padding)
+    local padding, pp = U.get_padding(p.cfg.padding)
+
+    local yes, _, stripped = U.is_commented(U.escape(p.lcs), U.escape(p.rcs), pp)(mid)
 
     local cmode
     if p.cmode == U.cmode.toggle then
@@ -237,9 +240,8 @@ function O.blockwise_x(p)
     if cmode == U.cmode.uncomment then
         A.nvim_set_current_line(first .. (stripped or mid) .. last)
     else
-        local pad = p.cfg.padding and ' ' or ''
-        local lcs = p.lcs and p.lcs .. pad or ''
-        local rcs = p.rcs and pad .. p.rcs or ''
+        local lcs = p.lcs and p.lcs .. padding or ''
+        local rcs = p.rcs and padding .. p.rcs or ''
         A.nvim_set_current_line(first .. lcs .. mid .. rcs .. last)
     end
 

@@ -56,13 +56,16 @@ function U.grab_indent(s)
     return indent, len
 end
 
----TODO: use this function everywhere
 ---Helper to get padding (I was tired to check this everywhere)
 ---NOTE: We can also use function to calculate padding if someone wants more spacing
 ---@param flag boolean
----@return string
+---@return string string Padding chars
+---@return string string Padding pattern
 function U.get_padding(flag)
-    return flag and ' ' or ''
+    if not flag then
+        return '', ''
+    end
+    return ' ', '%s?'
 end
 
 -- FIXME This prints `a` in i_CTRL-o
@@ -206,21 +209,20 @@ end
 ---@param ln string String that needs to be commented
 ---@param lcs string Left side of the commentstring
 ---@param rcs string Right side of the commentstring
----@param is_pad boolean Whether to add padding b/w comment and line
----@param spacing string|nil Pre-determine indentation (useful) when dealing w/ multiple lines
+---@param padding string Padding chars b/w comment and line
+---@param min_indent string|nil Pre-determine indentation (useful) when dealing w/ multiple lines
 ---@return string string Commented string
-function U.comment_str(ln, lcs, rcs, is_pad, spacing)
+function U.comment_str(ln, lcs, rcs, padding, min_indent)
     if U.is_empty(ln) then
-        return (spacing or '') .. (lcs or rcs)
+        return (min_indent or '') .. (lcs or rcs)
     end
 
     local indent, chars = ln:match('^(%s*)(.*)')
 
-    local pad = is_pad and ' ' or ''
-    local lcs_new = lcs and lcs .. pad or ''
-    local rcs_new = rcs and pad .. rcs or ''
+    local lcs_new = lcs and lcs .. padding or ''
+    local rcs_new = rcs and padding .. rcs or ''
 
-    local pos = #(spacing or indent)
+    local pos = #(min_indent or indent)
     local l_indent = indent:sub(0, pos) .. lcs_new .. indent:sub(pos + 1)
 
     return l_indent .. chars .. rcs_new
@@ -230,65 +232,59 @@ end
 ---@param ln string Line that needs to be uncommented
 ---@param lcs_esc string (Escaped) Left side of the commentstring
 ---@param rcs_esc string (Escaped) Right side of the commentstring
----@param is_pad boolean Whether to add padding b/w comment and line
+---@param pp string Padding pattern (@see U.get_padding)
 ---@return string string Uncommented string
-function U.uncomment_str(ln, lcs_esc, rcs_esc, is_pad)
-    if not U.is_commented(ln, lcs_esc, rcs_esc, is_pad) then
-        return ln
-    end
-
-    local ll = lcs_esc and lcs_esc .. '%s?' or ''
+function U.uncomment_str(ln, lcs_esc, rcs_esc, pp)
+    local ll = lcs_esc and lcs_esc .. pp or ''
     local rr = rcs_esc and rcs_esc .. '$?' or ''
 
     local indent, chars = ln:match('(%s*)' .. ll .. '(.*)' .. rr)
 
     -- If the line (after cstring) is empty then just return ''
     -- bcz when uncommenting multiline this also doesn't preserve leading whitespace as the line was previously empty
-    if #chars == 0 then
+    if U.is_empty(chars) then
         return ''
     end
 
     -- When padding is enabled then trim one trailing space char
-    return indent .. (is_pad and chars:gsub('%s?$', '') or chars)
+    return indent .. chars:gsub(pp .. '$', '')
 end
 
 ---Check if the given string is commented or not
----@param ln string Line that needs to be checked
 ---@param lcs_esc string (Escaped) Left side of the commentstring
 ---@param rcs_esc string (Escaped) Right side of the commentstring
----@param is_pad boolean Whether to add padding b/w comment and line
----@return number
-function U.is_commented(ln, lcs_esc, rcs_esc, is_pad)
-    local pad = is_pad and '%s?' or ''
-    local ll = lcs_esc and '^%s*' .. lcs_esc .. pad or ''
-    local rr = rcs_esc and pad .. rcs_esc .. '$' or ''
+---@param pp string Padding pattern (@see U.get_padding)
+---@return function function Function to call
+function U.is_commented(lcs_esc, rcs_esc, pp)
+    local ll = lcs_esc and '^%s*' .. lcs_esc .. pp or ''
+    local rr = rcs_esc and pp .. rcs_esc .. '$' or ''
 
-    return ln:find(ll .. '(.-)' .. rr)
+    return function(line)
+        return line:find(ll .. '(.-)' .. rr)
+    end
 end
 
 ---Check if the string is commented by LHS of commentstring
 ---Supports both full/partial blockwise comment detection
----@param ln string Line to be checked
 ---@param lcs_esc string (Escaped) LHS of commentstring
----@param pp string Padding Padding (@see U.get_padding)
----@return number number Start index of match
----@return number number End index of match
-function U.is_lcs_commented(ln, lcs_esc, pp)
-    if lcs_esc then
-        return ln:find('^%s*' .. lcs_esc .. pp)
+---@param pp string Padding pattern (@see U.get_padding)
+---@return function function Function to call
+function U.is_lcs_commented(lcs_esc, pp)
+    local ll = lcs_esc and '^%s*' .. lcs_esc .. pp
+    return function(line)
+        return line:find(ll)
     end
 end
 
 ---Check if the string is commented by RHS of commentstring
 ---Supports both full/partial blockwise comment detection
----@param ln string Line to be checked
 ---@param rcs_esc string (Escaped) RHS of commentstring
----@param pp string Padding Padding (@see U.get_padding)
----@return number number Start index of match
----@return number number End index of match
-function U.is_rcs_commented(ln, rcs_esc, pp)
-    if rcs_esc then
-        return ln:find('^.*' .. pp .. rcs_esc)
+---@param pp string Padding pattern (@see U.get_padding)
+---@return function function Function to call
+function U.is_rcs_commented(rcs_esc, pp)
+    local rr = rcs_esc and '^.*' .. pp .. rcs_esc
+    return function(line)
+        return line:find(rr)
     end
 end
 
