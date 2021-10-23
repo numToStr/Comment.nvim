@@ -189,8 +189,8 @@ function O.blockwise(p, partial)
     -- If given mode is toggle then determine whether to comment or not
     local cmode
     if p.cmode == U.cmode.toggle then
-        local s_cmt = U.is_lcs_commented(lcs_esc, pp)(sln_check)
-        local e_cmt = U.is_rcs_commented(rcs_esc, pp)(eln_check)
+        local s_cmt = U.is_commented(lcs_esc, nil, pp)(sln_check)
+        local e_cmt = U.is_commented(nil, rcs_esc, pp)(eln_check)
         cmode = (s_cmt and e_cmt) and U.cmode.uncomment or U.cmode.comment
     else
         cmode = p.cmode

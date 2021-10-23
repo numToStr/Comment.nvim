@@ -264,28 +264,4 @@ function U.is_commented(lcs_esc, rcs_esc, pp)
     end
 end
 
----Check if the string is commented by LHS of commentstring
----Supports both full/partial blockwise comment detection
----@param lcs_esc string (Escaped) LHS of commentstring
----@param pp string Padding pattern (@see U.get_padding)
----@return function function Function to call
-function U.is_lcs_commented(lcs_esc, pp)
-    local ll = lcs_esc and '^%s*' .. lcs_esc .. pp
-    return function(line)
-        return line:find(ll)
-    end
-end
-
----Check if the string is commented by RHS of commentstring
----Supports both full/partial blockwise comment detection
----@param rcs_esc string (Escaped) RHS of commentstring
----@param pp string Padding pattern (@see U.get_padding)
----@return function function Function to call
-function U.is_rcs_commented(rcs_esc, pp)
-    local rr = rcs_esc and '^.*' .. pp .. rcs_esc
-    return function(line)
-        return line:find(rr)
-    end
-end
-
 return U
