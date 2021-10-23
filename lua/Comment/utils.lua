@@ -88,6 +88,21 @@ function U.is_fn(fn, ...)
     return type(fn) == 'function' and fn(...)
 end
 
+---Helper to compute the ignore pattern
+---@param ig string|function
+---@return boolean|string
+function U.get_pattern(ig)
+    return ig and (type(ig) == 'string' and ig or U.is_fn(ig))
+end
+
+---Check if the given line is ignored or not with the given pattern
+---@param ln string Line to be ignored
+---@param pat string Lua regex
+---@return boolean
+function U.ignore(ln, pat)
+    return pat and ln:find(pat) ~= nil
+end
+
 ---Get region for vim mode
 ---@param vmode string VIM mode
 ---@return number number start row
@@ -251,19 +266,30 @@ function U.is_commented(ln, lcs_esc, rcs_esc, is_pad)
     return ln:find(ll .. '(.-)' .. rr)
 end
 
----Helper to compute the ignore pattern
----@param ig string|function
----@return boolean|string
-function U.get_pattern(ig)
-    return ig and (type(ig) == 'string' and ig or U.is_fn(ig))
+---Check if the string is commented by LHS of commentstring
+---Supports both full/partial blockwise comment detection
+---@param ln string Line to be checked
+---@param lcs_esc string (Escaped) LHS of commentstring
+---@param pp string Padding Padding (@see U.get_padding)
+---@return number number Start index of match
+---@return number number End index of match
+function U.is_lcs_commented(ln, lcs_esc, pp)
+    if lcs_esc then
+        return ln:find('^%s*' .. lcs_esc .. pp)
+    end
 end
 
----Check if the given line is ignored or not with the given pattern
----@param ln string Line to be ignored
----@param pat string Lua regex
----@return boolean
-function U.ignore(ln, pat)
-    return pat and ln:find(pat) ~= nil
+---Check if the string is commented by RHS of commentstring
+---Supports both full/partial blockwise comment detection
+---@param ln string Line to be checked
+---@param rcs_esc string (Escaped) RHS of commentstring
+---@param pp string Padding Padding (@see U.get_padding)
+---@return number number Start index of match
+---@return number number End index of match
+function U.is_rcs_commented(ln, rcs_esc, pp)
+    if rcs_esc then
+        return ln:find('^.*' .. pp .. rcs_esc)
+    end
 end
 
 return U
