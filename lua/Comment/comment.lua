@@ -7,22 +7,6 @@ local C = {
     config = nil,
 }
 
----Common fn to comment and set the current line
----@param ln string Line that needs to be commented
----@param lcs string Left side of the commentstring
----@param rcs string Right side of the commentstring
-local function comment_ln(ln, lcs, rcs)
-    A.nvim_set_current_line(U.comment_str(ln, lcs, rcs, C.config.padding))
-end
-
----Common fn to uncomment and set the current line
----@param ln string Line that needs to be uncommented
----@param lcs_esc string (Escaped) Left side of the commentstring
----@param rcs_esc string (Escaped) Right side of the commentstring
-local function uncomment_ln(ln, lcs_esc, rcs_esc)
-    A.nvim_set_current_line(U.uncomment_str(ln, lcs_esc, rcs_esc, C.config.padding))
-end
-
 ---Comment context
 ---@class Ctx
 ---@field ctype CType
@@ -42,8 +26,9 @@ function C.comment()
             ctype = U.ctype.line,
         }
 
+        local padding, _ = U.get_padding(C.config.padding)
         local lcs, rcs = U.parse_cstr(C.config, ctx)
-        comment_ln(line, lcs, rcs)
+        A.nvim_set_current_line(U.comment_str(line, lcs, rcs, padding))
         U.is_fn(C.config.post_hook, ctx, -1)
     end
 end
@@ -62,7 +47,13 @@ function C.uncomment()
         }
 
         local lcs, rcs = U.parse_cstr(C.config, ctx)
-        uncomment_ln(line, U.escape(lcs), U.escape(rcs))
+        local _, pp = U.get_padding(C.config.padding)
+        local lcs_esc, rcs_esc = U.escape(lcs), U.escape(rcs)
+
+        if U.is_commented(lcs_esc, rcs_esc, pp)(line) then
+            A.nvim_set_current_line(U.uncomment_str(line, lcs_esc, rcs_esc, pp))
+        end
+
         U.is_fn(C.config.post_hook, ctx, -1)
     end
 end
@@ -81,14 +72,15 @@ function C.toggle()
         }
 
         local lcs, rcs = U.parse_cstr(C.config, ctx)
-        local lcs_esc = U.escape(lcs)
-        local is_cmt = U.is_commented(line, lcs_esc, nil, C.config.padding)
+        local lcs_esc, rcs_esc = U.escape(lcs), U.escape(rcs)
+        local padding, pp = U.get_padding(C.config.padding)
+        local is_cmt = U.is_commented(lcs_esc, rcs_esc, pp)(line)
 
         if is_cmt then
-            uncomment_ln(line, lcs_esc, U.escape(rcs))
+            A.nvim_set_current_line(U.uncomment_str(line, lcs_esc, rcs_esc, pp))
             ctx.cmode = U.cmode.uncomment
         else
-            comment_ln(line, lcs, rcs)
+            A.nvim_set_current_line(U.comment_str(line, lcs, rcs, padding))
             ctx.cmode = U.cmode.comment
         end
 
