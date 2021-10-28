@@ -62,8 +62,11 @@ function E.norm_A(ctype, cfg)
     local lcs, rcs = U.parse_cstr(cfg, ctx)
     local padding = U.get_padding(cfg.padding)
 
-    -- I am assuming that the users wants a space b/w the end of line and start of the comment
-    local ll = line .. ' ' .. lcs .. padding
+    -- NOTE:
+    -- 1. Python is the only language that recommends 2 spaces between the statement and the comment
+    -- 2. Other than that, I am assuming that the users wants a space b/w the end of line and start of the comment
+    local space = vim.bo.filetype == 'python' and '  ' or ' '
+    local ll = line .. space .. lcs .. padding
 
     -- We need RHS of cstr, if we are doing block comments or if RHS exists
     -- because even in line comment RHS do exists for some filetypes like jsx_element, ocaml
