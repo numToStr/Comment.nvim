@@ -221,38 +221,38 @@ function C.setup(opts)
         if cfg.mappings.extended then
             local Op = require('Comment.opfunc')
 
-            function _G.___comment_ggt(vmode)
+            function C.ggt(vmode)
                 Op.opfunc(cfg, vmode, U.cmode.comment, U.ctype.line, U.cmotion._)
             end
-            function _G.___comment_ggtc(vmode)
+            function C.ggtc(vmode)
                 Op.opfunc(cfg, vmode, U.cmode.comment, U.ctype.line, U.cmotion.line)
             end
-            function _G.___comment_ggtb(vmode)
+            function C.ggtb(vmode)
                 Op.opfunc(cfg, vmode, U.cmode.comment, U.ctype.block, U.cmotion.line)
             end
 
-            function _G.___comment_glt(vmode)
+            function C.glt(vmode)
                 Op.opfunc(cfg, vmode, U.cmode.uncomment, U.ctype.line, U.cmotion._)
             end
-            function _G.___comment_gltc(vmode)
+            function C.gltc(vmode)
                 Op.opfunc(cfg, vmode, U.cmode.uncomment, U.ctype.line, U.cmotion.line)
             end
-            function _G.___comment_gltb(vmode)
+            function C.gltb(vmode)
                 Op.opfunc(cfg, vmode, U.cmode.uncomment, U.ctype.block, U.cmotion.line)
             end
 
             -- NORMAL mode extended
-            map('n', 'g>', '<CMD>lua ___comment_call("ggt")<CR>g@', map_opt)
-            map('n', 'g>c', '<CMD>lua ___comment_call("ggtc")<CR>g@$', map_opt)
-            map('n', 'g>b', '<CMD>lua ___comment_call("ggtb")<CR>g@$', map_opt)
+            map('n', 'g>', '<CMD>lua require("Comment.comment").call("ggt")<CR>g@', map_opt)
+            map('n', 'g>c', '<CMD>lua require("Comment.comment").call("ggtc")<CR>g@$', map_opt)
+            map('n', 'g>b', '<CMD>lua require("Comment.comment").call("ggtb")<CR>g@$', map_opt)
 
-            map('n', 'g<', '<CMD>lua ___comment_call("glt")<CR>g@', map_opt)
-            map('n', 'g<c', '<CMD>lua ___comment_call("gltc")<CR>g@$', map_opt)
-            map('n', 'g<b', '<CMD>lua ___comment_call("gltb")<CR>g@$', map_opt)
+            map('n', 'g<', '<CMD>lua require("Comment.comment").call("glt")<CR>g@', map_opt)
+            map('n', 'g<c', '<CMD>lua require("Comment.comment").call("gltc")<CR>g@$', map_opt)
+            map('n', 'g<b', '<CMD>lua require("Comment.comment").call("gltb")<CR>g@$', map_opt)
 
             -- VISUAL mode extended
-            map('x', 'g>', '<ESC><CMD>lua ___comment_ggt(vim.fn.visualmode())<CR>', map_opt)
-            map('x', 'g<', '<ESC><CMD>lua ___comment_glt(vim.fn.visualmode())<CR>', map_opt)
+            map('x', 'g>', '<ESC><CMD>lua require("Comment.comment").ggt(vim.fn.visualmode())<CR>', map_opt)
+            map('x', 'g<', '<ESC><CMD>lua require("Comment.comment").glt(vim.fn.visualmode())<CR>', map_opt)
         end
     end
 end
