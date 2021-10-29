@@ -20,12 +20,12 @@ local O = {}
 ---@field range CRange
 
 ---Common operatorfunc callback
----@param cfg Config Plugin config
 ---@param vmode string VIM mode - line|char
+---@param cfg Config Plugin config
 ---@param cmode CMode Comment mode
 ---@param ctype CType Type of the commentstring (line/block)
 ---@param cmotion CMotion Motion type
-function O.opfunc(cfg, vmode, cmode, ctype, cmotion)
+function O.opfunc(vmode, cfg, cmode, ctype, cmotion)
     -- comment/uncomment logic
     --
     -- 1. type == line

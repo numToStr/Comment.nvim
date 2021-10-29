@@ -88,6 +88,26 @@ function C.toggle()
     end
 end
 
+function C.count_gcc(cfg)
+    require('Comment.opfunc').count(cfg or C.config)
+end
+
+function C.gcc(vmode, cfg)
+    require('Comment.opfunc').opfunc(vmode, cfg or C.config, U.cmode.toggle, U.ctype.line, U.cmotion.line)
+end
+
+function C.gbc(vmode, cfg)
+    require('Comment.opfunc').opfunc(vmode, cfg or C.config, U.cmode.toggle, U.ctype.block, U.cmotion.line)
+end
+
+function C.gc(vmode, cfg)
+    require('Comment.opfunc').opfunc(vmode, cfg or C.config, U.cmode.toggle, U.ctype.line, U.cmotion._)
+end
+
+function C.gb(vmode, cfg)
+    require('Comment.opfunc').opfunc(vmode, cfg or C.config, U.cmode.toggle, U.ctype.block, U.cmotion._)
+end
+
 ---Configures the whole plugin
 ---@param opts Config
 function C.setup(opts)
@@ -145,50 +165,37 @@ function C.setup(opts)
     local cfg = C.config
 
     if cfg.mappings then
-        local Op = require('Comment.opfunc')
-
         local map = A.nvim_set_keymap
         local map_opt = { noremap = true, silent = true }
 
         -- Callback function to save cursor position and set operatorfunc
         -- NOTE: We are using cfg to store the position as the cfg is tossed around in most places
-        function _G.___comment_call(cb)
+        function C.call(cb)
             cfg.___pos = cfg.sticky and A.nvim_win_get_cursor(0)
-            vim.o.operatorfunc = 'v:lua.___comment_' .. cb
+            vim.o.operatorfunc = "v:lua.require'Comment.comment'." .. cb
         end
 
         -- Basic Mappings
         if cfg.mappings.basic then
-            function _G.___comment_count_gcc()
-                Op.count(cfg)
-            end
-            function _G.___comment_gcc(vmode)
-                Op.opfunc(cfg, vmode, U.cmode.toggle, U.ctype.line, U.cmotion.line)
-            end
-            function _G.___comment_gbc(vmode)
-                Op.opfunc(cfg, vmode, U.cmode.toggle, U.ctype.block, U.cmotion.line)
-            end
-            function _G.___comment_gc(vmode)
-                Op.opfunc(cfg, vmode, U.cmode.toggle, U.ctype.line, U.cmotion._)
-            end
-            function _G.___comment_gb(vmode)
-                Op.opfunc(cfg, vmode, U.cmode.toggle, U.ctype.block, U.cmotion._)
-            end
-
             -- NORMAL mode mappings
             map(
                 'n',
                 cfg.toggler.line,
-                [[v:count == 0 ? '<CMD>lua ___comment_call("gcc")<CR>g@$' : '<CMD>lua ___comment_count_gcc()<CR>']],
+                [[v:count == 0 ? '<CMD>lua require("Comment.comment").call("gcc")<CR>g@$' : '<CMD>lua require("Comment.comment").count_gcc()<CR>']],
                 { noremap = true, silent = true, expr = true }
             )
-            map('n', cfg.toggler.block, '<CMD>lua ___comment_call("gbc")<CR>g@$', map_opt)
-            map('n', cfg.opleader.line, '<CMD>lua ___comment_call("gc")<CR>g@', map_opt)
-            map('n', cfg.opleader.block, '<CMD>lua ___comment_call("gb")<CR>g@', map_opt)
+            map('n', cfg.toggler.block, '<CMD>lua require("Comment.comment").call("gbc")<CR>g@$', map_opt)
+            map('n', cfg.opleader.line, '<CMD>lua require("Comment.comment").call("gc")<CR>g@', map_opt)
+            map('n', cfg.opleader.block, '<CMD>lua require("Comment.comment").call("gb")<CR>g@', map_opt)
 
             -- VISUAL mode mappings
-            map('x', cfg.opleader.line, '<ESC><CMD>lua ___comment_gc(vim.fn.visualmode())<CR>', map_opt)
-            map('x', cfg.opleader.block, '<ESC><CMD>lua ___comment_gb(vim.fn.visualmode())<CR>', map_opt)
+            map('x', cfg.opleader.line, '<ESC><CMD>lua require("Comment.comment").gc(vim.fn.visualmode())<CR>', map_opt)
+            map(
+                'x',
+                cfg.opleader.block,
+                '<ESC><CMD>lua require("Comment.comment").gb(vim.fn.visualmode())<CR>',
+                map_opt
+            )
         end
 
         -- Extra Mappings
@@ -212,6 +219,8 @@ function C.setup(opts)
 
         -- Extended Mappings
         if cfg.mappings.extended then
+            local Op = require('Comment.opfunc')
+
             function _G.___comment_ggt(vmode)
                 Op.opfunc(cfg, vmode, U.cmode.comment, U.ctype.line, U.cmotion._)
             end
