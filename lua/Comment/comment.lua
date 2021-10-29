@@ -202,19 +202,19 @@ function C.setup(opts)
         if cfg.mappings.extra then
             local E = require('Comment.extra')
 
-            function _G.___comment_norm_o()
+            function C.gco()
                 E.norm_o(U.ctype.line, cfg)
             end
-            function _G.___comment_norm_O()
+            function C.gcO()
                 E.norm_O(U.ctype.line, cfg)
             end
-            function _G.___comment_norm_A()
+            function C.gcA()
                 E.norm_A(U.ctype.line, cfg)
             end
 
-            map('n', 'gco', '<CMD>lua ___comment_norm_o()<CR>', map_opt)
-            map('n', 'gcO', '<CMD>lua ___comment_norm_O()<CR>', map_opt)
-            map('n', 'gcA', '<CMD>lua ___comment_norm_A()<CR>', map_opt)
+            map('n', 'gco', '<CMD>lua require("Comment.comment").gco()<CR>', map_opt)
+            map('n', 'gcO', '<CMD>lua require("Comment.comment").gcO()<CR>', map_opt)
+            map('n', 'gcA', '<CMD>lua require("Comment.comment").gcA()<CR>', map_opt)
         end
 
         -- Extended Mappings
