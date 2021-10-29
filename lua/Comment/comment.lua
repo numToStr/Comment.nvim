@@ -1,3 +1,4 @@
+local Op = require('Comment.opfunc')
 local U = require('Comment.utils')
 
 local A = vim.api
@@ -89,23 +90,23 @@ function C.toggle()
 end
 
 function C.count_gcc(cfg)
-    require('Comment.opfunc').count(cfg or C.config)
+    Op.count(cfg or C.config)
 end
 
 function C.gcc(vmode, cfg)
-    require('Comment.opfunc').opfunc(vmode, cfg or C.config, U.cmode.toggle, U.ctype.line, U.cmotion.line)
+    Op.opfunc(vmode, cfg or C.config, U.cmode.toggle, U.ctype.line, U.cmotion.line)
 end
 
 function C.gbc(vmode, cfg)
-    require('Comment.opfunc').opfunc(vmode, cfg or C.config, U.cmode.toggle, U.ctype.block, U.cmotion.line)
+    Op.opfunc(vmode, cfg or C.config, U.cmode.toggle, U.ctype.block, U.cmotion.line)
 end
 
 function C.gc(vmode, cfg)
-    require('Comment.opfunc').opfunc(vmode, cfg or C.config, U.cmode.toggle, U.ctype.line, U.cmotion._)
+    Op.opfunc(vmode, cfg or C.config, U.cmode.toggle, U.ctype.line, U.cmotion._)
 end
 
 function C.gb(vmode, cfg)
-    require('Comment.opfunc').opfunc(vmode, cfg or C.config, U.cmode.toggle, U.ctype.block, U.cmotion._)
+    Op.opfunc(vmode, cfg or C.config, U.cmode.toggle, U.ctype.block, U.cmotion._)
 end
 
 ---Configures the whole plugin
@@ -219,8 +220,6 @@ function C.setup(opts)
 
         -- Extended Mappings
         if cfg.mappings.extended then
-            local Op = require('Comment.opfunc')
-
             function C.ggt(vmode)
                 Op.opfunc(cfg, vmode, U.cmode.comment, U.ctype.line, U.cmotion._)
             end
