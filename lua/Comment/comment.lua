@@ -4,7 +4,7 @@ local U = require('Comment.utils')
 local A = vim.api
 
 local C = {
-    ---@type Config|nil
+    ---@type Config
     config = nil,
 }
 
@@ -89,22 +89,36 @@ function C.toggle()
     end
 end
 
+---Does line comment with a count i.e vim.v.count
+---@param cfg Config
 function C.count_gcc(cfg)
     Op.count(cfg or C.config)
 end
 
+---Toggle comment using linewise comment
+---@param vmode string Vim Mode. Read `:h :map-operator`
+---@param cfg Config
 function C.gcc(vmode, cfg)
     Op.opfunc(vmode, cfg or C.config, U.cmode.toggle, U.ctype.line, U.cmotion.line)
 end
 
+---Toggle comment using blockwise comment
+---@param vmode string Vim Mode. Read `:h :map-operator`
+---@param cfg Config
 function C.gbc(vmode, cfg)
     Op.opfunc(vmode, cfg or C.config, U.cmode.toggle, U.ctype.block, U.cmotion.line)
 end
 
+---(Operator-Pending) Toggle comment using linewise comment
+---@param vmode string Vim Mode. Read `:h :map-operator`
+---@param cfg Config
 function C.gc(vmode, cfg)
     Op.opfunc(vmode, cfg or C.config, U.cmode.toggle, U.ctype.line, U.cmotion._)
 end
 
+---(Operator-Pending) Toggle comment using blockwise comment
+---@param vmode string Vim Mode. Read `:h :map-operator`
+---@param cfg Config
 function C.gb(vmode, cfg)
     Op.opfunc(vmode, cfg or C.config, U.cmode.toggle, U.ctype.block, U.cmotion._)
 end
