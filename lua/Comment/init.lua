@@ -1,4 +1,4 @@
-local C = require('Comment.comment')
+local C = require('Comment.api')
 
 return {
     setup = C.setup,

@@ -187,7 +187,7 @@ function C.setup(opts)
         -- NOTE: We are using cfg to store the position as the cfg is tossed around in most places
         function C.call(cb)
             cfg.___pos = cfg.sticky and A.nvim_win_get_cursor(0)
-            vim.o.operatorfunc = "v:lua.require'Comment.comment'." .. cb
+            vim.o.operatorfunc = "v:lua.require'Comment.api'." .. cb
         end
 
         -- Basic Mappings
@@ -196,21 +196,16 @@ function C.setup(opts)
             map(
                 'n',
                 cfg.toggler.line,
-                [[v:count == 0 ? '<CMD>lua require("Comment.comment").call("gcc")<CR>g@$' : '<CMD>lua require("Comment.comment").count_gcc()<CR>']],
+                [[v:count == 0 ? '<CMD>lua require("Comment.api").call("gcc")<CR>g@$' : '<CMD>lua require("Comment.api").count_gcc()<CR>']],
                 { noremap = true, silent = true, expr = true }
             )
-            map('n', cfg.toggler.block, '<CMD>lua require("Comment.comment").call("gbc")<CR>g@$', map_opt)
-            map('n', cfg.opleader.line, '<CMD>lua require("Comment.comment").call("gc")<CR>g@', map_opt)
-            map('n', cfg.opleader.block, '<CMD>lua require("Comment.comment").call("gb")<CR>g@', map_opt)
+            map('n', cfg.toggler.block, '<CMD>lua require("Comment.api").call("gbc")<CR>g@$', map_opt)
+            map('n', cfg.opleader.line, '<CMD>lua require("Comment.api").call("gc")<CR>g@', map_opt)
+            map('n', cfg.opleader.block, '<CMD>lua require("Comment.api").call("gb")<CR>g@', map_opt)
 
             -- VISUAL mode mappings
-            map('x', cfg.opleader.line, '<ESC><CMD>lua require("Comment.comment").gc(vim.fn.visualmode())<CR>', map_opt)
-            map(
-                'x',
-                cfg.opleader.block,
-                '<ESC><CMD>lua require("Comment.comment").gb(vim.fn.visualmode())<CR>',
-                map_opt
-            )
+            map('x', cfg.opleader.line, '<ESC><CMD>lua require("Comment.api").gc(vim.fn.visualmode())<CR>', map_opt)
+            map('x', cfg.opleader.block, '<ESC><CMD>lua require("Comment.api").gb(vim.fn.visualmode())<CR>', map_opt)
         end
 
         -- Extra Mappings
@@ -227,9 +222,9 @@ function C.setup(opts)
                 E.norm_A(U.ctype.line, cfg)
             end
 
-            map('n', 'gco', '<CMD>lua require("Comment.comment").gco()<CR>', map_opt)
-            map('n', 'gcO', '<CMD>lua require("Comment.comment").gcO()<CR>', map_opt)
-            map('n', 'gcA', '<CMD>lua require("Comment.comment").gcA()<CR>', map_opt)
+            map('n', 'gco', '<CMD>lua require("Comment.api").gco()<CR>', map_opt)
+            map('n', 'gcO', '<CMD>lua require("Comment.api").gcO()<CR>', map_opt)
+            map('n', 'gcA', '<CMD>lua require("Comment.api").gcA()<CR>', map_opt)
         end
 
         -- Extended Mappings
@@ -255,17 +250,17 @@ function C.setup(opts)
             end
 
             -- NORMAL mode extended
-            map('n', 'g>', '<CMD>lua require("Comment.comment").call("ggt")<CR>g@', map_opt)
-            map('n', 'g>c', '<CMD>lua require("Comment.comment").call("ggtc")<CR>g@$', map_opt)
-            map('n', 'g>b', '<CMD>lua require("Comment.comment").call("ggtb")<CR>g@$', map_opt)
+            map('n', 'g>', '<CMD>lua require("Comment.api").call("ggt")<CR>g@', map_opt)
+            map('n', 'g>c', '<CMD>lua require("Comment.api").call("ggtc")<CR>g@$', map_opt)
+            map('n', 'g>b', '<CMD>lua require("Comment.api").call("ggtb")<CR>g@$', map_opt)
 
-            map('n', 'g<', '<CMD>lua require("Comment.comment").call("glt")<CR>g@', map_opt)
-            map('n', 'g<c', '<CMD>lua require("Comment.comment").call("gltc")<CR>g@$', map_opt)
-            map('n', 'g<b', '<CMD>lua require("Comment.comment").call("gltb")<CR>g@$', map_opt)
+            map('n', 'g<', '<CMD>lua require("Comment.api").call("glt")<CR>g@', map_opt)
+            map('n', 'g<c', '<CMD>lua require("Comment.api").call("gltc")<CR>g@$', map_opt)
+            map('n', 'g<b', '<CMD>lua require("Comment.api").call("gltb")<CR>g@$', map_opt)
 
             -- VISUAL mode extended
-            map('x', 'g>', '<ESC><CMD>lua require("Comment.comment").ggt(vim.fn.visualmode())<CR>', map_opt)
-            map('x', 'g<', '<ESC><CMD>lua require("Comment.comment").glt(vim.fn.visualmode())<CR>', map_opt)
+            map('x', 'g>', '<ESC><CMD>lua require("Comment.api").ggt(vim.fn.visualmode())<CR>', map_opt)
+            map('x', 'g<', '<ESC><CMD>lua require("Comment.api").glt(vim.fn.visualmode())<CR>', map_opt)
         end
     end
 end
