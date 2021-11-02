@@ -369,6 +369,18 @@ local ft = require('Comment.ft')
 -- set both line and block commentstring
 ft.set('javascript', {'//%s', '/*%s*/'})
 
+-- set line, block and override commentstring
+ft.set("javascript", {
+  "// %s",
+  "/*%s*/",
+  jsx_fragment = { "{/* %s */}" },
+  jsx_element = { "{/* %s */}" },
+  jsx_attribute = { "// %s" },
+  jsx_expression = { "// %s", "/*%s*/" },
+  call_expression = { "// %s", "/*%s*/" },
+  statement_block = { "// %s" },
+})
+
 -- Just set only line comment
 ft.set('yaml', '#%s')
 
@@ -412,6 +424,7 @@ The following object is provided as an argument to `pre_hook` and `post_hook` fu
 ```lua
 ---Comment context
 ---@class Ctx
+---@field lang string: The name of the language where the cursor is
 ---@field ctype CType
 ---@field cmode CMode
 ---@field cmotion CMotion

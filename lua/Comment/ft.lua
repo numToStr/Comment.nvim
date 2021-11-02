@@ -60,9 +60,33 @@ return setmetatable({}, {
         set = function(k, v)
             L[k] = type(v) == 'string' and { v } or v
         end,
+
         get = function(lang, ctype)
             local l = L[lang]
             return l and l[ctype]
+        end,
+
+        lang = function(lang)
+            return L[lang]
+        end,
+
+        calculate = function(ctx)
+            local lang = L[ctx.lang]
+            if not lang then
+                return
+            end
+
+            if not ctx.contained then
+                return lang[ctx.ctype] or lang[1]
+            end
+
+            local config = lang[ctx.contained:type()]
+            if not config then
+                return lang[ctx.ctype] or lang[1]
+            end
+
+            -- TODO: Dunno if this is any good or not.
+            return config[ctx.ctype] or config[1]
         end,
     },
     __newindex = function(this, k, v)

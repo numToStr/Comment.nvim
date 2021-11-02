@@ -199,7 +199,9 @@ end
 ---@return string string Right side of the commentstring
 function U.parse_cstr(cfg, ctx)
     local cstr = U.is_fn(cfg.pre_hook, ctx)
-        or require('Comment.ft').get(vim.bo.filetype, ctx.ctype)
+        -- calculate from ft if possible
+        or require('Comment.ft').calculate(ctx)
+        -- last resort use comentstring
         or vim.bo.commentstring
 
     return U.unwrap_cstr(cstr)

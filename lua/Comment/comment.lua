@@ -1,3 +1,4 @@
+local Ctx = require('Comment.ctx')
 local U = require('Comment.utils')
 
 local A = vim.api
@@ -7,24 +8,18 @@ local C = {
     config = nil,
 }
 
----Comment context
----@class Ctx
----@field ctype CType
----@field cmode CMode
----@field cmotion CMotion
-
 ---Comments the current line
 function C.comment()
     local line = A.nvim_get_current_line()
 
     local pattern = U.get_pattern(C.config.ignore)
     if not U.ignore(line, pattern) then
-        ---@type Ctx
-        local ctx = {
+        local ctx = Ctx:new({
+            lang = U.get_lang(),
             cmode = U.cmode.comment,
             cmotion = U.cmotion.line,
             ctype = U.ctype.line,
-        }
+        })
 
         local padding, _ = U.get_padding(C.config.padding)
         local lcs, rcs = U.parse_cstr(C.config, ctx)
@@ -39,12 +34,11 @@ function C.uncomment()
 
     local pattern = U.get_pattern(C.config.ignore)
     if not U.ignore(line, pattern) then
-        ---@type Ctx
-        local ctx = {
+        local ctx = Ctx:new({
             cmode = U.cmode.uncomment,
             cmotion = U.cmotion.line,
             ctype = U.ctype.line,
-        }
+        })
 
         local lcs, rcs = U.parse_cstr(C.config, ctx)
         local _, pp = U.get_padding(C.config.padding)
@@ -64,12 +58,11 @@ function C.toggle()
 
     local pattern = U.get_pattern(C.config.ignore)
     if not U.ignore(line, pattern) then
-        ---@type Ctx
-        local ctx = {
+        local ctx = Ctx:new({
             cmode = U.cmode.toggle,
             cmotion = U.cmotion.line,
             ctype = U.ctype.line,
-        }
+        })
 
         local lcs, rcs = U.parse_cstr(C.config, ctx)
         local lcs_esc, rcs_esc = U.escape(lcs), U.escape(rcs)

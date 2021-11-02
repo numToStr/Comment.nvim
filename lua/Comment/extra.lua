@@ -1,4 +1,5 @@
 local U = require('Comment.utils')
+local Ctx = require('Comment.ctx')
 local A = vim.api
 
 local E = {}
@@ -7,12 +8,11 @@ local E = {}
 ---@param ctype CType
 ---@param cfg Config
 local function ins_on_line(count, ctype, cfg)
-    ---@type Ctx
-    local ctx = {
+    local ctx = Ctx:new({
         cmode = U.cmode.comment,
         cmotion = U.cmotion.line,
         ctype = ctype,
-    }
+    })
 
     local pos = A.nvim_win_get_cursor(0)
     local srow, scol = pos[1] + count, pos[2]
@@ -50,12 +50,11 @@ end
 ---@param ctype CType
 ---@param cfg Config
 function E.norm_A(ctype, cfg)
-    ---@type Ctx
-    local ctx = {
+    local ctx = Ctx:new({
         cmode = U.cmode.comment,
         cmotion = U.cmotion.line,
         ctype = ctype,
-    }
+    })
 
     local pos = A.nvim_win_get_cursor(0)
     local line = A.nvim_get_current_line()

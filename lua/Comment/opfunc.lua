@@ -1,3 +1,4 @@
+local Ctx = require('Comment.ctx')
 local U = require('Comment.utils')
 local A = vim.api
 
@@ -48,12 +49,11 @@ function O.opfunc(cfg, vmode, cmode, ctype, cmotion)
     local partial_block = cmotion == U.cmotion.char or cmotion == U.cmotion.v
     local block_x = partial_block and same_line
 
-    ---@type Ctx
-    local ctx = {
+    local ctx = Ctx:new({
         cmode = cmode,
         cmotion = cmotion,
         ctype = block_x and U.ctype.block or ctype,
-    }
+    })
 
     local lcs, rcs = U.parse_cstr(cfg, ctx)
 
@@ -252,12 +252,11 @@ end
 ---Example: `10gl` will comment 10 lines
 ---@param cfg Config
 function O.count(cfg)
-    ---@type Ctx
-    local ctx = {
+    local ctx = Ctx:new({
         cmode = U.cmode.toggle,
         cmotion = U.cmotion.line,
         ctype = U.ctype.line,
-    }
+    })
     local lcs, rcs = U.parse_cstr(cfg, ctx)
     local srow, erow, lines = U.get_count_lines(vim.v.count)
     ctx.cmode = O.linewise({
