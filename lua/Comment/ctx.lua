@@ -18,7 +18,6 @@ function Ctx:new(opts)
 
     opts.lang = ts.get_lang()
     opts.contained = ts.get_containing_node()
-    opts.other = true
 
     return setmetatable(opts, self)
 end

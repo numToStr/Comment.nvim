@@ -15,7 +15,6 @@ function C.comment()
     local pattern = U.get_pattern(C.config.ignore)
     if not U.ignore(line, pattern) then
         local ctx = Ctx:new({
-            lang = U.get_lang(),
             cmode = U.cmode.comment,
             cmotion = U.cmotion.line,
             ctype = U.ctype.line,

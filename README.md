@@ -370,6 +370,7 @@ local ft = require('Comment.ft')
 ft.set('javascript', {'//%s', '/*%s*/'})
 
 -- set line, block and override commentstring
+-- for particular treesitter nodes
 ft.set("javascript", {
   "// %s",
   "/*%s*/",
@@ -455,17 +456,6 @@ There are multiple ways to contribute reporting/fixing bugs, feature requests. Y
 -   Live upto the expectation of `tcomment`
 -   Basic INSERT mode mappings
 -   Doc comment i.e `/**%s*/` (js), `///%s` (rust)
-
--   Inbuilt context commentstring using treesitter
-
-```lua
-{
-    pre_hook = function()
-        return require('Comment.ts').commentstring()
-    end
-}
-```
-
 -   Header comment
 
 ```lua
