@@ -79,11 +79,30 @@ Following are the **default** config for the [`setup()`](#setup). If you want to
     ---@type string|function
     ignore = nil,
 
+    ---LHS of toggle mappings in NORMAL + VISUAL mode
+    ---@type table
+    toggler = {
+        ---line-comment keymap
+        line = 'gcc',
+        ---block-comment keymap
+        block = 'gbc',
+    },
+
+    ---LHS of operator-pending mappings in NORMAL + VISUAL mode
+    ---@type table
+    opleader = {
+        ---line-comment keymap
+        line = 'gc',
+        ---block-comment keymap
+        block = 'gb',
+    },
+
     ---Create basic (operator-pending) and extended mappings for NORMAL + VISUAL mode
     ---@type table
     mappings = {
         ---operator-pending mapping
         ---Includes `gcc`, `gcb`, `gc[count]{motion}` and `gb[count]{motion}`
+        ---NOTE: These mappings can be changed individually by `opleader` and `toggler` config
         basic = true,
         ---extra mapping
         ---Includes `gco`, `gcO`, `gcA`
@@ -93,30 +112,12 @@ Following are the **default** config for the [`setup()`](#setup). If you want to
         extended = false,
     },
 
-    ---LHS of toggle mapping in NORMAL + VISUAL mode
-    ---@type table
-    toggler = {
-        ---line-comment keymap
-        line = 'gcc',
-        ---block-comment keymap
-        block = 'gbc',
-    },
-
-    ---LHS of operator-pending mapping in NORMAL + VISUAL mode
-    ---@type table
-    opleader = {
-        ---line-comment keymap
-        line = 'gc',
-        ---block-comment keymap
-        block = 'gb',
-    },
-
     ---Pre-hook, called before commenting the line
-    ---@type function|nil
+    ---@type function
     pre_hook = nil,
 
     ---Post-hook, called after commenting is done
-    ---@type function|nil
+    ---@type function
     post_hook = nil,
 }
 ```
@@ -250,16 +251,18 @@ There are two hook methods i.e `pre_hook` and `post_hook` which are called befor
     end
 }
 
--- or with some spicy logic
+-- OR with some spicy logic
+-- NOTE: The example below is a proper integration and it is RECOMMENDED.
 {
     ---@param ctx Ctx
     pre_hook = function(ctx)
-        local u = require('Comment.utils')
-        if ctx.ctype == u.ctype.line or ctx.cmotion == u.cmotion.line then
-            -- Only comment when we are doing linewise comment or up-down motion
-            return require('ts_context_commentstring.internal').calculate_commentstring()
+        -- Only calculate commentstring for tsx filetypes
+        if vim.bo.filetype == 'typescriptreact' then
+            -- Detemine whether to use linewise or blockwise commentstring
+            local type = ctx.ctype == require('Comment.utils').ctype.line and '__default' or '__multiline'
+            return require('ts_context_commentstring.internal').calculate_commentstring({ key = type })
         end
-    end
+    end,
 }
 ```
 
