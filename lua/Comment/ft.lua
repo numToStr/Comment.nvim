@@ -7,11 +7,13 @@ local M = {
     haskell_b = '{-%s-}',
     fsharp_b = '(*%s*)',
     html_b = '<!--%s-->',
+    latex = '%%s',
 }
 
 ---Lang table that contains commentstring (linewise/blockwise) for mutliple filetypes
 ---@type table { filetype = { linewise, blockwise } }
 local L = {
+    bib = { M.latex },
     c = { M.cxx_l, M.cxx_b },
     cmake = { M.hash, '#[[%s]]' },
     cpp = { M.cxx_l, M.cxx_b },
@@ -43,6 +45,7 @@ local L = {
     sql = { M.dash, M.cxx_b },
     swift = { M.cxx_l, M.cxx_b },
     terraform = { M.hash, M.cxx_b },
+    tex = { M.latex },
     toml = { M.hash },
     typescript = { M.cxx_l, M.cxx_b },
     typescriptreact = { M.cxx_l, M.cxx_b },
