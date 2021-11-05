@@ -201,8 +201,8 @@ These mappings are disabled by default. (config: `mappings.extended`)
 `gcw` - Toggle from the current cursor position to the next word
 `gc$` - Toggle from the current cursor position to the end of line
 `gc}` - Toggle until the next blank line
-`gc5l` - Toggle 5 lines after the current cursor
-`gc8k` - Toggle 8 lines before the current cursor
+`gc5l` - Toggle 5 lines after the current cursor position
+`gc8k` - Toggle 8 lines before the current cursor position
 `gcip` - Toggle inside of paragraph
 `gca}` - Toggle around curly brackets
 
@@ -243,15 +243,6 @@ There are two hook methods i.e `pre_hook` and `post_hook` which are called befor
 -   `pre_hook` - This method is called with a [`ctx`](#comment-context) argument before comment/uncomment is started. It can be used to return a custom `commentstring` which will be used for comment/uncomment the lines. You can use something like [nvim-ts-context-commentstring](https://github.com/JoosepAlviste/nvim-ts-context-commentstring) to compute the commentstring using treesitter.
 
 ```lua
-
-{
-    ---@param ctx Ctx
-    pre_hook = function(ctx)
-        return require('ts_context_commentstring.internal').calculate_commentstring()
-    end
-}
-
--- OR with some spicy logic
 -- NOTE: The example below is a proper integration and it is RECOMMENDED.
 {
     ---@param ctx Ctx
