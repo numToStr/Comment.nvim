@@ -10,6 +10,16 @@ local M = {
     latex = '%%s',
 }
 
+local javascript_special_nodes = {
+    comment = { M.cxx_l, M.cxx_b },
+    jsx_attribute = { M.cxx_l, M.cxx_b },
+    jsx_element = { '{/* %s */}', '{/* %s */}' },
+    jsx_fragment = { '{/* %s */}', '{/* %s */}' },
+    jsx_opening_element = { M.cxx_l, M.cxx_b },
+    call_expression = { M.cxx_l, M.cxx_b },
+    statement_block = { M.cxx_l, M.cxx_b },
+}
+
 ---Lang table that contains commentstring (linewise/blockwise) for mutliple filetypes
 ---@type table { filetype = { linewise, blockwise } }
 local L = {
@@ -28,28 +38,8 @@ local L = {
     html = { M.html_b, M.html_b },
     idris = { M.dash, M.haskell_b },
     java = { M.cxx_l, M.cxx_b },
-    javascript = {
-        M.cxx_l,
-        M.cxx_b,
-
-        jsx_fragment = { '{/* %s */}' },
-        jsx_element = { '{/* %s */}' },
-        jsx_attribute = { '// %s' },
-        jsx_expression = { '// %s', '/*%s*/' },
-        call_expression = { '// %s', '/*%s*/' },
-        statement_block = { '// %s' },
-    },
-    javascriptreact = {
-        M.cxx_l,
-        M.cxx_b,
-
-        jsx_fragment = { '{/* %s */}' },
-        jsx_element = { '{/* %s */}' },
-        jsx_attribute = { '// %s' },
-        jsx_expression = { '// %s', '/*%s*/' },
-        call_expression = { '// %s', '/*%s*/' },
-        statement_block = { '// %s' },
-    },
+    javascript = vim.tbl_deep_extend('keep', { M.cxx_l, M.cxx_b }, javascript_special_nodes),
+    javascriptreact = vim.tbl_deep_extend('keep', { M.cxx_l, M.cxx_b }, javascript_special_nodes),
     julia = { M.hash, '#=%s=#' },
     lidris = { M.dash, M.haskell_b },
     lua = { M.dash, '--[[%s--]]' },
@@ -67,8 +57,8 @@ local L = {
     terraform = { M.hash, M.cxx_b },
     tex = { M.latex },
     toml = { M.hash },
-    typescript = { M.cxx_l, M.cxx_b },
-    typescriptreact = { M.cxx_l, M.cxx_b },
+    typescript = vim.tbl_deep_extend('keep', { M.cxx_l, M.cxx_b }, javascript_special_nodes),
+    typescriptreact = vim.tbl_deep_extend('keep', { M.cxx_l, M.cxx_b }, javascript_special_nodes),
     vim = { '"%s' },
     xml = { M.html_b, M.html_b },
     yaml = { M.hash },
@@ -91,16 +81,17 @@ return setmetatable({}, {
         end,
 
         calculate = function(ctx)
+            P(ctx)
             local lang = L[ctx.lang]
             if not lang then
                 return
             end
 
-            if not ctx.contained then
+            if not ctx.node then
                 return lang[ctx.ctype] or lang[1]
             end
 
-            local config = lang[ctx.contained:type()]
+            local config = lang[ctx.node:type()]
             if not config then
                 return lang[ctx.ctype] or lang[1]
             end

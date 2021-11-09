@@ -3,7 +3,7 @@ local ts = require('Comment.ts')
 --- Comment context
 ---@class Ctx
 ---@field lang string: The name of the language where the cursor is
----@field contained table: The containing node of where the cursor is
+---@field node table: The containing node of where the cursor is
 ---@field ctype CType
 ---@field cmode CMode
 ---@field cmotion CMotion
@@ -16,8 +16,9 @@ function Ctx:new(opts)
     assert(opts.cmotion, 'Must have a cmotion')
     assert(opts.ctype, 'Must have a ctype')
 
-    opts.lang = ts.get_lang()
-    opts.contained = ts.get_containing_node()
+    opts.lang = ts.get_lang(opts)
+    opts.node = ts.get_node(opts)
+    opts.node_type = opts.node and opts.node:type()
 
     return setmetatable(opts, self)
 end
