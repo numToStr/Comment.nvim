@@ -93,7 +93,7 @@ function ts.get_node(ctx, bufnr, in_range)
     local root = current_tree:trees()[1]:root()
     local contained = root:named_descendant_for_range(unpack(range))
 
-    local original = contained
+    -- local original = contained
     while contained and contained:type() and not config[contained:type()] do
         contained = contained:parent()
     end
