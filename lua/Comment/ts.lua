@@ -13,7 +13,7 @@ local get_cursor_line_non_whitespace_col_location = function()
     }
 end
 
---- Get the tree associated with the current comment
+--- Get the tree associated with the current range
 ---@param ctx Ctx
 local get_current_tree = function(ctx, bufnr, range)
     if bufnr and not range then
@@ -40,14 +40,10 @@ local get_current_tree = function(ctx, bufnr, range)
         else
             -- ctx.cmotion == U.cmotion.char
             cursor = vim.api.nvim_win_get_cursor(0)
+            cursor[1] = cursor[1] - 1
         end
 
-        range = {
-            cursor[1] - 1,
-            cursor[2],
-            cursor[1] - 1,
-            cursor[2],
-        }
+        range = { cursor[1], cursor[2], cursor[1], cursor[2] }
     end
 
     return langtree:language_for_range(range), range
