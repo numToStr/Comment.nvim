@@ -16,9 +16,9 @@ function Ctx:new(opts)
     assert(opts.cmotion, 'Must have a cmotion')
     assert(opts.ctype, 'Must have a ctype')
 
-    opts.lang = ts.get_lang(opts)
-    opts.node = ts.get_node(opts)
-    opts.node_type = opts.node and opts.node:type()
+    -- opts.lang = ts.get_lang(opts)
+    -- opts.node = ts.get_node(opts)
+    -- opts.node_type = opts.node and opts.node:type()
 
     return setmetatable(opts, self)
 end

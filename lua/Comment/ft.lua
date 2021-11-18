@@ -67,40 +67,52 @@ local L = {
     zig = { M.cxx_l }, -- Zig doesn't have block comments. waaaattttt!
 }
 
-return setmetatable({}, {
-    __index = {
-        set = function(k, v)
-            L[k] = type(v) == 'string' and { v } or v
-        end,
+local ft = {}
 
-        get = function(lang, ctype)
-            local l = L[lang]
-            return l and l[ctype]
-        end,
+---@alias Lang string Filetype/Language of the buffer
 
-        lang = function(lang)
-            return L[lang]
-        end,
+---Sets a commentstring(s) for a filetype/language
+---@param lang Lang
+---@param val string|string[]
+function ft.set(lang, val)
+    L[lang] = type(val) == 'string' and { val } or val
+end
 
-        calculate = function(ctx)
-            local lang = L[ctx.lang]
-            if not lang then
-                return
+---Get a commentstring from the filtype List
+---@param lang Lang
+---@param ctype CType
+---@return string
+function ft.get(lang, ctype)
+    local l = L[lang]
+    return l and l[ctype]
+end
+
+---Calculate commentstring w/ the power of treesitter
+---@param ctx Ctx
+---@return string
+function ft.calculate(ctx)
+    local buf = vim.api.nvim_get_current_buf()
+    local langtree = vim.treesitter.get_parser(buf)
+
+    local win = vim.api.nvim_get_current_win()
+    local row, col = unpack(vim.api.nvim_win_get_cursor(win))
+    local range = { row - 1, col, row - 1, col }
+
+    local found
+    langtree:for_each_child(function(tree)
+        if not found and tree:contains(range) then
+            local lang = tree:lang()
+            local cstr = ft.get(lang, ctx.ctype)
+            if cstr then
+                found = cstr
             end
+        end
+    end)
 
-            if not ctx.node then
-                return lang[ctx.ctype] or lang[1]
-            end
+    return found or ft.get(vim.bo.filetype, ctx.ctype)
+end
 
-            local config = lang[ctx.node:type()]
-            if not config then
-                return lang[ctx.ctype] or lang[1]
-            end
-
-            -- TODO: Dunno if this is any good or not.
-            return config[ctx.ctype] or config[1]
-        end,
-    },
+return setmetatable(ft, {
     __newindex = function(this, k, v)
         this.set(k, v)
     end,
