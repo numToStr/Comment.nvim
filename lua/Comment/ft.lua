@@ -102,15 +102,14 @@ function ft.calculate(ctx)
     }
 
     local found
-    langtree:for_each_child(function(tree)
-        if not found and tree:contains(range) then
-            local lang = tree:lang()
-            local cstr = ft.get(lang, ctx.ctype)
-            if cstr then
-                found = cstr
-            end
+    for lang, tree in pairs(langtree:children()) do
+        if found then
+            break
         end
-    end)
+        if tree:contains(range) then
+            found = ft.get(lang, ctx.ctype)
+        end
+    end
 
     return found or ft.get(vim.bo.filetype, ctx.ctype)
 end
