@@ -5,20 +5,20 @@
 
 ### ✨ Features
 
--   Supports `commentstring`. [Read more](#commentstring)
--   Prefers single-line/linewise comments
--   Supports line (`//`) and block (`/* */`) comments
--   Dot (`.`) repeat support for `gcc`, `gbc` and friends
--   Count support (`[count]gcc` only)
--   Left-right (`gcw` `gc$`) and Up-Down (`gc2j` `gc4k`) motions
--   Use with text-objects (`gci{` `gbat`)
--   Supports pre and post hooks
--   Custom language/filetype support
--   Ignore certain lines, powered by Lua regex
+- Supports `commentstring`. [Read more](#commentstring)
+- Prefers single-line/linewise comments
+- Supports line (`//`) and block (`/* */`) comments
+- Dot (`.`) repeat support for `gcc`, `gbc` and friends
+- Count support (`[count]gcc` only)
+- Left-right (`gcw` `gc$`) and Up-Down (`gc2j` `gc4k`) motions
+- Use with text-objects (`gci{` `gbat`)
+- Supports pre and post hooks
+- Custom language/filetype support
+- Ignore certain lines, powered by Lua regex
 
 ### 🚀 Installation
 
--   With [packer.nvim](https://github.com/wbthomason/packer.nvim)
+- With [packer.nvim](https://github.com/wbthomason/packer.nvim)
 
 ```lua
 use {
@@ -29,7 +29,7 @@ use {
 }
 ```
 
--   With [vim-plug](https://github.com/junegunn/vim-plug)
+- With [vim-plug](https://github.com/junegunn/vim-plug)
 
 ```vim
 Plug 'numToStr/Comment.nvim'
@@ -44,13 +44,13 @@ lua require('Comment').setup()
 
 First you need to call the `setup()` method to create the default mappings.
 
--   Lua
+- Lua
 
 ```lua
 require('Comment').setup()
 ```
 
--   VimL
+- VimL
 
 ```vim
 lua << EOF
@@ -138,7 +138,7 @@ When you call [`setup()`](#setup) method, `Comment.nvim` sets up some basic mapp
 
 These mappings are enabled by default. (config: `mappings.basic`)
 
--   NORMAL mode
+- NORMAL mode
 
 ```help
 `gcc` - Toggles the current line using linewise comment
@@ -152,7 +152,7 @@ These mappings are enabled by default. (config: `mappings.basic`)
 
 > NOTE: Dot repeat is not supported with `[count]gcc`
 
--   VISUAL mode
+- VISUAL mode
 
 ```help
 `gc` - Toggles the region using linewise comment
@@ -163,7 +163,7 @@ These mappings are enabled by default. (config: `mappings.basic`)
 
 These mappings are enabled by default. (config: `mappings.extra`)
 
--   NORMAL mode
+- NORMAL mode
 
 ```help
 `gco` - Insert comment to the next line and enters INSERT mode
@@ -175,7 +175,7 @@ These mappings are enabled by default. (config: `mappings.extra`)
 
 These mappings are disabled by default. (config: `mappings.extended`)
 
--   NORMAL mode
+- NORMAL mode
 
 ```help
 `g>[count]{motion}` - (Op-pending) Comments the region using linewise comment
@@ -186,7 +186,7 @@ These mappings are disabled by default. (config: `mappings.extended`)
 `g<b`- Uncomments the current line using blockwise comment
 ```
 
--   VISUAL mode
+- VISUAL mode
 
 ```help
 `g>` - Comments the region using single line
@@ -240,7 +240,7 @@ Read [API](./API.md) for more crazy stuff.
 
 There are two hook methods i.e `pre_hook` and `post_hook` which are called before comment and after comment respectively. Both should be provided during [`setup()`](#setup).
 
--   `pre_hook` - This method is called with a [`ctx`](#comment-context) argument before comment/uncomment is started. It can be used to return a custom `commentstring` which will be used for comment/uncomment the lines. You can use something like [nvim-ts-context-commentstring](https://github.com/JoosepAlviste/nvim-ts-context-commentstring) to compute the commentstring using treesitter.
+- `pre_hook` - This method is called with a [`ctx`](#comment-context) argument before comment/uncomment is started. It can be used to return a custom `commentstring` which will be used for comment/uncomment the lines. You can use something like [nvim-ts-context-commentstring](https://github.com/JoosepAlviste/nvim-ts-context-commentstring) to compute the commentstring using treesitter.
 
 ```lua
 -- NOTE: The example below is a proper integration and it is RECOMMENDED.
@@ -285,7 +285,7 @@ Also, you can set the `commentstring` from here but [**i won't recommend it**](#
 }
 ```
 
--   `post_hook` - This method is called after commenting is done. It receives the same 1) [`ctx`](#comment-context), the lines range 2) `start_row` 3) `end_row` 4) `start_col` 5) `end_col`.
+- `post_hook` - This method is called after commenting is done. It receives the same 1) [`ctx`](#comment-context), the lines range 2) `start_row` 3) `end_row` 4) `start_col` 5) `end_col`.
 
 > NOTE: If [methods](#methods) are used, then `post_hook` will receives only two arguments 1) [`ctx`](#comment-context) and 2) `-1` indicating the current line
 
@@ -316,7 +316,7 @@ You can use `ignore` to ignore certain lines during comment/uncomment. It can ta
 
 > NOTE: Ignore only works when with linewise comment. This is by design. As ignoring lines in block comments doesn't make that much sense.
 
--   With `string`
+- With `string`
 
 ```lua
 -- ignores empty lines
@@ -329,7 +329,7 @@ ignore = '^(%s*)local'
 ignore = '^const(.*)=(%s?)%((.*)%)(%s?)=>'
 ```
 
--   With `function`
+- With `function`
 
 ```lua
 {
@@ -369,19 +369,6 @@ local ft = require('Comment.ft')
 -- set both line and block commentstring
 ft.set('javascript', {'//%s', '/*%s*/'})
 
--- set line, block and override commentstring
--- for particular treesitter nodes
-ft.set("javascript", {
-  "// %s",
-  "/*%s*/",
-  jsx_fragment = { "{/* %s */}" },
-  jsx_element = { "{/* %s */}" },
-  jsx_attribute = { "// %s" },
-  jsx_expression = { "// %s", "/*%s*/" },
-  call_expression = { "// %s", "/*%s*/" },
-  statement_block = { "// %s" },
-})
-
 -- Just set only line comment
 ft.set('yaml', '#%s')
 
@@ -404,11 +391,11 @@ ft({'toml', 'graphql'}, '#%s')
 
 Although, `Comment.nvim` supports neovim's `commentstring` but unfortunately it has the least priority. The commentstring is taken from the following place in the respective order.
 
--   [`pre_hook`](#hooks) - If a string is returned from this method then it will be used for commenting.
+- [`pre_hook`](#hooks) - If a string is returned from this method then it will be used for commenting.
 
--   [`ft_table`](#languages) - If the current filetype is found in the table, then the string there will be used.
+- [`ft_table`](#languages) - If the current filetype is found in the table, then the string there will be used.
 
--   `commentstring` - Neovim's native commentstring for the filetype
+- `commentstring` - Neovim's native commentstring for the filetype
 
 <a id="commentstring-caveat"></a>
 
@@ -447,16 +434,16 @@ There are multiple ways to contribute reporting/fixing bugs, feature requests. Y
 
 ### 💐 Credits
 
--   [tcomment]() - To be with me forever and motivated me to write this.
--   [nvim-comment](https://github.com/terrortylor/nvim-comment) - Little and less powerful cousin. Also I took some code from it.
--   [kommentary](https://github.com/b3nj5m1n/kommentary) - Nicely done plugin but lacks some features. But it helped me to design this plugin.
+- [tcomment]() - To be with me forever and motivated me to write this.
+- [nvim-comment](https://github.com/terrortylor/nvim-comment) - Little and less powerful cousin. Also I took some code from it.
+- [kommentary](https://github.com/b3nj5m1n/kommentary) - Nicely done plugin but lacks some features. But it helped me to design this plugin.
 
 ### 🚗 Roadmap
 
--   Live upto the expectation of `tcomment`
--   Basic INSERT mode mappings
--   Doc comment i.e `/**%s*/` (js), `///%s` (rust)
--   Header comment
+- Live upto the expectation of `tcomment`
+- Basic INSERT mode mappings
+- Doc comment i.e `/**%s*/` (js), `///%s` (rust)
+- Header comment
 
 ```lua
 ----------------------

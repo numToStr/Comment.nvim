@@ -8,17 +8,6 @@ local M = {
     fsharp_b = '(*%s*)',
     html_b = '<!--%s-->',
     latex = '%%s',
-    jsx = '{/*%s*/}',
-}
-
-local javascript_special_nodes = {
-    comment = { M.cxx_l, M.cxx_b },
-    jsx_attribute = { M.cxx_l, M.cxx_b },
-    jsx_element = { M.jsx, M.jsx },
-    jsx_fragment = { M.jsx, M.jsx },
-    jsx_opening_element = { M.jsx, M.jsx },
-    call_expression = { M.cxx_l, M.cxx_b },
-    statement_block = { M.cxx_l, M.cxx_b },
 }
 
 ---Lang table that contains commentstring (linewise/blockwise) for mutliple filetypes
@@ -40,7 +29,8 @@ local L = {
     html = { M.html_b, M.html_b },
     idris = { M.dash, M.haskell_b },
     java = { M.cxx_l, M.cxx_b },
-    javascript = vim.tbl_deep_extend('keep', { M.cxx_l, M.cxx_b }, javascript_special_nodes),
+    javascript = { M.cxx_l, M.cxx_b },
+    javascriptreact = { M.cxx_l, M.cxx_b },
     julia = { M.hash, '#=%s=#' },
     lidris = { M.dash, M.haskell_b },
     lua = { M.dash, '--[[%s--]]' },
@@ -58,8 +48,8 @@ local L = {
     terraform = { M.hash, M.cxx_b },
     tex = { M.latex },
     toml = { M.hash },
-    tsx = vim.tbl_deep_extend('keep', { M.cxx_l, M.cxx_b }, javascript_special_nodes),
     typescript = { M.cxx_l, M.cxx_b },
+    typescriptreact = { M.cxx_l, M.cxx_b },
     vim = { '"%s' },
     vue = { M.html_b, M.html_b },
     xml = { M.html_b, M.html_b },

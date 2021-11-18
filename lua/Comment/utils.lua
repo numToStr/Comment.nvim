@@ -211,10 +211,11 @@ end
 ---@return string string Left side of the commentstring
 ---@return string string Right side of the commentstring
 function U.parse_cstr(cfg, ctx)
+    -- 1. We ask `pre_hook` for a commentstring
     local cstr = U.is_fn(cfg.pre_hook, ctx)
-        -- calculate from ft if possible
+        -- 2. Calculate w/ the help of treesitter
         or require('Comment.ft').calculate(ctx)
-        -- last resort use comentstring
+        -- 3. Last resort to use native commentstring
         or vim.bo.commentstring
 
     return U.unwrap_cstr(cstr)
