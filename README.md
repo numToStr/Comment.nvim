@@ -5,6 +5,7 @@
 
 ### ✨ Features
 
+- Supports treesitter. [Read more](#treesitter)
 - Supports `commentstring`. [Read more](#commentstring)
 - Prefers single-line/linewise comments
 - Supports line (`//`) and block (`/* */`) comments
@@ -13,7 +14,6 @@
 - Left-right (`gcw` `gc$`) and Up-Down (`gc2j` `gc4k`) motions
 - Use with text-objects (`gci{` `gbat`)
 - Supports pre and post hooks
-- Custom language/filetype support
 - Ignore certain lines, powered by Lua regex
 
 ### 🚀 Installation
@@ -234,6 +234,17 @@ require('Comment').toggle()
 
 Read [API](./API.md) for more crazy stuff.
 
+<a id="treesitter"></a>
+
+### 🌳 Treesitter
+
+This plugin also has basic support of treesitter for calculating `commentstring` which works most of the time and might be all that someone needs. But due to the nature of the parsed tree this implmentation has some known limitation.
+
+1. No `jsx/tsx` support. Its implmentation was quite complicated.
+2. Invalid comment on region where one language ends and the other starts. [Read more](https://github.com/numToStr/Comment.nvim/pull/62#issuecomment-972790418)
+
+For more advance use cases you should use [nvim-ts-context-commentstring](https://github.com/JoosepAlviste/nvim-ts-context-commentstring). See [hooks](#hooks) section.
+
 <a id="hooks"></a>
 
 ### 🎣 Hooks
@@ -440,8 +451,6 @@ There are multiple ways to contribute reporting/fixing bugs, feature requests. Y
 
 ### 🚗 Roadmap
 
-- Live upto the expectation of `tcomment`
-- Basic INSERT mode mappings
 - Doc comment i.e `/**%s*/` (js), `///%s` (rust)
 - Header comment
 

@@ -101,7 +101,7 @@ function ft.calculate(ctx)
         end
     end
 
-    return found or ft.get(vim.bo.filetype, ctx.ctype)
+    return found or ft.get(vim.api.nvim_buf_get_option(buf, 'filetype'), ctx.ctype)
 end
 
 return setmetatable(ft, {
