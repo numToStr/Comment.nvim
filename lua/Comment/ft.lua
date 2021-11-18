@@ -94,9 +94,12 @@ function ft.calculate(ctx)
     local buf = vim.api.nvim_get_current_buf()
     local langtree = vim.treesitter.get_parser(buf)
 
-    local win = vim.api.nvim_get_current_win()
-    local row, col = unpack(vim.api.nvim_win_get_cursor(win))
-    local range = { row - 1, col, row - 1, col }
+    local range = {
+        ctx.range.srow - 1,
+        ctx.range.scol,
+        ctx.range.erow - 1,
+        ctx.range.ecol,
+    }
 
     local found
     langtree:for_each_child(function(tree)

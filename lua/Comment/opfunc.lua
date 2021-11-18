@@ -1,8 +1,14 @@
-local Ctx = require('Comment.ctx')
 local U = require('Comment.utils')
 local A = vim.api
 
 local O = {}
+
+---Comment context
+---@class Ctx
+---@field ctype CType
+---@field cmode CMode
+---@field cmotion CMotion
+---@field range CRange
 
 ---Operator function parameter
 ---@class OpFnParams
@@ -46,11 +52,13 @@ function O.opfunc(cfg, vmode, cmode, ctype, cmotion)
     local partial_block = cmotion == U.cmotion.char or cmotion == U.cmotion.v
     local block_x = partial_block and same_line
 
-    local ctx = Ctx:new({
+    ---@type Ctx
+    local ctx = {
         cmode = cmode,
         cmotion = cmotion,
         ctype = block_x and U.ctype.block or ctype,
-    })
+        range = range,
+    }
 
     local lcs, rcs = U.parse_cstr(cfg, ctx)
 
@@ -243,13 +251,17 @@ end
 ---Example: `10gl` will comment 10 lines
 ---@param cfg Config
 function O.count(cfg)
-    local ctx = Ctx:new({
+    local lines, range = U.get_count_lines(vim.v.count)
+
+    ---@type Ctx
+    local ctx = {
         cmode = U.cmode.toggle,
         cmotion = U.cmotion.line,
         ctype = U.ctype.line,
-    })
+        range = range,
+    }
     local lcs, rcs = U.parse_cstr(cfg, ctx)
-    local lines, range = U.get_count_lines(vim.v.count)
+
     ctx.cmode = O.linewise({
         cfg = cfg,
         cmode = ctx.cmode,
@@ -258,6 +270,7 @@ function O.count(cfg)
         rcs = rcs,
         range = range,
     })
+
     -- TODO: Remove the range arguments in next update
     U.is_fn(cfg.post_hook, ctx, range.srow, range.erow)
 end
