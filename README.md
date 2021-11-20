@@ -282,33 +282,13 @@ There are two hook methods i.e `pre_hook` and `post_hook` which are called befor
 }
 ```
 
-Also, you can set the `commentstring` from here but [**i won't recommend it**](#commentstring-caveat) for now.
+- `post_hook` - This method is called after commenting is done. It receives the same [`ctx`](#comment-context) argument
 
 ```lua
 {
     ---@param ctx Ctx
-    pre_hook = function(ctx)
-        -- Only update commentstring for tsx filetypes
-        if vim.bo.filetype == 'typescriptreact' then
-            require('ts_context_commentstring.internal').update_commentstring()
-        end
-    end
-}
-```
-
-- `post_hook` - This method is called after commenting is done. It receives the same 1) [`ctx`](#comment-context), the lines range 2) `start_row` 3) `end_row` 4) `start_col` 5) `end_col`.
-
-> NOTE: If [methods](#methods) are used, then `post_hook` will receives only two arguments 1) [`ctx`](#comment-context) and 2) `-1` indicating the current line
-
-```lua
-{
-    ---@param ctx Ctx
-    ---@param start_row integar
-    ---@param end_row integar
-    ---@param start_col integar
-    ---@param end_col integar
-    post_hook = function(ctx, start_row, end_row, start_col, end_col)
-        if start_row == -1 then
+    post_hook = function(ctx)
+        if ctx.range.srow == ctx.range.srow then
             -- do something with the current line
         else
             -- do something with lines range
@@ -317,7 +297,10 @@ Also, you can set the `commentstring` from here but [**i won't recommend it**](#
 }
 ```
 
-The `post_hook` can be implemented to use newlines instead of padding e.g. for commenting out code in C with `#if 0`. You can find an example [here](https://github.com/numToStr/Comment.nvim/issues/38#issuecomment-945082507).
+The `post_hook` can be implemented to cover some niche use cases like the following:
+
+- Using newlines instead of padding e.g. for commenting out code in C with `#if 0`. You can find an example [here](https://github.com/numToStr/Comment.nvim/issues/38#issuecomment-945082507).
+- Duplicating the commented block and moving the cursor the next block. See [this](https://github.com/numToStr/Comment.nvim/issues/70)
 
 > NOTE: When pressing `gc`, `gb` and friends, `cmode` (Comment mode) inside `pre_hook` will always be toggle because when pre-hook is called, in that moment we don't know whether `gc` or `gb` will comment or uncomment the lines. But luckily, we do know this before `post_hook` and this will always receive either comment or uncomment status
 
@@ -423,10 +406,17 @@ The following object is provided as an argument to `pre_hook` and `post_hook` fu
 ```lua
 ---Comment context
 ---@class Ctx
----@field lang string: The name of the language where the cursor is
 ---@field ctype CType
 ---@field cmode CMode
 ---@field cmotion CMotion
+---@field range CRange
+
+---Range of the selection that needs to be commented
+---@class CRange
+---@field srow number Starting row
+---@field scol number Starting column
+---@field erow number Ending row
+---@field ecol number Ending column
 ```
 
 `CType` (Comment type), `CMode` (Comment mode) and `CMotion` (Comment motion) all of them are exported from the plugin's utils for reuse
@@ -445,7 +435,7 @@ There are multiple ways to contribute reporting/fixing bugs, feature requests. Y
 
 ### 💐 Credits
 
-- [tcomment]() - To be with me forever and motivated me to write this.
+- [tcomment](https://github.com/tomtom/tcomment_vim) - To be with me forever and motivated me to write this.
 - [nvim-comment](https://github.com/terrortylor/nvim-comment) - Little and less powerful cousin. Also I took some code from it.
 - [kommentary](https://github.com/b3nj5m1n/kommentary) - Nicely done plugin but lacks some features. But it helped me to design this plugin.
 

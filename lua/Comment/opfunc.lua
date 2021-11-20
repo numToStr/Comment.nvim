@@ -101,8 +101,7 @@ function O.opfunc(cfg, vmode, cmode, ctype, cmotion)
         cfg.___pos = nil
     end
 
-    -- TODO: Remove the range arguments in next update
-    U.is_fn(cfg.post_hook, ctx, range.srow, range.erow, range.scol, range.ecol)
+    U.is_fn(cfg.post_hook, ctx)
 end
 
 ---Linewise commenting
@@ -272,8 +271,7 @@ function O.count(cfg)
         range = range,
     })
 
-    -- TODO: Remove the range arguments in next update
-    U.is_fn(cfg.post_hook, ctx, range.srow, range.erow)
+    U.is_fn(cfg.post_hook, ctx)
 end
 
 return O
