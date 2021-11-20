@@ -1,3 +1,5 @@
+local A = vim.api
+
 ---Common commentstring shared b/w mutliple languages
 local M = {
     cxx_l = '//%s',
@@ -82,8 +84,13 @@ end
 ---@param ctx Ctx
 ---@return string
 function ft.calculate(ctx)
-    local buf = vim.api.nvim_get_current_buf()
-    local langtree = vim.treesitter.get_parser(buf)
+    local buf = A.nvim_get_current_buf()
+    local ok, langtree = pcall(vim.treesitter.get_parser, buf)
+    local buf_type = A.nvim_buf_get_option(buf, 'filetype')
+
+    if not ok then
+        return ft.get(buf_type, ctx.ctype)
+    end
 
     local range = {
         ctx.range.srow - 1,
@@ -102,7 +109,7 @@ function ft.calculate(ctx)
         end
     end
 
-    return found or ft.get(vim.api.nvim_buf_get_option(buf, 'filetype'), ctx.ctype)
+    return found or ft.get(buf_type, ctx.ctype)
 end
 
 return setmetatable(ft, {
