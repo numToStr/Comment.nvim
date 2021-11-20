@@ -17,6 +17,7 @@ local L = {
     c = { M.cxx_l, M.cxx_b },
     cmake = { M.hash, '#[[%s]]' },
     cpp = { M.cxx_l, M.cxx_b },
+    cs = { M.cxx_l, M.cxx_b },
     css = { M.cxx_b, M.cxx_b },
     dhall = { M.dash, M.haskell_b },
     dot = { M.cxx_l, M.cxx_b },
