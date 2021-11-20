@@ -124,11 +124,9 @@ function U.get_region(vmode)
     local sln, eln
 
     if vmode:match('[vV]') then
-        sln = m(buf, '<')
-        eln = m(buf, '>')
+        sln, eln = m(buf, '<'), m(buf, '>')
     else
-        sln = m(buf, '[')
-        eln = m(buf, ']')
+        sln, eln = m(buf, '['), m(buf, ']')
     end
 
     return {
@@ -158,29 +156,15 @@ function U.get_count_lines(count)
 end
 
 ---Get lines from a NORMAL/VISUAL mode
----@param vmode string VIM mode
----@param ctype CType
+---@param range CRange
 ---@return CLines
----@return CRange
-function U.get_lines(vmode, ctype)
-    local range = U.get_region(vmode)
-
+function U.get_lines(range)
     -- If start and end is same, then just return the current line
-    local lines
     if range.srow == range.erow then
-        lines = { A.nvim_get_current_line() }
-    elseif ctype == U.ctype.block then
-        -- In block we only need the starting and endling line
-        lines = {
-            A.nvim_buf_get_lines(0, range.srow - 1, range.srow, false)[1],
-            A.nvim_buf_get_lines(0, range.erow - 1, range.erow, false)[1],
-        }
-    else
-        -- decrementing `scol` by one bcz marks are 1 based but lines are 0 based
-        lines = A.nvim_buf_get_lines(0, range.srow - 1, range.erow, false)
+        return { A.nvim_get_current_line() }
     end
 
-    return lines, range
+    return A.nvim_buf_get_lines(0, range.srow - 1, range.erow, false)
 end
 
 ---Validates and unwraps the given commentstring
