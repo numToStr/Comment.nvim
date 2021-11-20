@@ -18,6 +18,7 @@ local L = {
     cmake = { M.hash, '#[[%s]]' },
     cpp = { M.cxx_l, M.cxx_b },
     cs = { M.cxx_l, M.cxx_b },
+    css = { M.cxx_b, M.cxx_b },
     dhall = { M.dash, M.haskell_b },
     dot = { M.cxx_l, M.cxx_b },
     elm = { M.dash, M.haskell_b },
@@ -51,21 +52,60 @@ local L = {
     typescript = { M.cxx_l, M.cxx_b },
     typescriptreact = { M.cxx_l, M.cxx_b },
     vim = { '"%s' },
+    vue = { M.html_b, M.html_b },
     xml = { M.html_b, M.html_b },
     yaml = { M.hash },
     zig = { M.cxx_l }, -- Zig doesn't have block comments. waaaattttt!
 }
 
-return setmetatable({}, {
-    __index = {
-        set = function(k, v)
-            L[k] = type(v) == 'string' and { v } or v
-        end,
-        get = function(lang, ctype)
-            local l = L[lang]
-            return l and l[ctype]
-        end,
-    },
+local ft = {}
+
+---@alias Lang string Filetype/Language of the buffer
+
+---Sets a commentstring(s) for a filetype/language
+---@param lang Lang
+---@param val string|string[]
+function ft.set(lang, val)
+    L[lang] = type(val) == 'string' and { val } or val
+end
+
+---Get a commentstring from the filtype List
+---@param lang Lang
+---@param ctype CType
+---@return string
+function ft.get(lang, ctype)
+    local l = L[lang]
+    return l and l[ctype]
+end
+
+---Calculate commentstring w/ the power of treesitter
+---@param ctx Ctx
+---@return string
+function ft.calculate(ctx)
+    local buf = vim.api.nvim_get_current_buf()
+    local langtree = vim.treesitter.get_parser(buf)
+
+    local range = {
+        ctx.range.srow - 1,
+        ctx.range.scol,
+        ctx.range.erow - 1,
+        ctx.range.ecol,
+    }
+
+    local found
+    for lang, tree in pairs(langtree:children()) do
+        if found then
+            break
+        end
+        if tree:contains(range) then
+            found = ft.get(lang, ctx.ctype)
+        end
+    end
+
+    return found or ft.get(vim.api.nvim_buf_get_option(buf, 'filetype'), ctx.ctype)
+end
+
+return setmetatable(ft, {
     __newindex = function(this, k, v)
         this.set(k, v)
     end,
