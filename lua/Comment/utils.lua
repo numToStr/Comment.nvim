@@ -230,7 +230,7 @@ end
 ---@return string string Commented string
 function U.comment_str(ln, lcs, rcs, padding, min_indent)
     if U.is_empty(ln) then
-        return (min_indent or '') .. (lcs or rcs)
+        return (min_indent or '') .. ((lcs or '') .. (rcs or ''))
     end
 
     local indent, chars = ln:match('^(%s*)(.*)')
