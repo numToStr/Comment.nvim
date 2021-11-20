@@ -7,27 +7,23 @@ local C = {
     config = nil,
 }
 
----Comment context
----@class Ctx
----@field ctype CType
----@field cmode CMode
----@field cmotion CMotion
-
 ---Comments the current line
 function C.comment()
     local line = A.nvim_get_current_line()
 
     local pattern = U.get_pattern(C.config.ignore)
     if not U.ignore(line, pattern) then
+        local srow, scol = unpack(A.nvim_win_get_cursor(0))
         ---@type Ctx
         local ctx = {
             cmode = U.cmode.comment,
             cmotion = U.cmotion.line,
             ctype = U.ctype.line,
+            range = { srow = srow, scol = scol, erow = srow, ecol = scol },
         }
+        local lcs, rcs = U.parse_cstr(C.config, ctx)
 
         local padding, _ = U.get_padding(C.config.padding)
-        local lcs, rcs = U.parse_cstr(C.config, ctx)
         A.nvim_set_current_line(U.comment_str(line, lcs, rcs, padding))
         U.is_fn(C.config.post_hook, ctx, -1)
     end
@@ -39,14 +35,16 @@ function C.uncomment()
 
     local pattern = U.get_pattern(C.config.ignore)
     if not U.ignore(line, pattern) then
+        local srow, scol = unpack(A.nvim_win_get_cursor(0))
         ---@type Ctx
         local ctx = {
             cmode = U.cmode.uncomment,
             cmotion = U.cmotion.line,
             ctype = U.ctype.line,
+            range = { srow = srow, scol = scol, erow = srow, ecol = scol },
         }
-
         local lcs, rcs = U.parse_cstr(C.config, ctx)
+
         local _, pp = U.get_padding(C.config.padding)
         local lcs_esc, rcs_esc = U.escape(lcs), U.escape(rcs)
 
@@ -64,14 +62,16 @@ function C.toggle()
 
     local pattern = U.get_pattern(C.config.ignore)
     if not U.ignore(line, pattern) then
+        local srow, scol = unpack(A.nvim_win_get_cursor(0))
         ---@type Ctx
         local ctx = {
             cmode = U.cmode.toggle,
             cmotion = U.cmotion.line,
             ctype = U.ctype.line,
+            range = { srow = srow, scol = scol, erow = srow, ecol = scol },
         }
-
         local lcs, rcs = U.parse_cstr(C.config, ctx)
+
         local lcs_esc, rcs_esc = U.escape(lcs), U.escape(rcs)
         local padding, pp = U.get_padding(C.config.padding)
         local is_cmt = U.is_commented(lcs_esc, rcs_esc, pp)(line)

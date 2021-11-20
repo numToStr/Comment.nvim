@@ -3,17 +3,21 @@ local A = vim.api
 
 local O = {}
 
----Opfunc options
+---Comment context
+---@class Ctx
+---@field ctype CType
+---@field cmode CMode
+---@field cmotion CMotion
+---@field range CRange
+
+---Operator function parameter
 ---@class OpFnParams
 ---@field cfg Config
 ---@field cmode CMode
 ---@field lines table List of lines
 ---@field rcs string RHS of commentstring
 ---@field lcs string LHS of commentstring
----@field srow number Starting row
----@field erow number Ending row
----@field scol number Starting column
----@field ecol number Ending column
+---@field range CRange
 
 ---Common operatorfunc callback
 ---@param cfg Config Plugin config
@@ -42,9 +46,9 @@ function O.opfunc(cfg, vmode, cmode, ctype, cmotion)
 
     cmotion = cmotion == U.cmotion._ and U.cmotion[vmode] or cmotion
 
-    local srow, erow, lines, scol, ecol = U.get_lines(vmode, ctype)
+    local lines, range = U.get_lines(vmode, ctype)
 
-    local same_line = srow == erow
+    local same_line = range.srow == range.erow
     local partial_block = cmotion == U.cmotion.char or cmotion == U.cmotion.v
     local block_x = partial_block and same_line
 
@@ -53,6 +57,7 @@ function O.opfunc(cfg, vmode, cmode, ctype, cmotion)
         cmode = cmode,
         cmotion = cmotion,
         ctype = block_x and U.ctype.block or ctype,
+        range = range,
     }
 
     local lcs, rcs = U.parse_cstr(cfg, ctx)
@@ -64,10 +69,7 @@ function O.opfunc(cfg, vmode, cmode, ctype, cmotion)
             lines = lines,
             lcs = lcs,
             rcs = rcs,
-            srow = srow,
-            erow = erow,
-            scol = scol,
-            ecol = ecol,
+            range = range,
         })
     elseif ctype == U.ctype.block and not same_line then
         ctx.cmode = O.blockwise({
@@ -76,10 +78,7 @@ function O.opfunc(cfg, vmode, cmode, ctype, cmotion)
             lines = lines,
             lcs = lcs,
             rcs = rcs,
-            srow = srow,
-            erow = erow,
-            scol = scol,
-            ecol = ecol,
+            range = range,
         }, partial_block)
     else
         ctx.cmode = O.linewise({
@@ -88,8 +87,7 @@ function O.opfunc(cfg, vmode, cmode, ctype, cmotion)
             lines = lines,
             lcs = lcs,
             rcs = rcs,
-            srow = srow,
-            erow = erow,
+            range = range,
         })
     end
 
@@ -103,7 +101,8 @@ function O.opfunc(cfg, vmode, cmode, ctype, cmotion)
         cfg.___pos = nil
     end
 
-    U.is_fn(cfg.post_hook, ctx, srow, erow, scol, ecol)
+    -- TODO: Remove the range arguments in next update
+    U.is_fn(cfg.post_hook, ctx, range.srow, range.erow, range.scol, range.ecol)
 end
 
 ---Linewise commenting
@@ -163,7 +162,7 @@ function O.linewise(p)
             end
         end
     end
-    A.nvim_buf_set_lines(0, p.srow - 1, p.erow, false, p.lines)
+    A.nvim_buf_set_lines(0, p.range.srow - 1, p.range.erow, false, p.lines)
 
     return cmode
 end
@@ -182,8 +181,8 @@ function O.blockwise(p, partial)
     local sln_check = sln
     local eln_check = eln
     if partial then
-        sln_check = sln:sub(p.scol + 1)
-        eln_check = eln:sub(0, p.ecol + 1)
+        sln_check = sln:sub(p.range.scol + 1)
+        eln_check = eln:sub(0, p.range.ecol + 1)
     end
 
     -- If given mode is toggle then determine whether to comment or not
@@ -207,12 +206,12 @@ function O.blockwise(p, partial)
     end
 
     if partial then
-        l1 = sln:sub(0, p.scol) .. l1
-        l2 = l2 .. eln:sub(p.ecol + 2)
+        l1 = sln:sub(0, p.range.scol) .. l1
+        l2 = l2 .. eln:sub(p.range.ecol + 2)
     end
 
-    A.nvim_buf_set_lines(0, p.srow - 1, p.srow, false, { l1 })
-    A.nvim_buf_set_lines(0, p.erow - 1, p.erow, false, { l2 })
+    A.nvim_buf_set_lines(0, p.range.srow - 1, p.range.srow, false, { l1 })
+    A.nvim_buf_set_lines(0, p.range.erow - 1, p.range.erow, false, { l2 })
 
     return cmode
 end
@@ -222,9 +221,9 @@ end
 ---@return integer CMode
 function O.blockwise_x(p)
     local line = p.lines[1]
-    local first = line:sub(0, p.scol)
-    local mid = line:sub(p.scol + 1, p.ecol + 1)
-    local last = line:sub(p.ecol + 2)
+    local first = line:sub(0, p.range.scol)
+    local mid = line:sub(p.range.scol + 1, p.range.ecol + 1)
+    local last = line:sub(p.range.ecol + 2)
 
     local padding, pp = U.get_padding(p.cfg.padding)
 
@@ -252,24 +251,28 @@ end
 ---Example: `10gl` will comment 10 lines
 ---@param cfg Config
 function O.count(cfg)
+    local lines, range = U.get_count_lines(vim.v.count)
+
     ---@type Ctx
     local ctx = {
         cmode = U.cmode.toggle,
         cmotion = U.cmotion.line,
         ctype = U.ctype.line,
+        range = range,
     }
     local lcs, rcs = U.parse_cstr(cfg, ctx)
-    local srow, erow, lines = U.get_count_lines(vim.v.count)
+
     ctx.cmode = O.linewise({
         cfg = cfg,
         cmode = ctx.cmode,
         lines = lines,
         lcs = lcs,
         rcs = rcs,
-        srow = srow,
-        erow = erow,
+        range = range,
     })
-    U.is_fn(cfg.post_hook, ctx, srow, erow)
+
+    -- TODO: Remove the range arguments in next update
+    U.is_fn(cfg.post_hook, ctx, range.srow, range.erow)
 end
 
 return O
