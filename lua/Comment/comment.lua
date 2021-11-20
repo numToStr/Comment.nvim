@@ -38,7 +38,7 @@ function C.uncomment()
         local srow, scol = unpack(A.nvim_win_get_cursor(0))
         ---@type Ctx
         local ctx = {
-            cmode = U.cmode.comment,
+            cmode = U.cmode.uncomment,
             cmotion = U.cmotion.line,
             ctype = U.ctype.line,
             range = { srow = srow, scol = scol, erow = srow, ecol = scol },
@@ -65,7 +65,7 @@ function C.toggle()
         local srow, scol = unpack(A.nvim_win_get_cursor(0))
         ---@type Ctx
         local ctx = {
-            cmode = U.cmode.comment,
+            cmode = U.cmode.toggle,
             cmotion = U.cmotion.line,
             ctype = U.ctype.line,
             range = { srow = srow, scol = scol, erow = srow, ecol = scol },
