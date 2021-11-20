@@ -46,8 +46,7 @@ function O.opfunc(cfg, vmode, cmode, ctype, cmotion)
 
     cmotion = cmotion == U.cmotion._ and U.cmotion[vmode] or cmotion
 
-    local lines, range = U.get_lines(vmode, ctype)
-
+    local range = U.get_region(vmode)
     local same_line = range.srow == range.erow
     local partial_block = cmotion == U.cmotion.char or cmotion == U.cmotion.v
     local block_x = partial_block and same_line
@@ -61,6 +60,7 @@ function O.opfunc(cfg, vmode, cmode, ctype, cmotion)
     }
 
     local lcs, rcs = U.parse_cstr(cfg, ctx)
+    local lines = U.get_lines(range)
 
     if block_x then
         ctx.cmode = O.blockwise_x({
@@ -173,16 +173,17 @@ end
 ---@return integer CMode
 function O.blockwise(p, partial)
     -- Block wise, only when there are more than 1 lines
-    local sln, eln = p.lines[1], p.lines[2]
+    local sln, eln = p.lines[1], p.lines[#p.lines]
     local lcs_esc, rcs_esc = U.escape(p.lcs), U.escape(p.rcs)
     local padding, pp = U.get_padding(p.cfg.padding)
 
     -- These string should be checked for comment/uncomment
-    local sln_check = sln
-    local eln_check = eln
+    local sln_check, eln_check
     if partial then
         sln_check = sln:sub(p.range.scol + 1)
         eln_check = eln:sub(0, p.range.ecol + 1)
+    else
+        sln_check, eln_check = sln, eln
     end
 
     -- If given mode is toggle then determine whether to comment or not
