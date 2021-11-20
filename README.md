@@ -238,10 +238,10 @@ Read [API](./API.md) for more crazy stuff.
 
 ### 🌳 Treesitter
 
-This plugin also has basic support of treesitter for calculating `commentstring` which works most of the time and might be all that someone needs. But due to the nature of the parsed tree this implmentation has some known limitation.
+This plugin also has the basic support of treesitter for calculating `commentstring` which works most of the time and might be all that someone needs. But due to the nature of the parsed tree, this implementation has some known limitations.
 
-1. No `jsx/tsx` support. Its implmentation was quite complicated.
-2. Invalid comment on region where one language ends and the other starts. [Read more](https://github.com/numToStr/Comment.nvim/pull/62#issuecomment-972790418)
+1. No `jsx/tsx` support. Its implementation was quite complicated.
+2. Invalid comment on the region where one language ends and the other starts. [Read more](https://github.com/numToStr/Comment.nvim/pull/62#issuecomment-972790418)
 
 For more advance use cases you should use [nvim-ts-context-commentstring](https://github.com/JoosepAlviste/nvim-ts-context-commentstring). See [hooks](#hooks) section.
 
