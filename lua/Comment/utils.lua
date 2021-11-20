@@ -124,11 +124,9 @@ function U.get_region(vmode)
     local sln, eln
 
     if vmode:match('[vV]') then
-        sln = m(buf, '<')
-        eln = m(buf, '>')
+        sln, eln = m(buf, '<'), m(buf, '>')
     else
-        sln = m(buf, '[')
-        eln = m(buf, ']')
+        sln, eln = m(buf, '['), m(buf, ']')
     end
 
     return {
