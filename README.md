@@ -243,13 +243,15 @@ This plugin also has the basic support of treesitter for calculating `commentstr
 1. No `jsx/tsx` support. Its implementation was quite complicated.
 2. Invalid comment on the region where one language ends and the other starts. [Read more](https://github.com/numToStr/Comment.nvim/pull/62#issuecomment-972790418)
 
-For more advance use cases you should use [nvim-ts-context-commentstring](https://github.com/JoosepAlviste/nvim-ts-context-commentstring). See [hooks](#hooks) section.
+For more advance use cases you should use [nvim-ts-context-commentstring](https://github.com/JoosepAlviste/nvim-ts-context-commentstring). See [`pre_hook`](#pre-hook) section for the integration.
 
 <a id="hooks"></a>
 
 ### 🎣 Hooks
 
 There are two hook methods i.e `pre_hook` and `post_hook` which are called before comment and after comment respectively. Both should be provided during [`setup()`](#setup).
+
+<a id="pre-hook"></a>
 
 - `pre_hook` - This method is called with a [`ctx`](#comment-context) argument before comment/uncomment is started. It can be used to return a custom `commentstring` which will be used for comment/uncomment the lines. You can use something like [nvim-ts-context-commentstring](https://github.com/JoosepAlviste/nvim-ts-context-commentstring) to compute the commentstring using treesitter.
 
@@ -282,7 +284,9 @@ There are two hook methods i.e `pre_hook` and `post_hook` which are called befor
 }
 ```
 
-- `post_hook` - This method is called after commenting is done. It receives the same [`ctx`](#comment-context) argument
+<a id="post-hook"></a>
+
+- `post_hook` - This method is called after commenting is done. It receives the same [`ctx`](#comment-context) argument as [`pre_hook`](#pre_hook).
 
 ```lua
 {
@@ -299,8 +303,8 @@ There are two hook methods i.e `pre_hook` and `post_hook` which are called befor
 
 The `post_hook` can be implemented to cover some niche use cases like the following:
 
-- Using newlines instead of padding e.g. for commenting out code in C with `#if 0`. You can find an example [here](https://github.com/numToStr/Comment.nvim/issues/38#issuecomment-945082507).
-- Duplicating the commented block and moving the cursor the next block. See [this](https://github.com/numToStr/Comment.nvim/issues/70)
+- Using newlines instead of padding e.g. for commenting out code in C with `#if 0`. See an example [here](https://github.com/numToStr/Comment.nvim/issues/38#issuecomment-945082507).
+- Duplicating the commented block (using `pre_hook`) and moving the cursor to the next block (using `post_hook`). See [this](https://github.com/numToStr/Comment.nvim/issues/70).
 
 > NOTE: When pressing `gc`, `gb` and friends, `cmode` (Comment mode) inside `pre_hook` will always be toggle because when pre-hook is called, in that moment we don't know whether `gc` or `gb` will comment or uncomment the lines. But luckily, we do know this before `post_hook` and this will always receive either comment or uncomment status
 
