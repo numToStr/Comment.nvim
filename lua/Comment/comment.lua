@@ -25,7 +25,7 @@ function C.comment()
 
         local padding, _ = U.get_padding(C.config.padding)
         A.nvim_set_current_line(U.comment_str(line, lcs, rcs, padding))
-        U.is_fn(C.config.post_hook, ctx, -1)
+        U.is_fn(C.config.post_hook, ctx)
     end
 end
 
@@ -52,7 +52,7 @@ function C.uncomment()
             A.nvim_set_current_line(U.uncomment_str(line, lcs_esc, rcs_esc, pp))
         end
 
-        U.is_fn(C.config.post_hook, ctx, -1)
+        U.is_fn(C.config.post_hook, ctx)
     end
 end
 
@@ -84,7 +84,7 @@ function C.toggle()
             ctx.cmode = U.cmode.comment
         end
 
-        U.is_fn(C.config.post_hook, ctx, -1)
+        U.is_fn(C.config.post_hook, ctx)
     end
 end
 

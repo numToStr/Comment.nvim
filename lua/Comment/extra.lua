@@ -31,7 +31,7 @@ local function ins_on_line(count, ctype, cfg)
     A.nvim_buf_set_lines(0, srow, srow, false, { ll .. if_rcs })
     local erow, ecol = srow + 1, #ll - 1
     U.move_n_insert(erow, ecol)
-    U.is_fn(cfg.post_hook, ctx, srow, erow, col, ecol)
+    U.is_fn(cfg.post_hook, ctx)
 end
 
 ---Add a comment below the current line and goes to INSERT mode
@@ -79,7 +79,7 @@ function E.norm_A(ctype, cfg)
     local erow, ecol = srow - 1, #ll - 1
     A.nvim_buf_set_lines(0, erow, srow, false, { ll .. if_rcs })
     U.move_n_insert(srow, ecol)
-    U.is_fn(cfg.post_hook, ctx, srow, erow, scol, ecol)
+    U.is_fn(cfg.post_hook, ctx)
 end
 
 return E
