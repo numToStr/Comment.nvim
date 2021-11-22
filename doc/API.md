@@ -18,7 +18,7 @@ require('Comment.api').uncomment()
 ---Line comment with a count
 ---@param count integer Number of lines. (default: `vim.v.count`)
 ---@param cfg Config If not provided, will use the default config
-require('Comment.api').count_gcc(count, cfg)
+require('Comment.api').gcc_count(count, cfg)
 
 ---Toggle comment using linewise comment. This powers the default `gcc` mapping.
 ---@param vmode VMode
