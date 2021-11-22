@@ -128,9 +128,10 @@ function C.toggle()
 end
 
 ---Does line comment with a count i.e vim.v.count
+---@param count integer Number of lines
 ---@param cfg Config
-function C.count_gcc(cfg)
-    Op.count(cfg or C.config)
+function C.gcc_count(count, cfg)
+    Op.count(count or vim.v.count, cfg or C.config)
 end
 
 ---Toggle comment using linewise comment
@@ -206,7 +207,7 @@ function C.setup(opts)
             map(
                 'n',
                 cfg.toggler.line,
-                [[v:count == 0 ? '<CMD>lua require("Comment.api").call("gcc")<CR>g@$' : '<CMD>lua require("Comment.api").count_gcc()<CR>']],
+                [[v:count == 0 ? '<CMD>lua require("Comment.api").call("gcc")<CR>g@$' : '<CMD>lua require("Comment.api").gcc_count()<CR>']],
                 { noremap = true, silent = true, expr = true }
             )
             map('n', cfg.toggler.block, '<CMD>lua require("Comment.api").call("gbc")<CR>g@$', map_opt)

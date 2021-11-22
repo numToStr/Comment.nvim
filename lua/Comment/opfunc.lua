@@ -251,9 +251,10 @@ end
 
 ---Toggle line comment with count
 ---Example: `10gl` will comment 10 lines
+---@param count integer Number of lines
 ---@param cfg Config
-function O.count(cfg)
-    local lines, range = U.get_count_lines(vim.v.count)
+function O.count(count, cfg)
+    local lines, range = U.get_count_lines(count)
 
     ---@type Ctx
     local ctx = {

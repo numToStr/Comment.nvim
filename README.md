@@ -213,26 +213,11 @@ These mappings are disabled by default. (config: `mappings.extended`)
 `gbac` - Toggle comment around a class (w/ LSP/treesitter support)
 ```
 
-#### Methods
-
-`Comment.nvim` also provides some methods apart from the [mappings](#mappings). Also note that these methods only do linewise commenting and only on the current line.
-
-```lua
--- Comments the current line
-require('Comment').comment()
-
--- Uncomments the current lines
-require('Comment').uncomment()
-
--- Toggles the current lines
-require('Comment').toggle()
-```
-
 <a id="api"></a>
 
 ### ⚙️ API
 
-Read [API](./API.md) for more crazy stuff.
+Read [doc/API.md](./doc/API.md) to see all the API/functions that are exported from the plugin.
 
 <a id="treesitter"></a>
 
