@@ -2,6 +2,11 @@
 
 ### Core
 
+<!-- ---Line comment with a count -->
+<!-- ---@param count integer Number of lines. (default: `vim.v.count`) -->
+<!-- ---@param cfg Config If not provided, will use the default config -->
+<!-- require('Comment.api').gcc_count(count, cfg) -->
+
 ```lua
 ---@alias VMode 'line'|'char'|'v'|'V' Vim Mode. Read `:h map-operator`
 ---@alias cfg table Same as `.setup({cfg})`
@@ -14,11 +19,6 @@ require('Comment.api').comment()
 
 ---Uncomment the current line (using linewise comment)
 require('Comment.api').uncomment()
-
----Line comment with a count
----@param count integer Number of lines. (default: `vim.v.count`)
----@param cfg Config If not provided, will use the default config
-require('Comment.api').gcc_count(count, cfg)
 
 ---Toggle comment using linewise comment. This powers the default `gcc` mapping.
 ---@param vmode VMode

@@ -249,7 +249,7 @@ function O.blockwise_x(p)
     return cmode
 end
 
----Toggle line comment with count
+---Toggle line comment with count i.e vim.v.count
 ---Example: `10gl` will comment 10 lines
 ---@param count integer Number of lines
 ---@param cfg Config

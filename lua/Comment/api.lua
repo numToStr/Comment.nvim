@@ -127,13 +127,6 @@ function C.toggle()
     end
 end
 
----Does line comment with a count i.e vim.v.count
----@param count integer Number of lines
----@param cfg Config
-function C.gcc_count(count, cfg)
-    Op.count(count or vim.v.count, cfg or C.config)
-end
-
 ---Toggle comment using linewise comment
 ---@param vmode VMode
 ---@param cfg Config
@@ -203,6 +196,11 @@ function C.setup(opts)
 
         -- Basic Mappings
         if cfg.mappings.basic then
+            ---@private
+            function C.gcc_count()
+                Op.count(vim.v.count, cfg)
+            end
+
             -- NORMAL mode mappings
             map(
                 'n',
