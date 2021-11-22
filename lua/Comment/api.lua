@@ -96,28 +96,28 @@ function C.count_gcc(cfg)
 end
 
 ---Toggle comment using linewise comment
----@param vmode string Vim Mode. Read `:h :map-operator`
+---@param vmode VMode
 ---@param cfg Config
 function C.gcc(vmode, cfg)
     Op.opfunc(vmode, cfg or C.config, U.cmode.toggle, U.ctype.line, U.cmotion.line)
 end
 
 ---Toggle comment using blockwise comment
----@param vmode string Vim Mode. Read `:h :map-operator`
+---@param vmode VMode
 ---@param cfg Config
 function C.gbc(vmode, cfg)
     Op.opfunc(vmode, cfg or C.config, U.cmode.toggle, U.ctype.block, U.cmotion.line)
 end
 
 ---(Operator-Pending) Toggle comment using linewise comment
----@param vmode string Vim Mode. Read `:h :map-operator`
+---@param vmode VMode
 ---@param cfg Config
 function C.gc(vmode, cfg)
     Op.opfunc(vmode, cfg or C.config, U.cmode.toggle, U.ctype.line, U.cmotion._)
 end
 
 ---(Operator-Pending) Toggle comment using blockwise comment
----@param vmode string Vim Mode. Read `:h :map-operator`
+---@param vmode VMode
 ---@param cfg Config
 function C.gb(vmode, cfg)
     Op.opfunc(vmode, cfg or C.config, U.cmode.toggle, U.ctype.block, U.cmotion._)
@@ -126,6 +126,7 @@ end
 ---Configures the whole plugin
 ---@param opts Config
 function C.setup(opts)
+    ---Plugin config
     ---@class Config
     C.config = {
         ---Add a space b/w comment and the line

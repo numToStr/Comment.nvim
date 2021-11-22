@@ -3,6 +3,8 @@ local A = vim.api
 
 local O = {}
 
+---@alias VMode 'line'|'char'|'v'|'V' Vim Mode. Read `:h map-operator`
+
 ---Comment context
 ---@class Ctx
 ---@field ctype CType
@@ -20,11 +22,11 @@ local O = {}
 ---@field range CRange
 
 ---Common operatorfunc callback
----@param vmode string VIM mode - line|char
----@param cfg Config Plugin config
----@param cmode CMode Comment mode
----@param ctype CType Type of the commentstring (line/block)
----@param cmotion CMotion Motion type
+---@param vmode VMode
+---@param cfg Config
+---@param cmode CMode
+---@param ctype CType
+---@param cmotion CMotion
 function O.opfunc(vmode, cfg, cmode, ctype, cmotion)
     -- comment/uncomment logic
     --
