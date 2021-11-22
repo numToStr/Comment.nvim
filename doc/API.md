@@ -3,6 +3,9 @@
 ### Core
 
 ```lua
+---@alias VMode 'line'|'char'|'v'|'V' Vim Mode. Read `:h map-operator`
+---@alias cfg table Same as `.setup({cfg})`
+
 ---Toggle comment on a line
 require('Comment.api').toggle()
 
