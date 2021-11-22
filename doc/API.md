@@ -6,13 +6,13 @@
 ---@alias VMode 'line'|'char'|'v'|'V' Vim Mode. Read `:h map-operator`
 ---@alias cfg table Same as `.setup({cfg})`
 
----Toggle comment on a line
+---Toggle comment on the current line (using linewise comment)
 require('Comment.api').toggle()
 
----Comment a line
+---Comment the current line (using linewise comment)
 require('Comment.api').comment()
 
----Uncomment a line
+---Uncomment the current line (using linewise comment)
 require('Comment.api').uncomment()
 
 ---Line comment with a count
