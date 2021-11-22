@@ -1,7 +1,45 @@
 local Op = require('Comment.opfunc')
 local U = require('Comment.utils')
-
 local A = vim.api
+
+---LHS of toggle mappings in NORMAL + VISUAL mode
+---@class Toggler
+---@field line string Linewise comment keymap
+---@field block string Blockwise comment keymap
+
+---LHS of operator-pending mappings in NORMAL + VISUAL mode
+---@class Opleader
+---@field line string Linewise comment keymap
+---@field block string Blockwise comment keymap
+
+---Whether to create basic (operator-pending) and extended mappings
+---@class Mappings
+---Enable operator-pending mapping
+---Includes `gcc`, `gcb`, `gc[count]{motion}` and `gb[count]{motion}`
+---NOTE: These mappings can be changed individually by `opleader` and `toggler` config
+---@field basic boolean
+---Enable extra mapping
+---Includes `gco`, `gcO`, `gcA`
+---@field extra boolean
+---Enable extended mapping
+---Includes `g>`, `g<`, `g>[count]{motion}` and `g<[count]{motion}`
+---@field extended boolean
+
+---Plugin's config
+---@class Config
+---@field padding boolean Add a space b/w comment and the line
+---Whether the cursor should stay at its position
+---NOTE: This only affects NORMAL mode mappings and doesn't work with dot-repeat
+---@field sticky boolean
+---Lines to be ignored while comment/uncomment.
+---Could be a regex string or a function that returns a regex string.
+---Example: Use '^$' to ignore empty lines
+---@field ignore string|function
+---@field mappings Mappings
+---@field toggler Toggler
+---@field opleader Opleader
+---@field pre_hook fun(ctx: Ctx):string Function to be called before comment/uncomment
+---@field post_hook fun(ctx:Ctx) Function to be called after comment/uncomment
 
 local C = {
     ---@type Config
@@ -126,52 +164,23 @@ end
 ---Configures the whole plugin
 ---@param opts Config
 function C.setup(opts)
-    ---Plugin config
-    ---@class Config
+    ---@type Config
     C.config = {
-        ---Add a space b/w comment and the line
-        ---@type boolean
         padding = true,
-        ---Whether the cursor should stay at its position
-        ---This only affects NORMAL mode mappings
-        ---@type boolean
         sticky = true,
-        ---Line which should be ignored while comment/uncomment
-        ---Example: Use '^$' to ignore empty lines
-        ---@type string|function Lua regex
-        ignore = nil,
-        ---Whether to create basic (operator-pending) and extended mappings
-        ---@type table
         mappings = {
-            ---operator-pending mapping
             basic = true,
-            ---extra mapping
             extra = true,
-            ---extended mapping
             extended = false,
         },
-        ---LHS of toggle mapping in NORMAL mode for line and block comment
-        ---@type table
         toggler = {
-            ---LHS of line-comment toggle
             line = 'gcc',
-            ---LHS of block-comment toggle
             block = 'gbc',
         },
-        ---LHS of operator-mode mapping in NORMAL/VISUAL mode for line and block comment
-        ---@type table
         opleader = {
-            ---LHS of line-comment opfunc mapping
             line = 'gc',
-            ---LHS of block-comment opfunc mapping
             block = 'gb',
         },
-        ---Pre-hook, called before commenting the line
-        ---@type function|nil
-        pre_hook = nil,
-        ---Post-hook, called after commenting is done
-        ---@type function|nil
-        post_hook = nil,
     }
 
     if opts ~= nil then

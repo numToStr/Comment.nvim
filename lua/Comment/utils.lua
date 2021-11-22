@@ -259,7 +259,7 @@ end
 ---@param lcs_esc string (Escaped) Left side of the commentstring
 ---@param rcs_esc string (Escaped) Right side of the commentstring
 ---@param pp string Padding pattern (@see U.get_padding)
----@return function function Function to call
+---@return fun(line: string):boolean
 function U.is_commented(lcs_esc, rcs_esc, pp)
     local ll = lcs_esc and '^%s*' .. lcs_esc .. pp or ''
     local rr = rcs_esc and pp .. rcs_esc .. '$' or ''

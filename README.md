@@ -113,11 +113,11 @@ Following are the **default** config for the [`setup()`](#setup). If you want to
     },
 
     ---Pre-hook, called before commenting the line
-    ---@type function
+    ---@type fun(ctx: Ctx):string
     pre_hook = nil,
 
     ---Post-hook, called after commenting is done
-    ---@type function
+    ---@type fun(ctx: Ctx)
     post_hook = nil,
 }
 ```
