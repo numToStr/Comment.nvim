@@ -41,6 +41,8 @@ require('Comment.api').gc(vmode, cfg)
 require('Comment.api').gb(vmode, cfg)
 ```
 
+> NOTE: If `cfg` argument is not provided, then the [default config](https://github.com/numToStr/Comment.nvim/tree/master#configuration-optional) will be used or the custom config provided during the [`setup()`](https://github.com/numToStr/Comment.nvim/tree/master#setup). BTW, You can also use these function without calling the `setup()` :)
+
 > If you enabled `config.mappings.extra` then you can get access to these
 
 ```lua
