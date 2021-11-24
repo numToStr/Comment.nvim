@@ -125,7 +125,12 @@ Following are the **default** config for the [`setup()`](#setup). If you want to
 The configuration is also exported by the following method. But make to sure to call [setup](#setup) first.
 
 ```lua
+-- NOTE: This directly returns the config without copying it. So modifying it directly could have some side effects.
 require('Comment.api').get_config()
+
+-- You can do this instead to safely modify it, if you want.
+local api = require('Comment.api')
+local config = vim.deepcopy(api.get_config())
 ```
 
 ### 🔥 Usage
