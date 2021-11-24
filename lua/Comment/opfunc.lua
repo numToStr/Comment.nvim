@@ -3,6 +3,8 @@ local A = vim.api
 
 local O = {}
 
+---@alias VMode 'line'|'char'|'v'|'V' Vim Mode. Read `:h map-operator`
+
 ---Comment context
 ---@class Ctx
 ---@field ctype CType
@@ -20,12 +22,12 @@ local O = {}
 ---@field range CRange
 
 ---Common operatorfunc callback
----@param cfg Config Plugin config
----@param vmode string VIM mode - line|char
----@param cmode CMode Comment mode
----@param ctype CType Type of the commentstring (line/block)
----@param cmotion CMotion Motion type
-function O.opfunc(cfg, vmode, cmode, ctype, cmotion)
+---@param vmode VMode
+---@param cfg Config
+---@param cmode CMode
+---@param ctype CType
+---@param cmotion CMotion
+function O.opfunc(vmode, cfg, cmode, ctype, cmotion)
     -- comment/uncomment logic
     --
     -- 1. type == line
@@ -247,11 +249,12 @@ function O.blockwise_x(p)
     return cmode
 end
 
----Toggle line comment with count
+---Toggle line comment with count i.e vim.v.count
 ---Example: `10gl` will comment 10 lines
+---@param count integer Number of lines
 ---@param cfg Config
-function O.count(cfg)
-    local lines, range = U.get_count_lines(vim.v.count)
+function O.count(count, cfg)
+    local lines, range = U.get_count_lines(count)
 
     ---@type Ctx
     local ctx = {

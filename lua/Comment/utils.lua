@@ -11,35 +11,40 @@ local U = {}
 
 ---@alias CLines string[] List of lines inside the start and end index
 
----Comment modes
+---Comment modes - Can be manual or computed in operator-pending phase
 ---@class CMode
+---@field toggle number Toggle action
+---@field comment number Comment action
+---@field uncomment number Uncomment action
 U.cmode = {
     toggle = 0,
     comment = 1,
     uncomment = 2,
 }
 
----Comment types
+---Comment string types
 ---@class CType
+---@field line number Use linewise commentstring
+---@field block number Use blockwise commentstring
 U.ctype = {
     line = 1,
     block = 2,
 }
 
----Motion types
+---Comment motion types
 ---@class CMotion
+---@field _ number Compute from vim mode (@see VMode)
+---@field line number Line motion (ie. `gc2j`)
+---@field char number Character/left-right motion (ie. `gc2j`)
+---@field block number Visual operator-pending motion
+---@field v number Visual motion
+---@field V number Visual-line motion
 U.cmotion = {
-    ---Compute from vmode
     _ = 0,
-    ---line
     line = 1,
-    ---char/left-right
     char = 2,
-    ---visual operator-pending
     block = 3,
-    ---visual
     v = 4,
-    ---visual-line
     V = 5,
 }
 
@@ -116,7 +121,7 @@ function U.ignore(ln, pat)
 end
 
 ---Get region for vim mode
----@param vmode string VIM mode
+---@param vmode VMode
 ---@return CRange
 function U.get_region(vmode)
     local m = A.nvim_buf_get_mark
@@ -190,8 +195,8 @@ end
 ---1. pre_hook (optionally a string can be returned)
 ---2. ft_table (extra commentstring table in the plugin)
 ---3. commentstring (already set or added in pre_hook)
----@param cfg Config Context
----@param ctx Ctx Context
+---@param cfg Config
+---@param ctx Ctx
 ---@return string string Left side of the commentstring
 ---@return string string Right side of the commentstring
 function U.parse_cstr(cfg, ctx)
@@ -254,7 +259,7 @@ end
 ---@param lcs_esc string (Escaped) Left side of the commentstring
 ---@param rcs_esc string (Escaped) Right side of the commentstring
 ---@param pp string Padding pattern (@see U.get_padding)
----@return function function Function to call
+---@return fun(line: string):boolean
 function U.is_commented(lcs_esc, rcs_esc, pp)
     local ll = lcs_esc and '^%s*' .. lcs_esc .. pp or ''
     local rr = rcs_esc and pp .. rcs_esc .. '$' or ''

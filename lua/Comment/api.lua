@@ -1,11 +1,56 @@
+local Op = require('Comment.opfunc')
 local U = require('Comment.utils')
-
 local A = vim.api
 
+---LHS of toggle mappings in NORMAL + VISUAL mode
+---@class Toggler
+---@field line string Linewise comment keymap
+---@field block string Blockwise comment keymap
+
+---LHS of operator-pending mappings in NORMAL + VISUAL mode
+---@class Opleader
+---@field line string Linewise comment keymap
+---@field block string Blockwise comment keymap
+
+---Whether to create basic (operator-pending) and extended mappings
+---@class Mappings
+---Enable operator-pending mapping
+---Includes `gcc`, `gcb`, `gc[count]{motion}` and `gb[count]{motion}`
+---NOTE: These mappings can be changed individually by `opleader` and `toggler` config
+---@field basic boolean
+---Enable extra mapping
+---Includes `gco`, `gcO`, `gcA`
+---@field extra boolean
+---Enable extended mapping
+---Includes `g>`, `g<`, `g>[count]{motion}` and `g<[count]{motion}`
+---@field extended boolean
+
+---Plugin's config
+---@class Config
+---@field padding boolean Add a space b/w comment and the line
+---Whether the cursor should stay at its position
+---NOTE: This only affects NORMAL mode mappings and doesn't work with dot-repeat
+---@field sticky boolean
+---Lines to be ignored while comment/uncomment.
+---Could be a regex string or a function that returns a regex string.
+---Example: Use '^$' to ignore empty lines
+---@field ignore string|function
+---@field mappings Mappings
+---@field toggler Toggler
+---@field opleader Opleader
+---@field pre_hook fun(ctx: Ctx):string Function to be called before comment/uncomment
+---@field post_hook fun(ctx:Ctx) Function to be called after comment/uncomment
+
 local C = {
-    ---@type Config|nil
+    ---@type Config
     config = nil,
 }
+
+---Get the plugin's config
+---@return Config
+function C.get_config()
+    return C.config
+end
 
 ---Comments the current line
 function C.comment()
@@ -88,54 +133,54 @@ function C.toggle()
     end
 end
 
+---Toggle comment using linewise comment
+---@param vmode VMode
+---@param cfg Config
+function C.gcc(vmode, cfg)
+    Op.opfunc(vmode, cfg or C.config, U.cmode.toggle, U.ctype.line, U.cmotion.line)
+end
+
+---Toggle comment using blockwise comment
+---@param vmode VMode
+---@param cfg Config
+function C.gbc(vmode, cfg)
+    Op.opfunc(vmode, cfg or C.config, U.cmode.toggle, U.ctype.block, U.cmotion.line)
+end
+
+---(Operator-Pending) Toggle comment using linewise comment
+---@param vmode VMode
+---@param cfg Config
+function C.gc(vmode, cfg)
+    Op.opfunc(vmode, cfg or C.config, U.cmode.toggle, U.ctype.line, U.cmotion._)
+end
+
+---(Operator-Pending) Toggle comment using blockwise comment
+---@param vmode VMode
+---@param cfg Config
+function C.gb(vmode, cfg)
+    Op.opfunc(vmode, cfg or C.config, U.cmode.toggle, U.ctype.block, U.cmotion._)
+end
+
 ---Configures the whole plugin
 ---@param opts Config
 function C.setup(opts)
-    ---@class Config
+    ---@type Config
     C.config = {
-        ---Add a space b/w comment and the line
-        ---@type boolean
         padding = true,
-        ---Whether the cursor should stay at its position
-        ---This only affects NORMAL mode mappings
-        ---@type boolean
         sticky = true,
-        ---Line which should be ignored while comment/uncomment
-        ---Example: Use '^$' to ignore empty lines
-        ---@type string|function Lua regex
-        ignore = nil,
-        ---Whether to create basic (operator-pending) and extended mappings
-        ---@type table
         mappings = {
-            ---operator-pending mapping
             basic = true,
-            ---extra mapping
             extra = true,
-            ---extended mapping
             extended = false,
         },
-        ---LHS of toggle mapping in NORMAL mode for line and block comment
-        ---@type table
         toggler = {
-            ---LHS of line-comment toggle
             line = 'gcc',
-            ---LHS of block-comment toggle
             block = 'gbc',
         },
-        ---LHS of operator-mode mapping in NORMAL/VISUAL mode for line and block comment
-        ---@type table
         opleader = {
-            ---LHS of line-comment opfunc mapping
             line = 'gc',
-            ---LHS of block-comment opfunc mapping
             block = 'gb',
         },
-        ---Pre-hook, called before commenting the line
-        ---@type function|nil
-        pre_hook = nil,
-        ---Post-hook, called after commenting is done
-        ---@type function|nil
-        post_hook = nil,
     }
 
     if opts ~= nil then
@@ -145,105 +190,92 @@ function C.setup(opts)
     local cfg = C.config
 
     if cfg.mappings then
-        local Op = require('Comment.opfunc')
-
         local map = A.nvim_set_keymap
         local map_opt = { noremap = true, silent = true }
 
         -- Callback function to save cursor position and set operatorfunc
         -- NOTE: We are using cfg to store the position as the cfg is tossed around in most places
-        function _G.___comment_call(cb)
+        function C.call(cb)
             cfg.___pos = cfg.sticky and A.nvim_win_get_cursor(0)
-            vim.o.operatorfunc = 'v:lua.___comment_' .. cb
+            vim.o.operatorfunc = "v:lua.require'Comment.api'." .. cb
         end
 
         -- Basic Mappings
         if cfg.mappings.basic then
-            function _G.___comment_count_gcc()
-                Op.count(cfg)
-            end
-            function _G.___comment_gcc(vmode)
-                Op.opfunc(cfg, vmode, U.cmode.toggle, U.ctype.line, U.cmotion.line)
-            end
-            function _G.___comment_gbc(vmode)
-                Op.opfunc(cfg, vmode, U.cmode.toggle, U.ctype.block, U.cmotion.line)
-            end
-            function _G.___comment_gc(vmode)
-                Op.opfunc(cfg, vmode, U.cmode.toggle, U.ctype.line, U.cmotion._)
-            end
-            function _G.___comment_gb(vmode)
-                Op.opfunc(cfg, vmode, U.cmode.toggle, U.ctype.block, U.cmotion._)
+            ---@private
+            function C.gcc_count()
+                Op.count(vim.v.count, cfg)
             end
 
             -- NORMAL mode mappings
             map(
                 'n',
                 cfg.toggler.line,
-                [[v:count == 0 ? '<CMD>lua ___comment_call("gcc")<CR>g@$' : '<CMD>lua ___comment_count_gcc()<CR>']],
+                [[v:count == 0 ? '<CMD>lua require("Comment.api").call("gcc")<CR>g@$' : '<CMD>lua require("Comment.api").gcc_count()<CR>']],
                 { noremap = true, silent = true, expr = true }
             )
-            map('n', cfg.toggler.block, '<CMD>lua ___comment_call("gbc")<CR>g@$', map_opt)
-            map('n', cfg.opleader.line, '<CMD>lua ___comment_call("gc")<CR>g@', map_opt)
-            map('n', cfg.opleader.block, '<CMD>lua ___comment_call("gb")<CR>g@', map_opt)
+            map('n', cfg.toggler.block, '<CMD>lua require("Comment.api").call("gbc")<CR>g@$', map_opt)
+            map('n', cfg.opleader.line, '<CMD>lua require("Comment.api").call("gc")<CR>g@', map_opt)
+            map('n', cfg.opleader.block, '<CMD>lua require("Comment.api").call("gb")<CR>g@', map_opt)
 
             -- VISUAL mode mappings
-            map('x', cfg.opleader.line, '<ESC><CMD>lua ___comment_gc(vim.fn.visualmode())<CR>', map_opt)
-            map('x', cfg.opleader.block, '<ESC><CMD>lua ___comment_gb(vim.fn.visualmode())<CR>', map_opt)
+            map('x', cfg.opleader.line, '<ESC><CMD>lua require("Comment.api").gc(vim.fn.visualmode())<CR>', map_opt)
+            map('x', cfg.opleader.block, '<ESC><CMD>lua require("Comment.api").gb(vim.fn.visualmode())<CR>', map_opt)
         end
 
         -- Extra Mappings
         if cfg.mappings.extra then
             local E = require('Comment.extra')
 
-            function _G.___comment_norm_o()
+            function C.gco()
                 E.norm_o(U.ctype.line, cfg)
             end
-            function _G.___comment_norm_O()
+            function C.gcO()
                 E.norm_O(U.ctype.line, cfg)
             end
-            function _G.___comment_norm_A()
+            function C.gcA()
                 E.norm_A(U.ctype.line, cfg)
             end
 
-            map('n', 'gco', '<CMD>lua ___comment_norm_o()<CR>', map_opt)
-            map('n', 'gcO', '<CMD>lua ___comment_norm_O()<CR>', map_opt)
-            map('n', 'gcA', '<CMD>lua ___comment_norm_A()<CR>', map_opt)
+            map('n', 'gco', '<CMD>lua require("Comment.api").gco()<CR>', map_opt)
+            map('n', 'gcO', '<CMD>lua require("Comment.api").gcO()<CR>', map_opt)
+            map('n', 'gcA', '<CMD>lua require("Comment.api").gcA()<CR>', map_opt)
         end
 
         -- Extended Mappings
         if cfg.mappings.extended then
-            function _G.___comment_ggt(vmode)
+            function C.ggt(vmode)
                 Op.opfunc(cfg, vmode, U.cmode.comment, U.ctype.line, U.cmotion._)
             end
-            function _G.___comment_ggtc(vmode)
+            function C.ggtc(vmode)
                 Op.opfunc(cfg, vmode, U.cmode.comment, U.ctype.line, U.cmotion.line)
             end
-            function _G.___comment_ggtb(vmode)
+            function C.ggtb(vmode)
                 Op.opfunc(cfg, vmode, U.cmode.comment, U.ctype.block, U.cmotion.line)
             end
 
-            function _G.___comment_glt(vmode)
+            function C.glt(vmode)
                 Op.opfunc(cfg, vmode, U.cmode.uncomment, U.ctype.line, U.cmotion._)
             end
-            function _G.___comment_gltc(vmode)
+            function C.gltc(vmode)
                 Op.opfunc(cfg, vmode, U.cmode.uncomment, U.ctype.line, U.cmotion.line)
             end
-            function _G.___comment_gltb(vmode)
+            function C.gltb(vmode)
                 Op.opfunc(cfg, vmode, U.cmode.uncomment, U.ctype.block, U.cmotion.line)
             end
 
             -- NORMAL mode extended
-            map('n', 'g>', '<CMD>lua ___comment_call("ggt")<CR>g@', map_opt)
-            map('n', 'g>c', '<CMD>lua ___comment_call("ggtc")<CR>g@$', map_opt)
-            map('n', 'g>b', '<CMD>lua ___comment_call("ggtb")<CR>g@$', map_opt)
+            map('n', 'g>', '<CMD>lua require("Comment.api").call("ggt")<CR>g@', map_opt)
+            map('n', 'g>c', '<CMD>lua require("Comment.api").call("ggtc")<CR>g@$', map_opt)
+            map('n', 'g>b', '<CMD>lua require("Comment.api").call("ggtb")<CR>g@$', map_opt)
 
-            map('n', 'g<', '<CMD>lua ___comment_call("glt")<CR>g@', map_opt)
-            map('n', 'g<c', '<CMD>lua ___comment_call("gltc")<CR>g@$', map_opt)
-            map('n', 'g<b', '<CMD>lua ___comment_call("gltb")<CR>g@$', map_opt)
+            map('n', 'g<', '<CMD>lua require("Comment.api").call("glt")<CR>g@', map_opt)
+            map('n', 'g<c', '<CMD>lua require("Comment.api").call("gltc")<CR>g@$', map_opt)
+            map('n', 'g<b', '<CMD>lua require("Comment.api").call("gltb")<CR>g@$', map_opt)
 
             -- VISUAL mode extended
-            map('x', 'g>', '<ESC><CMD>lua ___comment_ggt(vim.fn.visualmode())<CR>', map_opt)
-            map('x', 'g<', '<ESC><CMD>lua ___comment_glt(vim.fn.visualmode())<CR>', map_opt)
+            map('x', 'g>', '<ESC><CMD>lua require("Comment.api").ggt(vim.fn.visualmode())<CR>', map_opt)
+            map('x', 'g<', '<ESC><CMD>lua require("Comment.api").glt(vim.fn.visualmode())<CR>', map_opt)
         end
     end
 end

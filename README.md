@@ -113,11 +113,11 @@ Following are the **default** config for the [`setup()`](#setup). If you want to
     },
 
     ---Pre-hook, called before commenting the line
-    ---@type function
+    ---@type fun(ctx: Ctx):string
     pre_hook = nil,
 
     ---Post-hook, called after commenting is done
-    ---@type function
+    ---@type fun(ctx: Ctx)
     post_hook = nil,
 }
 ```
@@ -125,7 +125,12 @@ Following are the **default** config for the [`setup()`](#setup). If you want to
 The configuration is also exported by the following method. But make to sure to call [setup](#setup) first.
 
 ```lua
-require('Comment').get_config()
+-- NOTE: This directly returns the config without copying it. So modifying it directly could have some side effects.
+require('Comment.api').get_config()
+
+-- You can do this instead to safely modify it, if you want.
+local api = require('Comment.api')
+local config = vim.deepcopy(api.get_config())
 ```
 
 ### 🔥 Usage
@@ -213,26 +218,11 @@ These mappings are disabled by default. (config: `mappings.extended`)
 `gbac` - Toggle comment around a class (w/ LSP/treesitter support)
 ```
 
-#### Methods
-
-`Comment.nvim` also provides some methods apart from the [mappings](#mappings). Also note that these methods only do linewise commenting and only on the current line.
-
-```lua
--- Comments the current line
-require('Comment').comment()
-
--- Uncomments the current lines
-require('Comment').uncomment()
-
--- Toggles the current lines
-require('Comment').toggle()
-```
-
 <a id="api"></a>
 
 ### ⚙️ API
 
-Read [API](./API.md) for more crazy stuff.
+Read [doc/API.md](./doc/API.md) to see all the API/functions that are exported from the plugin.
 
 <a id="treesitter"></a>
 
