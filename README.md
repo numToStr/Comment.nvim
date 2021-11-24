@@ -125,7 +125,7 @@ Following are the **default** config for the [`setup()`](#setup). If you want to
 The configuration is also exported by the following method. But make to sure to call [setup](#setup) first.
 
 ```lua
-require('Comment').get_config()
+require('Comment.api').get_config()
 ```
 
 ### 🔥 Usage

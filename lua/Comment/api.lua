@@ -46,6 +46,12 @@ local C = {
     config = nil,
 }
 
+---Get the plugin's config
+---@return Config
+function C.get_config()
+    return C.config
+end
+
 ---Comments the current line
 function C.comment()
     local line = A.nvim_get_current_line()
