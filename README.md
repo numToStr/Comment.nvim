@@ -354,11 +354,12 @@ local ft = require('Comment.ft')
 
 -- 1. Using set function
 
--- set both line and block commentstring
-ft.set('javascript', {'//%s', '/*%s*/'})
-
 -- Just set only line comment
 ft.set('yaml', '#%s')
+
+-- Or set both line and block commentstring
+-- You can also chain the set calls
+ft.set('javascript', {'//%s', '/*%s*/'}).set('conf', '#%s')
 
 -- 2. Metatable magic
 

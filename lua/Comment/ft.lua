@@ -69,6 +69,7 @@ local ft = {}
 ---@param val string|string[]
 function ft.set(lang, val)
     L[lang] = type(val) == 'string' and { val } or val
+    return ft
 end
 
 ---Get a commentstring from the filtype List
@@ -117,5 +118,6 @@ return setmetatable(ft, {
         for _, lang in ipairs(langs) do
             this.set(lang, spec)
         end
+        return this
     end,
 })
