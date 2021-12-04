@@ -3,7 +3,7 @@ local A = vim.api
 
 local O = {}
 
----@alias VMode 'line'|'char'|'v'|'V' Vim Mode. Read `:h map-operator`
+---@alias VMode '"line"'|'"char"'|'"v"'|'"V"' Vim Mode. Read `:h map-operator`
 
 ---Comment context
 ---@class Ctx

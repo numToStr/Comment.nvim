@@ -87,10 +87,10 @@ end
 function ft.calculate(ctx)
     local buf = A.nvim_get_current_buf()
     local ok, langtree = pcall(vim.treesitter.get_parser, buf)
-    local filetype = A.nvim_buf_get_option(buf, 'filetype')
+    local default = ft.get(A.nvim_buf_get_option(buf, 'filetype'), ctx.ctype)
 
     if not ok then
-        return ft.get(filetype, ctx.ctype)
+        return default
     end
 
     local range = {
@@ -103,11 +103,11 @@ function ft.calculate(ctx)
     for lang, tree in pairs(langtree:children()) do
         if tree:contains(range) then
             -- If the language is in range but commentstring is not found, then fallback to filetype commentstring
-            return ft.get(lang, ctx.ctype) or ft.get(filetype, ctx.ctype)
+            return ft.get(lang, ctx.ctype) or default
         end
     end
 
-    return ft.get(filetype, ctx.ctype)
+    return default
 end
 
 return setmetatable(ft, {

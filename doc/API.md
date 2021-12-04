@@ -8,7 +8,7 @@
 <!-- require('Comment.api').gcc_count(count, cfg) -->
 
 ```lua
----@alias VMode 'line'|'char'|'v'|'V' Vim Mode. Read `:h map-operator`
+---@alias VMode '"line"'|'"char"'|'"v"'|'"V"' Vim Mode. Read `:h map-operator`
 ---@alias Config table Read https://github.com/numToStr/Comment.nvim/tree/master#configuration-optional
 
 ---Toggle comment on the current line (using linewise comment)
