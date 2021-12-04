@@ -38,6 +38,7 @@ local A = vim.api
 ---@field mappings Mappings
 ---@field toggler Toggler
 ---@field opleader Opleader
+---@field whichkey boolen enable whichkey integration if available
 ---@field pre_hook fun(ctx: Ctx):string Function to be called before comment/uncomment
 ---@field post_hook fun(ctx:Ctx) Function to be called after comment/uncomment
 
@@ -181,6 +182,7 @@ function C.setup(opts)
             line = 'gc',
             block = 'gb',
         },
+        whichkey = true,
     }
 
     if opts ~= nil then
@@ -190,7 +192,7 @@ function C.setup(opts)
     local cfg = C.config
 
     if cfg.mappings then
-        local map = A.nvim_set_keymap
+        local map = U.map
         local map_opt = { noremap = true, silent = true }
 
         -- Callback function to save cursor position and set operatorfunc
@@ -212,15 +214,46 @@ function C.setup(opts)
                 'n',
                 cfg.toggler.line,
                 [[v:count == 0 ? '<CMD>lua require("Comment.api").call("gcc")<CR>g@$' : '<CMD>lua require("Comment.api").gcc_count()<CR>']],
-                { noremap = true, silent = true, expr = true }
+                { noremap = true, silent = true, expr = true },
+                cfg.whichkey and 'line comment'
             )
-            map('n', cfg.toggler.block, '<CMD>lua require("Comment.api").call("gbc")<CR>g@$', map_opt)
-            map('n', cfg.opleader.line, '<CMD>lua require("Comment.api").call("gc")<CR>g@', map_opt)
-            map('n', cfg.opleader.block, '<CMD>lua require("Comment.api").call("gb")<CR>g@', map_opt)
+            map(
+                'n',
+                cfg.toggler.block,
+                '<CMD>lua require("Comment.api").call("gbc")<CR>g@$',
+                map_opt,
+                cfg.whichkey and 'block comment'
+            )
+            map(
+                'n',
+                cfg.opleader.line,
+                '<CMD>lua require("Comment.api").call("gc")<CR>g@',
+                map_opt,
+                cfg.whichkey and 'line comment'
+            )
+            map(
+                'n',
+                cfg.opleader.block,
+                '<CMD>lua require("Comment.api").call("gb")<CR>g@',
+                map_opt,
+                cfg.whichkey and 'block comment'
+            )
 
             -- VISUAL mode mappings
-            map('x', cfg.opleader.line, '<ESC><CMD>lua require("Comment.api").gc(vim.fn.visualmode())<CR>', map_opt)
-            map('x', cfg.opleader.block, '<ESC><CMD>lua require("Comment.api").gb(vim.fn.visualmode())<CR>', map_opt)
+            map(
+                'x',
+                cfg.opleader.line,
+                '<ESC><CMD>lua require("Comment.api").gc(vim.fn.visualmode())<CR>',
+                map_opt,
+                cfg.whichkey and 'line comment'
+            )
+            map(
+                'x',
+                cfg.opleader.block,
+                '<ESC><CMD>lua require("Comment.api").gb(vim.fn.visualmode())<CR>',
+                map_opt,
+                cfg.whichkey and 'block comment'
+            )
         end
 
         -- Extra Mappings
@@ -237,9 +270,27 @@ function C.setup(opts)
                 E.norm_A(U.ctype.line, cfg)
             end
 
-            map('n', 'gco', '<CMD>lua require("Comment.api").gco()<CR>', map_opt)
-            map('n', 'gcO', '<CMD>lua require("Comment.api").gcO()<CR>', map_opt)
-            map('n', 'gcA', '<CMD>lua require("Comment.api").gcA()<CR>', map_opt)
+            map(
+                'n',
+                'gco',
+                '<CMD>lua require("Comment.api").gco()<CR>',
+                map_opt,
+                cfg.whichkey and 'comment next line then insert'
+            )
+            map(
+                'n',
+                'gcO',
+                '<CMD>lua require("Comment.api").gcO()<CR>',
+                map_opt,
+                cfg.whichkey and 'comment prev line then insert'
+            )
+            map(
+                'n',
+                'gcA',
+                '<CMD>lua require("Comment.api").gcA()<CR>',
+                map_opt,
+                cfg.whichkey and 'comment end of line then insert'
+            )
         end
 
         -- Extended Mappings
@@ -265,17 +316,65 @@ function C.setup(opts)
             end
 
             -- NORMAL mode extended
-            map('n', 'g>', '<CMD>lua require("Comment.api").call("ggt")<CR>g@', map_opt)
-            map('n', 'g>c', '<CMD>lua require("Comment.api").call("ggtc")<CR>g@$', map_opt)
-            map('n', 'g>b', '<CMD>lua require("Comment.api").call("ggtb")<CR>g@$', map_opt)
+            map(
+                'n',
+                'g>',
+                '<CMD>lua require("Comment.api").call("ggt")<CR>g@',
+                map_opt,
+                cfg.whichkey and 'comment region (single-line)'
+            )
+            map(
+                'n',
+                'g>c',
+                '<CMD>lua require("Comment.api").call("ggtc")<CR>g@$',
+                map_opt,
+                cfg.whichkey and 'comment line-wise'
+            )
+            map(
+                'n',
+                'g>b',
+                '<CMD>lua require("Comment.api").call("ggtb")<CR>g@$',
+                map_opt,
+                cfg.whichkey and 'comment block-wise'
+            )
 
-            map('n', 'g<', '<CMD>lua require("Comment.api").call("glt")<CR>g@', map_opt)
-            map('n', 'g<c', '<CMD>lua require("Comment.api").call("gltc")<CR>g@$', map_opt)
-            map('n', 'g<b', '<CMD>lua require("Comment.api").call("gltb")<CR>g@$', map_opt)
+            map(
+                'n',
+                'g<',
+                '<CMD>lua require("Comment.api").call("glt")<CR>g@',
+                map_opt,
+                cfg.whichkey and 'uncomment region (siggle-line)'
+            )
+            map(
+                'n',
+                'g<c',
+                '<CMD>lua require("Comment.api").call("gltc")<CR>g@$',
+                map_opt,
+                cfg.whichkey and 'uncomment line'
+            )
+            map(
+                'n',
+                'g<b',
+                '<CMD>lua require("Comment.api").call("gltb")<CR>g@$',
+                map_opt,
+                cfg.whichkey and 'uncomment block'
+            )
 
             -- VISUAL mode extended
-            map('x', 'g>', '<ESC><CMD>lua require("Comment.api").ggt(vim.fn.visualmode())<CR>', map_opt)
-            map('x', 'g<', '<ESC><CMD>lua require("Comment.api").glt(vim.fn.visualmode())<CR>', map_opt)
+            map(
+                'x',
+                'g>',
+                '<ESC><CMD>lua require("Comment.api").ggt(vim.fn.visualmode())<CR>',
+                map_opt,
+                cfg.whichkey and 'comment region (single-line)'
+            )
+            map(
+                'x',
+                'g<',
+                '<ESC><CMD>lua require("Comment.api").glt(vim.fn.visualmode())<CR>',
+                map_opt,
+                cfg.whichkey and 'uncomment region (single-line)'
+            )
         end
     end
 end

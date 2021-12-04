@@ -269,4 +269,24 @@ function U.is_commented(lcs_esc, rcs_esc, pp)
     end
 end
 
+---@param  mode string Mode short-name (map command prefix: "n", "i", "v", "x", …)
+---              or "!" for |:map!|, or empty string for |:map|.
+---@param  lhs string Left-hand-side |{lhs}| of the mapping.
+---@param  rhs string Right-hand-side |{rhs}| of the mapping.
+---@param  opts table (Optional) parameters map. Accepts all |:map-arguments|
+---              as keys excluding |<buffer>| but including |noremap|.
+---              Values are Booleans. Unknown key is an error.
+---@param  label string (Optional) label passed to whichkey when available
+---@param[out]   err   Error details, if any.
+function U.map(mode, lhs, rhs, opts, label)
+    vim.api.nvim_set_keymap(mode, lhs, rhs, opts)
+    local wk_status_ok, wk = pcall(require, 'which-key')
+    if wk_status_ok and label then
+        local mapping_opts = vim.tbl_deep_extend('force', { mode = mode }, opts)
+        local key = {}
+        key[tostring(lhs)] = { label }
+        wk.register(key, mapping_opts)
+    end
+end
+
 return U
