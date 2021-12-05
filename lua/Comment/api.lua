@@ -15,7 +15,7 @@ local A = vim.api
 ---Whether to create basic (operator-pending) and extended mappings
 ---@class Mappings
 ---Enable operator-pending mapping
----Includes `gcc`, `gcb`, `gc[count]{motion}` and `gb[count]{motion}`
+---Includes `gcc`, `gbc`, `gc[count]{motion}` and `gb[count]{motion}`
 ---NOTE: These mappings can be changed individually by `opleader` and `toggler` config
 ---@field basic boolean
 ---Enable extra mapping
