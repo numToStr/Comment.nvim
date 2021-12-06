@@ -122,7 +122,7 @@ Following are the **default** config for the [`setup()`](#setup). If you want to
 }
 ```
 
-The configuration is also exported by the following method. But make to sure to call [setup](#setup) first.
+The configuration is also exported by the following method. But make sure to call [setup](#setup) first.
 
 ```lua
 -- NOTE: This directly returns the config without copying it. So modifying it directly could have some side effects.
