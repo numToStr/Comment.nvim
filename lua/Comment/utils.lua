@@ -88,7 +88,7 @@ end
 ---@param col number Ending column
 function U.move_n_insert(row, col)
     A.nvim_win_set_cursor(0, { row, col })
-    A.nvim_feedkeys('a', 'n', true)
+    A.nvim_feedkeys('a', 'ni', true)
 end
 
 ---Convert the string to a escaped string, if given
