@@ -27,6 +27,7 @@ local L = {
     dhall = { M.dash, M.haskell_b },
     dot = { M.cxx_l, M.cxx_b },
     elm = { M.dash, M.haskell_b },
+    fish = { M.hash },
     fsharp = { M.cxx_l, M.fsharp_b },
     go = { M.cxx_l, M.cxx_b },
     graphql = { M.hash },
