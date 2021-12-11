@@ -12,6 +12,12 @@ local A = vim.api
 ---@field line string Linewise comment keymap
 ---@field block string Blockwise comment keymap
 
+---LHS of extra mappings
+---@class ExtraMapping
+---@field above string Mapping to add comment on the line above
+---@field below string Mapping to add comment on the line below
+---@field eol string Mapping to add comment at the end of line
+
 ---Whether to create basic (operator-pending) and extended mappings
 ---@class Mappings
 ---Enable operator-pending mapping
@@ -34,10 +40,11 @@ local A = vim.api
 ---Lines to be ignored while comment/uncomment.
 ---Could be a regex string or a function that returns a regex string.
 ---Example: Use '^$' to ignore empty lines
----@field ignore string|function
+---@field ignore string|fun():string
 ---@field mappings Mappings
 ---@field toggler Toggler
 ---@field opleader Opleader
+---@field extra ExtraMapping
 ---@field pre_hook fun(ctx: Ctx):string Function to be called before comment/uncomment
 ---@field post_hook fun(ctx:Ctx) Function to be called after comment/uncomment
 
@@ -181,6 +188,11 @@ function C.setup(opts)
             line = 'gc',
             block = 'gb',
         },
+        extra = {
+            above = 'gcO',
+            below = 'gco',
+            eol = 'gcA',
+        },
     }
 
     if opts ~= nil then
@@ -237,9 +249,9 @@ function C.setup(opts)
                 E.norm_A(U.ctype.line, cfg)
             end
 
-            map('n', 'gco', '<CMD>lua require("Comment.api").gco()<CR>', map_opt)
-            map('n', 'gcO', '<CMD>lua require("Comment.api").gcO()<CR>', map_opt)
-            map('n', 'gcA', '<CMD>lua require("Comment.api").gcA()<CR>', map_opt)
+            map('n', cfg.extra.below, '<CMD>lua require("Comment.api").gco()<CR>', map_opt)
+            map('n', cfg.extra.above, '<CMD>lua require("Comment.api").gcO()<CR>', map_opt)
+            map('n', cfg.extra.eol, '<CMD>lua require("Comment.api").gcA()<CR>', map_opt)
         end
 
         -- Extended Mappings
