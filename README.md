@@ -439,6 +439,10 @@ require('Comment.utils').cmotion.{line,char,v,V}
 
 There are multiple ways to contribute reporting/fixing bugs, feature requests. You can also submit commentstring to this plugin by updating [ft.lua](./lua/Comment/ft.lua) and sending PR.
 
+### 📺 Videos
+
+- [TakeTuesday E02: Comment.nvim](https://www.youtube.com/watch?v=-InmtHhk2qM) by [TJ DeVries](https://github.com/tjdevries)
+
 ### 💐 Credits
 
 - [tcomment](https://github.com/tomtom/tcomment_vim) - To be with me forever and motivated me to write this.
