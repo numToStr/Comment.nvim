@@ -40,7 +40,7 @@ local A = vim.api
 ---Lines to be ignored while comment/uncomment.
 ---Could be a regex string or a function that returns a regex string.
 ---Example: Use '^$' to ignore empty lines
----@field ignore string|function
+---@field ignore string|fun():string
 ---@field mappings Mappings
 ---@field toggler Toggler
 ---@field opleader Opleader

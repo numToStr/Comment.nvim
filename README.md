@@ -76,38 +76,49 @@ Following are the **default** config for the [`setup()`](#setup). If you want to
     ---Lines to be ignored while comment/uncomment.
     ---Could be a regex string or a function that returns a regex string.
     ---Example: Use '^$' to ignore empty lines
-    ---@type string|function
+    ---@type string|fun():string
     ignore = nil,
 
     ---LHS of toggle mappings in NORMAL + VISUAL mode
     ---@type table
     toggler = {
-        ---line-comment keymap
+        ---Line-comment toggle keymap
         line = 'gcc',
-        ---block-comment keymap
+        ---Block-comment toggle keymap
         block = 'gbc',
     },
 
     ---LHS of operator-pending mappings in NORMAL + VISUAL mode
     ---@type table
     opleader = {
-        ---line-comment keymap
+        ---Line-comment keymap
         line = 'gc',
-        ---block-comment keymap
+        ---Block-comment keymap
         block = 'gb',
+    },
+
+    ---LHS of extra mappings
+    ---@type table
+    extra = {
+        ---Add comment on the line above
+        above = 'gcO',
+        ---Add comment on the line below
+        below = 'gco',
+        ---Add comment at the end of line
+        eol = 'gcA',
     },
 
     ---Create basic (operator-pending) and extended mappings for NORMAL + VISUAL mode
     ---@type table
     mappings = {
-        ---operator-pending mapping
+        ---Operator-pending mapping
         ---Includes `gcc`, `gbc`, `gc[count]{motion}` and `gb[count]{motion}`
         ---NOTE: These mappings can be changed individually by `opleader` and `toggler` config
         basic = true,
-        ---extra mapping
+        ---Extra mapping
         ---Includes `gco`, `gcO`, `gcA`
         extra = true,
-        ---extended mapping
+        ---Extended mapping
         ---Includes `g>`, `g<`, `g>[count]{motion}` and `g<[count]{motion}`
         extended = false,
     },
