@@ -1,69 +1,15 @@
-local Op = require('Comment.opfunc')
 local U = require('Comment.utils')
+local Op = require('Comment.opfunc')
+local Config = require('Comment.config'):new()
 local A = vim.api
 
----LHS of toggle mappings in NORMAL + VISUAL mode
----@class Toggler
----@field line string Linewise comment keymap
----@field block string Blockwise comment keymap
-
----LHS of operator-pending mappings in NORMAL + VISUAL mode
----@class Opleader
----@field line string Linewise comment keymap
----@field block string Blockwise comment keymap
-
----LHS of extra mappings
----@class ExtraMapping
----@field above string Mapping to add comment on the line above
----@field below string Mapping to add comment on the line below
----@field eol string Mapping to add comment at the end of line
-
----Whether to create basic (operator-pending) and extended mappings
----@class Mappings
----Enable operator-pending mapping
----Includes `gcc`, `gbc`, `gc[count]{motion}` and `gb[count]{motion}`
----NOTE: These mappings can be changed individually by `opleader` and `toggler` config
----@field basic boolean
----Enable extra mapping
----Includes `gco`, `gcO`, `gcA`
----@field extra boolean
----Enable extended mapping
----Includes `g>`, `g<`, `g>[count]{motion}` and `g<[count]{motion}`
----@field extended boolean
-
----Plugin's config
----@class Config
----@field padding boolean Add a space b/w comment and the line
----Whether the cursor should stay at its position
----NOTE: This only affects NORMAL mode mappings and doesn't work with dot-repeat
----@field sticky boolean
----Lines to be ignored while comment/uncomment.
----Could be a regex string or a function that returns a regex string.
----Example: Use '^$' to ignore empty lines
----@field ignore string|fun():string
----@field mappings Mappings
----@field toggler Toggler
----@field opleader Opleader
----@field extra ExtraMapping
----@field pre_hook fun(ctx: Ctx):string Function to be called before comment/uncomment
----@field post_hook fun(ctx:Ctx) Function to be called after comment/uncomment
-
-local C = {
-    ---@type Config
-    config = nil,
-}
-
----Get the plugin's config
----@return Config
-function C.get_config()
-    return C.config
-end
+local C = {}
 
 ---Comments the current line
 function C.comment()
     local line = A.nvim_get_current_line()
 
-    local pattern = U.get_pattern(C.config.ignore)
+    local pattern = U.get_pattern(Config:get().ignore)
     if not U.ignore(line, pattern) then
         local srow, scol = unpack(A.nvim_win_get_cursor(0))
         ---@type Ctx
@@ -73,11 +19,11 @@ function C.comment()
             ctype = U.ctype.line,
             range = { srow = srow, scol = scol, erow = srow, ecol = scol },
         }
-        local lcs, rcs = U.parse_cstr(C.config, ctx)
+        local lcs, rcs = U.parse_cstr(Config:get(), ctx)
 
-        local padding, _ = U.get_padding(C.config.padding)
+        local padding, _ = U.get_padding(Config:get().padding)
         A.nvim_set_current_line(U.comment_str(line, lcs, rcs, padding))
-        U.is_fn(C.config.post_hook, ctx)
+        U.is_fn(Config:get().post_hook, ctx)
     end
 end
 
@@ -85,7 +31,7 @@ end
 function C.uncomment()
     local line = A.nvim_get_current_line()
 
-    local pattern = U.get_pattern(C.config.ignore)
+    local pattern = U.get_pattern(Config:get().ignore)
     if not U.ignore(line, pattern) then
         local srow, scol = unpack(A.nvim_win_get_cursor(0))
         ---@type Ctx
@@ -95,16 +41,16 @@ function C.uncomment()
             ctype = U.ctype.line,
             range = { srow = srow, scol = scol, erow = srow, ecol = scol },
         }
-        local lcs, rcs = U.parse_cstr(C.config, ctx)
+        local lcs, rcs = U.parse_cstr(Config:get(), ctx)
 
-        local _, pp = U.get_padding(C.config.padding)
+        local _, pp = U.get_padding(Config:get().padding)
         local lcs_esc, rcs_esc = U.escape(lcs), U.escape(rcs)
 
         if U.is_commented(lcs_esc, rcs_esc, pp)(line) then
             A.nvim_set_current_line(U.uncomment_str(line, lcs_esc, rcs_esc, pp))
         end
 
-        U.is_fn(C.config.post_hook, ctx)
+        U.is_fn(Config:get().post_hook, ctx)
     end
 end
 
@@ -112,7 +58,7 @@ end
 function C.toggle()
     local line = A.nvim_get_current_line()
 
-    local pattern = U.get_pattern(C.config.ignore)
+    local pattern = U.get_pattern(Config:get().ignore)
     if not U.ignore(line, pattern) then
         local srow, scol = unpack(A.nvim_win_get_cursor(0))
         ---@type Ctx
@@ -122,10 +68,10 @@ function C.toggle()
             ctype = U.ctype.line,
             range = { srow = srow, scol = scol, erow = srow, ecol = scol },
         }
-        local lcs, rcs = U.parse_cstr(C.config, ctx)
+        local lcs, rcs = U.parse_cstr(Config:get(), ctx)
 
         local lcs_esc, rcs_esc = U.escape(lcs), U.escape(rcs)
-        local padding, pp = U.get_padding(C.config.padding)
+        local padding, pp = U.get_padding(Config:get().padding)
         local is_cmt = U.is_commented(lcs_esc, rcs_esc, pp)(line)
 
         if is_cmt then
@@ -136,7 +82,7 @@ function C.toggle()
             ctx.cmode = U.cmode.comment
         end
 
-        U.is_fn(C.config.post_hook, ctx)
+        U.is_fn(Config:get().post_hook, ctx)
     end
 end
 
@@ -144,62 +90,35 @@ end
 ---@param vmode VMode
 ---@param cfg Config
 function C.gcc(vmode, cfg)
-    Op.opfunc(vmode, cfg or C.config, U.cmode.toggle, U.ctype.line, U.cmotion.line)
+    Op.opfunc(vmode, cfg or Config:get(), U.cmode.toggle, U.ctype.line, U.cmotion.line)
 end
 
 ---Toggle comment using blockwise comment
 ---@param vmode VMode
 ---@param cfg Config
 function C.gbc(vmode, cfg)
-    Op.opfunc(vmode, cfg or C.config, U.cmode.toggle, U.ctype.block, U.cmotion.line)
+    Op.opfunc(vmode, cfg or Config:get(), U.cmode.toggle, U.ctype.block, U.cmotion.line)
 end
 
 ---(Operator-Pending) Toggle comment using linewise comment
 ---@param vmode VMode
 ---@param cfg Config
 function C.gc(vmode, cfg)
-    Op.opfunc(vmode, cfg or C.config, U.cmode.toggle, U.ctype.line, U.cmotion._)
+    Op.opfunc(vmode, cfg or Config:get(), U.cmode.toggle, U.ctype.line, U.cmotion._)
 end
 
 ---(Operator-Pending) Toggle comment using blockwise comment
 ---@param vmode VMode
 ---@param cfg Config
 function C.gb(vmode, cfg)
-    Op.opfunc(vmode, cfg or C.config, U.cmode.toggle, U.ctype.block, U.cmotion._)
+    Op.opfunc(vmode, cfg or Config:get(), U.cmode.toggle, U.ctype.block, U.cmotion._)
 end
 
 ---Configures the whole plugin
----@param opts Config
-function C.setup(opts)
-    ---@type Config
-    C.config = {
-        padding = true,
-        sticky = true,
-        mappings = {
-            basic = true,
-            extra = true,
-            extended = false,
-        },
-        toggler = {
-            line = 'gcc',
-            block = 'gbc',
-        },
-        opleader = {
-            line = 'gc',
-            block = 'gb',
-        },
-        extra = {
-            above = 'gcO',
-            below = 'gco',
-            eol = 'gcA',
-        },
-    }
-
-    if opts ~= nil then
-        C.config = vim.tbl_deep_extend('force', C.config, opts)
-    end
-
-    local cfg = C.config
+---@param config Config
+---@return table Config Updated config
+function C.setup(config)
+    local cfg = Config:set(config):get()
 
     if cfg.mappings then
         local map = A.nvim_set_keymap
@@ -290,6 +209,8 @@ function C.setup(opts)
             map('x', 'g<', '<ESC><CMD>lua require("Comment.api").glt(vim.fn.visualmode())<CR>', map_opt)
         end
     end
+
+    return cfg
 end
 
 return C
