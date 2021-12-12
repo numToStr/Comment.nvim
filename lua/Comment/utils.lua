@@ -120,7 +120,7 @@ function U.ignore(ln, pat)
     return pat and ln:find(pat) ~= nil
 end
 
----Get region for vim mode
+---Get region for line movement or visual selection
 ---NOTE: Returns the current line, if `vmode` is not given.
 ---@param vmode? VMode
 ---@return CRange
