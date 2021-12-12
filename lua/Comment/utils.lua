@@ -121,9 +121,15 @@ function U.ignore(ln, pat)
 end
 
 ---Get region for vim mode
----@param vmode VMode
+---NOTE: Returns the current line, if `vmode` is not given.
+---@param vmode? VMode
 ---@return CRange
 function U.get_region(vmode)
+    if not vmode then
+        local row, col = unpack(A.nvim_win_get_cursor(0))
+        return { srow = row, scol = col, erow = row, ecol = col }
+    end
+
     local m = A.nvim_buf_get_mark
     local buf = 0
     local sln, eln

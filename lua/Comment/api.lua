@@ -1,4 +1,5 @@
 local U = require('Comment.utils')
+local Ex = require('Comment.extra')
 local Op = require('Comment.opfunc')
 local Config = require('Comment.config'):new()
 local A = vim.api
@@ -86,37 +87,85 @@ function C.toggle()
     end
 end
 
----Toggle comment using linewise comment
+---(Operator-Pending) Toggle linewise-comment on the current line
 ---@param vmode VMode
----@param cfg Config
-function C.gcc(vmode, cfg)
+---@param cfg? Config
+function C.toggleln_linewise_op(vmode, cfg)
     Op.opfunc(vmode, cfg or Config:get(), U.cmode.toggle, U.ctype.line, U.cmotion.line)
 end
 
----Toggle comment using blockwise comment
+---Toggle linewise-comment on the current line
+---@param cfg? Config
+function C.toggleln_linewise(cfg)
+    C.toggleln_linewise_op(nil, cfg)
+end
+
+---(Operator-Pending) Toggle blockwise comment on the current line
 ---@param vmode VMode
----@param cfg Config
-function C.gbc(vmode, cfg)
+---@param cfg? Config
+function C.toggleln_blockwise_op(vmode, cfg)
     Op.opfunc(vmode, cfg or Config:get(), U.cmode.toggle, U.ctype.block, U.cmotion.line)
 end
 
----(Operator-Pending) Toggle comment using linewise comment
+---Toggle blockwise comment on the current line
+---@param cfg? Config
+function C.toggleln_blockwise(cfg)
+    C.toggleln_blockwise_op(nil, cfg)
+end
+
+---(Operator-Pending) Toggle linewise-comment over multiple lines
 ---@param vmode VMode
----@param cfg Config
-function C.gc(vmode, cfg)
+---@param cfg? Config
+function C.toggle_linewise_op(vmode, cfg)
     Op.opfunc(vmode, cfg or Config:get(), U.cmode.toggle, U.ctype.line, U.cmotion._)
 end
 
----(Operator-Pending) Toggle comment using blockwise comment
+---(Operator-Pending) Toggle blockwise-comment over multiple lines
 ---@param vmode VMode
----@param cfg Config
-function C.gb(vmode, cfg)
+---@param cfg? Config
+function C.toggle_blockwise_op(vmode, cfg)
     Op.opfunc(vmode, cfg or Config:get(), U.cmode.toggle, U.ctype.block, U.cmotion._)
+end
+
+---Insert a linewise-comment below
+---@param cfg? Config
+function C.insert_linewise_below(cfg)
+    Ex.insert_below(U.ctype.line, cfg or Config:get())
+end
+
+---Insert a blockwise-comment below
+---@param cfg? Config
+function C.insert_blockwise_below(cfg)
+    Ex.insert_below(U.ctype.block, cfg or Config:get())
+end
+
+---Insert a linewise-comment above
+---@param cfg? Config
+function C.insert_linewise_above(cfg)
+    Ex.insert_above(U.ctype.line, cfg or Config:get())
+end
+
+---Insert a blockwise-comment above
+---@param cfg? Config
+function C.insert_blockwise_above(cfg)
+    Ex.insert_above(U.ctype.block, cfg or Config:get())
+end
+
+---Insert a linewise-comment at the end-of-line
+---@param cfg? Config
+function C.insert_linewise_eol(cfg)
+    Ex.insert_eol(U.ctype.line, cfg or Config:get())
+end
+
+---Insert a blockwise-comment at the end-of-line
+---@param cfg? Config
+function C.insert_blockwise_eol(cfg)
+    Ex.insert_eol(U.ctype.block, cfg or Config:get())
 end
 
 ---Configures the whole plugin
 ---@param config Config
----@return table Config Updated config
+---@return Config
 function C.setup(config)
     local cfg = Config:set(config):get()
 
@@ -142,35 +191,33 @@ function C.setup(config)
             map(
                 'n',
                 cfg.toggler.line,
-                [[v:count == 0 ? '<CMD>lua require("Comment.api").call("gcc")<CR>g@$' : '<CMD>lua require("Comment.api").gcc_count()<CR>']],
+                [[ v:count == 0 ? '<CMD>lua require("Comment.api").call("toggleln_linewise_op")<CR>g@$' : '<CMD>lua require("Comment.api").gcc_count()<CR>']],
                 { noremap = true, silent = true, expr = true }
             )
-            map('n', cfg.toggler.block, '<CMD>lua require("Comment.api").call("gbc")<CR>g@$', map_opt)
-            map('n', cfg.opleader.line, '<CMD>lua require("Comment.api").call("gc")<CR>g@', map_opt)
-            map('n', cfg.opleader.block, '<CMD>lua require("Comment.api").call("gb")<CR>g@', map_opt)
+            map('n', cfg.toggler.block, '<CMD>lua require("Comment.api").call("toggleln_blockwise_op")<CR>g@$', map_opt)
+            map('n', cfg.opleader.line, '<CMD>lua require("Comment.api").call("toggle_linewise_op")<CR>g@', map_opt)
+            map('n', cfg.opleader.block, '<CMD>lua require("Comment.api").call("toggle_blockwise_op")<CR>g@', map_opt)
 
             -- VISUAL mode mappings
-            map('x', cfg.opleader.line, '<ESC><CMD>lua require("Comment.api").gc(vim.fn.visualmode())<CR>', map_opt)
-            map('x', cfg.opleader.block, '<ESC><CMD>lua require("Comment.api").gb(vim.fn.visualmode())<CR>', map_opt)
+            map(
+                'x',
+                cfg.opleader.line,
+                '<ESC><CMD>lua require("Comment.api").toggle_linewise_op(vim.fn.visualmode())<CR>',
+                map_opt
+            )
+            map(
+                'x',
+                cfg.opleader.block,
+                '<ESC><CMD>lua require("Comment.api").toggle_blockwise_op(vim.fn.visualmode())<CR>',
+                map_opt
+            )
         end
 
         -- Extra Mappings
         if cfg.mappings.extra then
-            local E = require('Comment.extra')
-
-            function C.gco()
-                E.norm_o(U.ctype.line, cfg)
-            end
-            function C.gcO()
-                E.norm_O(U.ctype.line, cfg)
-            end
-            function C.gcA()
-                E.norm_A(U.ctype.line, cfg)
-            end
-
-            map('n', cfg.extra.below, '<CMD>lua require("Comment.api").gco()<CR>', map_opt)
-            map('n', cfg.extra.above, '<CMD>lua require("Comment.api").gcO()<CR>', map_opt)
-            map('n', cfg.extra.eol, '<CMD>lua require("Comment.api").gcA()<CR>', map_opt)
+            map('n', cfg.extra.below, '<CMD>lua require("Comment.api").insert_linewise_below()<CR>', map_opt)
+            map('n', cfg.extra.above, '<CMD>lua require("Comment.api").insert_linewise_above()<CR>', map_opt)
+            map('n', cfg.extra.eol, '<CMD>lua require("Comment.api").insert_linewise_eol()<CR>', map_opt)
         end
 
         -- Extended Mappings
