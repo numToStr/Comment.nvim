@@ -201,7 +201,7 @@ function C.setup(config)
             map(
                 'n',
                 cfg.toggler.line,
-                [[ v:count == 0 ? '<CMD>lua require("Comment.api").call("toggleln_linewise_op")<CR>g@$' : '<CMD>lua require("Comment.api").toggle_linewise_count()<CR>']],
+                [[v:count == 0 ? '<CMD>lua require("Comment.api").call("toggleln_linewise_op")<CR>g@$' : '<CMD>lua require("Comment.api").toggle_linewise_count()<CR>']],
                 { noremap = true, silent = true, expr = true }
             )
             map('n', cfg.toggler.block, '<CMD>lua require("Comment.api").call("toggleln_blockwise_op")<CR>g@$', map_opt)
