@@ -140,12 +140,7 @@ function U.get_region(vmode)
         sln, eln = m(buf, '['), m(buf, ']')
     end
 
-    return {
-        srow = sln[1],
-        scol = sln[2],
-        erow = eln[1],
-        ecol = eln[2],
-    }
+    return { srow = sln[1], scol = sln[2], erow = eln[1], ecol = eln[2] }
 end
 
 ---Get lines from the current position to the given count
@@ -158,12 +153,7 @@ function U.get_count_lines(count)
     local erow = (srow + count) - 1
     local lines = A.nvim_buf_get_lines(0, srow - 1, erow, false)
 
-    return lines, {
-        srow = srow,
-        scol = 0,
-        erow = erow,
-        ecol = 0,
-    }
+    return lines, { srow = srow, scol = 0, erow = erow, ecol = 0 }
 end
 
 ---Get lines from a NORMAL/VISUAL mode

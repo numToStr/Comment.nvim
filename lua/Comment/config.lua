@@ -79,9 +79,9 @@ function Config:new()
     return setmetatable({ config = self.default() }, { __index = self })
 end
 
----Set/Update the config
----@private
+---Update the config
 ---@param cfg Config
+---@return RootConfig
 function Config:set(cfg)
     if cfg then
         self.config = vim.tbl_deep_extend('force', self.config, cfg)
