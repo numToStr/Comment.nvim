@@ -178,6 +178,19 @@ function C.uncommentln_blockwise_op(vmode, cfg)
     Op.opfunc(vmode, cfg, U.cmode.uncomment, U.ctype.block, U.cmotion.line)
 end
 
+--------------------------------------------
+-------------- ADDITIONAL API --------------
+--------------------------------------------
+
+-- Callback function to save cursor position and set operatorfunc
+-- NOTE: We are using `config` to store the position as it is a kinda global
+-- @param cb string Name of the API function to call
+function C.call(cb)
+    local cfg = Config:get()
+    A.nvim_set_option('operatorfunc', "v:lua.require'Comment.api'." .. cb)
+    cfg.__pos = cfg.sticky and A.nvim_win_get_cursor(0)
+end
+
 ---Configures the whole plugin
 ---@param config Config
 ---@return Config
@@ -187,13 +200,6 @@ function C.setup(config)
     if cfg.mappings then
         local map = A.nvim_set_keymap
         local map_opt = { noremap = true, silent = true }
-
-        -- Callback function to save cursor position and set operatorfunc
-        -- NOTE: We are using cfg to store the position as the cfg is tossed around in most places
-        function C.call(cb)
-            cfg.___pos = cfg.sticky and A.nvim_win_get_cursor(0)
-            vim.o.operatorfunc = "v:lua.require'Comment.api'." .. cb
-        end
 
         -- Basic Mappings
         if cfg.mappings.basic then

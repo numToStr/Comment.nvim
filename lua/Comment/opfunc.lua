@@ -98,9 +98,9 @@ function O.opfunc(vmode, cfg, cmode, ctype, cmotion)
     --
     -- And I found out that if someone presses `gc` but doesn't provide operators and
     -- does visual comments then cursor jumps to previous stored position. Thus the check for visual modes
-    if cfg.sticky and cfg.___pos and cmotion ~= U.cmotion.v and cmotion ~= U.cmotion.V then
-        A.nvim_win_set_cursor(0, cfg.___pos)
-        cfg.___pos = nil
+    if cfg.sticky and cfg.__pos and cmotion ~= U.cmotion.v and cmotion ~= U.cmotion.V then
+        A.nvim_win_set_cursor(0, cfg.__pos)
+        cfg.__pos = nil
     end
 
     U.is_fn(cfg.post_hook, ctx)

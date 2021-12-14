@@ -43,6 +43,7 @@
 ---@field extra ExtraMapping
 ---@field pre_hook fun(ctx: Ctx):string Function to be called before comment/uncomment
 ---@field post_hook fun(ctx:Ctx) Function to be called after comment/uncomment
+---@field __pos number[] To be used to restore cursor position
 
 ---@class RootConfig
 ---@field config Config
