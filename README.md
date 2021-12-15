@@ -58,6 +58,8 @@ require('Comment').setup()
 EOF
 ```
 
+<a id="config"></a>
+
 #### Configuration (optional)
 
 Following are the **default** config for the [`setup()`](#setup). If you want to override, just modify the option that you want then it will be merged with the default config.
@@ -148,7 +150,7 @@ local config = vim.deepcopy(api.get_config())
 
 When you call [`setup()`](#setup) method, `Comment.nvim` sets up some basic mapping which can used in NORMAL and VISUAL mode to get you started with the pleasure of commenting stuff out.
 
-<a id="mappings"></a>
+<a id="basic-mappings"></a>
 
 #### Basic mappings
 
@@ -175,6 +177,8 @@ These mappings are enabled by default. (config: `mappings.basic`)
 `gb` - Toggles the region using blockwise comment
 ```
 
+<a id="extra-mappings"></a>
+
 #### Extra mappings
 
 These mappings are enabled by default. (config: `mappings.extra`)
@@ -186,6 +190,8 @@ These mappings are enabled by default. (config: `mappings.extra`)
 `gcO` - Insert comment to the previous line and enters INSERT mode
 `gcA` - Insert comment to end of the current line and enters INSERT mode
 ```
+
+<a id="extended-mappings"></a>
 
 #### Extended mappings
 

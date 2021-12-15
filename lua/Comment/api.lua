@@ -182,9 +182,9 @@ end
 -------------- ADDITIONAL API --------------
 --------------------------------------------
 
--- Callback function to save cursor position and set operatorfunc
--- NOTE: We are using `config` to store the position as it is a kinda global
--- @param cb string Name of the API function to call
+---Callback function to provide dot-repeat support and store last cursor position
+---NOTE: We are using `config` to store the position as it is a kinda global
+---@param cb string Name of the API function to call
 function C.call(cb)
     local cfg = Config:get()
     A.nvim_set_option('operatorfunc', "v:lua.require'Comment.api'." .. cb)
