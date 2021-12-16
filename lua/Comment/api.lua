@@ -35,7 +35,7 @@ end
 ---Toggle linewise-comment over multiple lines using `vim.v.count`
 ---@param cfg? Config
 function C.toggle_linewise_count(cfg)
-    Op.count(vim.v.count, cfg or Config:get())
+    Op.count(vim.v.count, cfg or Config:get(), U.ctype.line)
 end
 
 --######### BLOCKWISE #########--
@@ -58,6 +58,12 @@ end
 ---@param cfg? Config
 function C.toggle_blockwise_op(vmode, cfg)
     Op.opfunc(vmode, cfg or Config:get(), U.cmode.toggle, U.ctype.block, U.cmotion._)
+end
+
+---Toggle blockwise-comment over multiple lines using `vim.v.count`
+---@param cfg? Config
+function C.toggle_blockwise_count(cfg)
+    Op.count(vim.v.count, cfg or Config:get(), U.ctype.block)
 end
 
 ---------------------------------------
@@ -203,18 +209,19 @@ function C.setup(config)
 
         -- Basic Mappings
         if cfg.mappings.basic then
+            local expr = { noremap = true, silent = true, expr = true }
             -- NORMAL mode mappings
             map(
                 'n',
                 cfg.toggler.line,
                 [[v:count == 0 ? '<CMD>lua require("Comment.api").call("toggle_current_linewise_op")<CR>g@$' : '<CMD>lua require("Comment.api").toggle_linewise_count()<CR>']],
-                { noremap = true, silent = true, expr = true }
+                expr
             )
             map(
                 'n',
                 cfg.toggler.block,
-                '<CMD>lua require("Comment.api").call("toggle_current_blockwise_op")<CR>g@$',
-                map_opt
+                [[v:count == 0 ? '<CMD>lua require("Comment.api").call("toggle_current_blockwise_op")<CR>g@$' : '<CMD>lua require("Comment.api").toggle_blockwise_count()<CR>']],
+                expr
             )
             map('n', cfg.opleader.line, '<CMD>lua require("Comment.api").call("toggle_linewise_op")<CR>g@', map_opt)
             map('n', cfg.opleader.block, '<CMD>lua require("Comment.api").call("toggle_blockwise_op")<CR>g@', map_opt)
