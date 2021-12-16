@@ -28,7 +28,7 @@ require('Comment.api').toggle_current_linewise_op(vmode, cfg)
 require('Comment.api').toggle_linewise_op(vmode, cfg)
 
 ---Toggle linewise-comment over multiple lines using `vim.v.count`
----@param cfg Config
+---@param cfg? Config
 require('Comment.api').toggle_linewise_count(cfg)
 
 --######### BLOCKWISE #########--

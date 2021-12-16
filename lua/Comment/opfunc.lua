@@ -136,7 +136,7 @@ function O.linewise(p)
                     end
                 end
 
-                -- If `cmode` changes to comment or the given cmode is not uncomment, then only calculate min_indent
+                -- If local `cmode` == comment or the given cmode ~= uncomment, then only calculate min_indent
                 -- As calculating min_indent only makes sense when we actually want to comment the lines
                 if not U.is_empty(line) and (cmode == U.cmode.comment or p.cmode == U.cmode.comment) then
                     local indent = U.grab_indent(line)
