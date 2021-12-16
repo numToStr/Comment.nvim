@@ -37,21 +37,21 @@ end
 ---Add a comment below the current line and goes to INSERT mode
 ---@param ctype CType
 ---@param cfg Config
-function E.norm_o(ctype, cfg)
+function E.insert_below(ctype, cfg)
     ins_on_line(0, ctype, cfg)
 end
 
 ---Add a comment above the current line and goes to INSERT mode
 ---@param ctype CType
 ---@param cfg Config
-function E.norm_O(ctype, cfg)
+function E.insert_above(ctype, cfg)
     ins_on_line(-1, ctype, cfg)
 end
 
 ---Add a comment at the end of current line and goes to INSERT mode
 ---@param ctype CType
 ---@param cfg Config
-function E.norm_A(ctype, cfg)
+function E.insert_eol(ctype, cfg)
     local srow, scol = unpack(A.nvim_win_get_cursor(0))
 
     ---@type Ctx

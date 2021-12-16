@@ -98,9 +98,9 @@ function O.opfunc(vmode, cfg, cmode, ctype, cmotion)
     --
     -- And I found out that if someone presses `gc` but doesn't provide operators and
     -- does visual comments then cursor jumps to previous stored position. Thus the check for visual modes
-    if cfg.sticky and cfg.___pos and cmotion ~= U.cmotion.v and cmotion ~= U.cmotion.V then
-        A.nvim_win_set_cursor(0, cfg.___pos)
-        cfg.___pos = nil
+    if cfg.sticky and cfg.__pos and cmotion ~= U.cmotion.v and cmotion ~= U.cmotion.V then
+        A.nvim_win_set_cursor(0, cfg.__pos)
+        cfg.__pos = nil
     end
 
     U.is_fn(cfg.post_hook, ctx)
@@ -115,8 +115,8 @@ function O.linewise(p)
     local padding, pp = U.get_padding(p.cfg.padding)
     local is_commented = U.is_commented(lcs_esc, rcs_esc, pp)
 
-    -- While commenting a block of text, there is a possiblity of lines being both commented and non-commented
-    -- In that case, we need to figure out that if any line is uncommented then we should comment the whole block or vise-versa
+    -- While commenting a region, there could be lines being both commented and non-commented
+    -- So, if any line is uncommented then we should comment the whole block or vise-versa
     local cmode = U.cmode.uncomment
 
     -- When commenting multiple line, it is to be expected that indentation should be preserved
@@ -136,7 +136,7 @@ function O.linewise(p)
                     end
                 end
 
-                -- If the internal cmode changes to comment or the given cmode is not uncomment, then only calculate min_indent
+                -- If local `cmode` == comment or the given cmode ~= uncomment, then only calculate min_indent
                 -- As calculating min_indent only makes sense when we actually want to comment the lines
                 if not U.is_empty(line) and (cmode == U.cmode.comment or p.cmode == U.cmode.comment) then
                     local indent = U.grab_indent(line)
