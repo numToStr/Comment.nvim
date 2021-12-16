@@ -15,12 +15,12 @@ These APIs powers the [basic-mappings](../README.md#basic-mappings).
 
 ---Toggle linewise-comment on the current line
 ---@param cfg? Config
-require('Comment.api').toggleln_linewise(cfg)
+require('Comment.api').toggle_current_linewise(cfg)
 
 ---(Operator-Pending) Toggle linewise-comment on the current line
 ---@param vmode VMode
 ---@param cfg? Config
-require('Comment.api').toggleln_linewise_op(vmode, cfg)
+require('Comment.api').toggle_current_linewise_op(vmode, cfg)
 
 ---(Operator-Pending) Toggle linewise-comment over multiple lines
 ---@param vmode VMode
@@ -35,12 +35,12 @@ require('Comment.api').toggle_linewise_count(cfg)
 
 ---Toggle blockwise comment on the current line
 ---@param cfg? Config
-require('Comment.api').toggleln_blockwise(cfg)
+require('Comment.api').toggle_current_blockwise(cfg)
 
 ---(Operator-Pending) Toggle blockwise comment on the current line
 ---@param vmode VMode
 ---@param cfg? Config
-require('Comment.api').toggleln_blockwise_op(vmode, cfg)
+require('Comment.api').toggle_current_blockwise_op(vmode, cfg)
 
 ---(Operator-Pending) Toggle blockwise-comment over multiple lines
 ---@param vmode VMode
@@ -91,12 +91,12 @@ These APIs powers the [extended-mappings](../README.md#extended-mappings).
 
 ---Comment current line using linewise-comment
 ---@param cfg? Config
-require('Comment.api').commentln_linewise(cfg)
+require('Comment.api').comment_current_linewise(cfg)
 
 ---(Operator-Pending) Comment current line using linewise-comment
 ---@param vmode VMode
 ---@param cfg? Config
-require('Comment.api').commentln_linewise_op(vmode, cfg)
+require('Comment.api').comment_current_linewise_op(vmode, cfg)
 
 ---(Operator-Pending) Comment multiple line using linewise-comment
 ---@param vmode VMode
@@ -105,12 +105,12 @@ require('Comment.api').comment_linewise_op(vmode, cfg)
 
 ---Uncomment current line using linewise-comment
 ---@param cfg? Config
-require('Comment.api').uncommentln_linewise(cfg)
+require('Comment.api').uncomment_current_linewise(cfg)
 
 ---(Operator-Pending) Uncomment current line using linewise-comment
 ---@param vmode VMode
 ---@param cfg? Config
-require('Comment.api').uncommentln_linewise_op(vmode, cfg)
+require('Comment.api').uncomment_current_linewise_op(vmode, cfg)
 
 ---(Operator-Pending) Uncomment multiple line using linewise-comment
 ---@param vmode VMode
@@ -121,21 +121,21 @@ require('Comment.api').uncomment_linewise_op(vmode, cfg)
 
 ---Comment current line using linewise-comment
 ---@param cfg? Config
-require('Comment.api').commentln_blockwise(cfg)
+require('Comment.api').comment_current_blockwise(cfg)
 
 ---(Operator-Pending) Comment current line using blockwise-comment
 ---@param vmode VMode
 ---@param cfg? Config
-require('Comment.api').commentln_blockwise_op(vmode, cfg)
+require('Comment.api').comment_current_blockwise_op(vmode, cfg)
 
 ---Uncomment current line using blockwise-comment
 ---@param cfg? Config
-require('Comment.api').uncommentln_blockwise(cfg)
+require('Comment.api').uncomment_current_blockwise(cfg)
 
 ---(Operator-Pending) Uncomment current line using blockwise-comment
 ---@param vmode VMode
 ---@param cfg? Config
-require('Comment.api').uncommentln_blockwise_op(vmode, cfg)
+require('Comment.api').uncomment_current_blockwise_op(vmode, cfg)
 ```
 
 ### Additional
@@ -163,14 +163,14 @@ end
 -- # NORMAL mode
 
 -- Linewise toggle current line using C-/
-map('n', '<C-_>', '<CMD>lua require("Comment.api").toggleln_linewise()<CR>')
+map('n', '<C-_>', '<CMD>lua require("Comment.api").toggle_current_linewise()<CR>')
 -- or with dot-repeat support
--- map('n', '<C-_>', '<CMD>lua require("Comment.api").call("toggleln_linewise")<CR>g@$')
+-- map('n', '<C-_>', '<CMD>lua require("Comment.api").call("toggle_current_linewise_op")<CR>g@$')
 
 -- Blockwise toggle current line using C-\
-map('n', '<C-\\>', '<CMD>lua require("Comment.api").toggleln_blockwise()<CR>')
+map('n', '<C-\\>', '<CMD>lua require("Comment.api").toggle_current_blockwise()<CR>')
 -- or with dot-repeat support
--- map('n', '<C-\\>', '<CMD>lua require("Comment.api").call("toggleln_blockwise")<CR>g@$')
+-- map('n', '<C-\\>', '<CMD>lua require("Comment.api").call("toggle_current_blockwise_op")<CR>g@$')
 
 -- Linewise toggle multiple line using <leader>gc with dot-repeat support
 -- Example: <leader>gc3j will comment 4 lines

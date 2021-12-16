@@ -14,14 +14,14 @@ local C = {}
 
 ---Toggle linewise-comment on the current line
 ---@param cfg? Config
-function C.toggleln_linewise(cfg)
-    C.toggleln_linewise_op(nil, cfg)
+function C.toggle_current_linewise(cfg)
+    C.toggle_current_linewise_op(nil, cfg)
 end
 
 ---(Operator-Pending) Toggle linewise-comment on the current line
 ---@param vmode VMode
 ---@param cfg? Config
-function C.toggleln_linewise_op(vmode, cfg)
+function C.toggle_current_linewise_op(vmode, cfg)
     Op.opfunc(vmode, cfg or Config:get(), U.cmode.toggle, U.ctype.line, U.cmotion.line)
 end
 
@@ -33,7 +33,7 @@ function C.toggle_linewise_op(vmode, cfg)
 end
 
 ---Toggle linewise-comment over multiple lines using `vim.v.count`
----@param cfg Config
+---@param cfg? Config
 function C.toggle_linewise_count(cfg)
     Op.count(vim.v.count, cfg or Config:get())
 end
@@ -42,14 +42,14 @@ end
 
 ---Toggle blockwise comment on the current line
 ---@param cfg? Config
-function C.toggleln_blockwise(cfg)
-    C.toggleln_blockwise_op(nil, cfg)
+function C.toggle_current_blockwise(cfg)
+    C.toggle_current_blockwise_op(nil, cfg)
 end
 
 ---(Operator-Pending) Toggle blockwise comment on the current line
 ---@param vmode VMode
 ---@param cfg? Config
-function C.toggleln_blockwise_op(vmode, cfg)
+function C.toggle_current_blockwise_op(vmode, cfg)
     Op.opfunc(vmode, cfg or Config:get(), U.cmode.toggle, U.ctype.block, U.cmotion.line)
 end
 
@@ -112,14 +112,14 @@ end
 
 ---Comment current line using linewise-comment
 ---@param cfg? Config
-function C.commentln_linewise(cfg)
-    C.commentln_linewise_op(nil, cfg)
+function C.comment_current_linewise(cfg)
+    C.comment_current_linewise_op(nil, cfg)
 end
 
 ---(Operator-Pending) Comment current line using linewise-comment
 ---@param vmode VMode
 ---@param cfg? Config
-function C.commentln_linewise_op(vmode, cfg)
+function C.comment_current_linewise_op(vmode, cfg)
     Op.opfunc(vmode, cfg or Config:get(), U.cmode.comment, U.ctype.line, U.cmotion.line)
 end
 
@@ -132,14 +132,14 @@ end
 
 ---Uncomment current line using linewise-comment
 ---@param cfg? Config
-function C.uncommentln_linewise(cfg)
-    C.uncommentln_linewise_op(nil, cfg)
+function C.uncomment_current_linewise(cfg)
+    C.uncomment_current_linewise_op(nil, cfg)
 end
 
 ---(Operator-Pending) Uncomment current line using linewise-comment
 ---@param vmode VMode
 ---@param cfg? Config
-function C.uncommentln_linewise_op(vmode, cfg)
+function C.uncomment_current_linewise_op(vmode, cfg)
     Op.opfunc(vmode, cfg or Config:get(), U.cmode.uncomment, U.ctype.line, U.cmotion.line)
 end
 
@@ -154,27 +154,27 @@ end
 
 ---Comment current line using linewise-comment
 ---@param cfg? Config
-function C.commentln_blockwise(cfg)
-    C.commentln_blockwise_op(nil, cfg)
+function C.comment_current_blockwise(cfg)
+    C.comment_current_blockwise_op(nil, cfg)
 end
 
 ---(Operator-Pending) Comment current line using blockwise-comment
 ---@param vmode VMode
 ---@param cfg? Config
-function C.commentln_blockwise_op(vmode, cfg)
+function C.comment_current_blockwise_op(vmode, cfg)
     Op.opfunc(vmode, cfg or Config:get(), U.cmode.comment, U.ctype.block, U.cmotion.line)
 end
 
 ---Uncomment current line using blockwise-comment
 ---@param cfg? Config
-function C.uncommentln_blockwise(cfg)
-    C.uncommentln_blockwise_op(nil, cfg)
+function C.uncomment_current_blockwise(cfg)
+    C.uncomment_current_blockwise_op(nil, cfg)
 end
 
 ---(Operator-Pending) Uncomment current line using blockwise-comment
 ---@param vmode VMode
 ---@param cfg? Config
-function C.uncommentln_blockwise_op(vmode, cfg)
+function C.uncomment_current_blockwise_op(vmode, cfg)
     Op.opfunc(vmode, cfg, U.cmode.uncomment, U.ctype.block, U.cmotion.line)
 end
 
@@ -207,10 +207,15 @@ function C.setup(config)
             map(
                 'n',
                 cfg.toggler.line,
-                [[v:count == 0 ? '<CMD>lua require("Comment.api").call("toggleln_linewise_op")<CR>g@$' : '<CMD>lua require("Comment.api").toggle_linewise_count()<CR>']],
+                [[v:count == 0 ? '<CMD>lua require("Comment.api").call("toggle_current_linewise_op")<CR>g@$' : '<CMD>lua require("Comment.api").toggle_linewise_count()<CR>']],
                 { noremap = true, silent = true, expr = true }
             )
-            map('n', cfg.toggler.block, '<CMD>lua require("Comment.api").call("toggleln_blockwise_op")<CR>g@$', map_opt)
+            map(
+                'n',
+                cfg.toggler.block,
+                '<CMD>lua require("Comment.api").call("toggle_current_blockwise_op")<CR>g@$',
+                map_opt
+            )
             map('n', cfg.opleader.line, '<CMD>lua require("Comment.api").call("toggle_linewise_op")<CR>g@', map_opt)
             map('n', cfg.opleader.block, '<CMD>lua require("Comment.api").call("toggle_blockwise_op")<CR>g@', map_opt)
 
@@ -240,12 +245,12 @@ function C.setup(config)
         if cfg.mappings.extended then
             -- NORMAL mode extended
             map('n', 'g>', '<CMD>lua require("Comment.api").call("comment_linewise_op")<CR>g@', map_opt)
-            map('n', 'g>c', '<CMD>lua require("Comment.api").call("commentln_linewise_op")<CR>g@$', map_opt)
-            map('n', 'g>b', '<CMD>lua require("Comment.api").call("commentln_blockwise_op")<CR>g@$', map_opt)
+            map('n', 'g>c', '<CMD>lua require("Comment.api").call("comment_current_linewise_op")<CR>g@$', map_opt)
+            map('n', 'g>b', '<CMD>lua require("Comment.api").call("comment_current_blockwise_op")<CR>g@$', map_opt)
 
             map('n', 'g<', '<CMD>lua require("Comment.api").call("uncomment_linewise_op")<CR>g@', map_opt)
-            map('n', 'g<c', '<CMD>lua require("Comment.api").call("uncommentln_linewise_op")<CR>g@$', map_opt)
-            map('n', 'g<b', '<CMD>lua require("Comment.api").call("uncommentln_blockwise_op")<CR>g@$', map_opt)
+            map('n', 'g<c', '<CMD>lua require("Comment.api").call("uncomment_current_linewise_op")<CR>g@$', map_opt)
+            map('n', 'g<b', '<CMD>lua require("Comment.api").call("uncomment_current_blockwise_op")<CR>g@$', map_opt)
 
             -- VISUAL mode extended
             map('x', 'g>', '<ESC><CMD>lua require("Comment.api").comment_linewise_op(vim.fn.visualmode())<CR>', map_opt)
