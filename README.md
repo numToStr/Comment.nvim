@@ -111,7 +111,8 @@ Following are the **default** config for the [`setup()`](#setup). If you want to
     },
 
     ---Create basic (operator-pending) and extended mappings for NORMAL + VISUAL mode
-    ---@type table
+    ---NOTE: If `mappings = false` then the plugin won't create any mappings
+    ---@type boolean|table
     mappings = {
         ---Operator-pending mapping
         ---Includes `gcc`, `gbc`, `gc[count]{motion}` and `gb[count]{motion}`
