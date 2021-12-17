@@ -46,6 +46,10 @@ require('Comment.api').toggle_current_blockwise_op(vmode, cfg)
 ---@param vmode VMode
 ---@param cfg? Config
 require('Comment.api').toggle_blockwise_op(vmode, cfg)
+
+---Toggle blockwise-comment over multiple lines using `vim.v.count`
+---@param cfg? Config
+require('Comment.api').toggle_blockwise_count(cfg)
 ```
 
 ### Extra

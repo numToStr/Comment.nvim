@@ -10,7 +10,7 @@
 - Prefers single-line/linewise comments
 - Supports line (`//`) and block (`/* */`) comments
 - Dot (`.`) repeat support for `gcc`, `gbc` and friends
-- Count support (`[count]gcc` only)
+- Count support for `[count]gcc` and `[count]gbc`
 - Left-right (`gcw` `gc$`) and Up-Down (`gc2j` `gc4k`) motions
 - Use with text-objects (`gci{` `gbat`)
 - Supports pre and post hooks
@@ -150,14 +150,15 @@ These mappings are enabled by default. (config: `mappings.basic`)
 ```help
 `gcc` - Toggles the current line using linewise comment
 `gbc` - Toggles the current line using blockwise comment
-`[count]gcc` - Toggles the number of line given as a prefix-count
+`[count]gcc` - Toggles the number of line given as a prefix-count using linewise
+`[count]gbc` - Toggles the number of line given as a prefix-count using blockwise
 `gc[count]{motion}` - (Op-pending) Toggles the region using linewise comment
 `gb[count]{motion}` - (Op-pending) Toggles the region using linewise comment
 ```
 
 <a id="count-prefix">
 
-> NOTE: Dot repeat is not supported with `[count]gcc`
+> NOTE: Dot repeat is not supported with `[count]gcc` and `[count]gbc`
 
 - VISUAL mode
 

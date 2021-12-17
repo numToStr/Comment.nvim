@@ -64,33 +64,22 @@ function O.opfunc(vmode, cfg, cmode, ctype, cmotion)
     local lcs, rcs = U.parse_cstr(cfg, ctx)
     local lines = U.get_lines(range)
 
+    ---@type OpFnParams
+    local params = {
+        cfg = cfg,
+        cmode = cmode,
+        lines = lines,
+        lcs = lcs,
+        rcs = rcs,
+        range = range,
+    }
+
     if block_x then
-        ctx.cmode = O.blockwise_x({
-            cfg = cfg,
-            cmode = cmode,
-            lines = lines,
-            lcs = lcs,
-            rcs = rcs,
-            range = range,
-        })
+        ctx.cmode = O.blockwise_x(params)
     elseif ctype == U.ctype.block and not same_line then
-        ctx.cmode = O.blockwise({
-            cfg = cfg,
-            cmode = cmode,
-            lines = lines,
-            lcs = lcs,
-            rcs = rcs,
-            range = range,
-        }, partial_block)
+        ctx.cmode = O.blockwise(params, partial_block)
     else
-        ctx.cmode = O.linewise({
-            cfg = cfg,
-            cmode = cmode,
-            lines = lines,
-            lcs = lcs,
-            rcs = rcs,
-            range = range,
-        })
+        ctx.cmode = O.linewise(params)
     end
 
     -- We only need to restore cursor if both sticky and position are available
@@ -253,26 +242,34 @@ end
 ---Example: `10gl` will comment 10 lines
 ---@param count integer Number of lines
 ---@param cfg Config
-function O.count(count, cfg)
+---@param ctype CType
+function O.count(count, cfg, ctype)
     local lines, range = U.get_count_lines(count)
 
     ---@type Ctx
     local ctx = {
         cmode = U.cmode.toggle,
         cmotion = U.cmotion.line,
-        ctype = U.ctype.line,
+        ctype = ctype,
         range = range,
     }
     local lcs, rcs = U.parse_cstr(cfg, ctx)
 
-    ctx.cmode = O.linewise({
+    ---@type OpFnParams
+    local params = {
         cfg = cfg,
         cmode = ctx.cmode,
         lines = lines,
         lcs = lcs,
         rcs = rcs,
         range = range,
-    })
+    }
+
+    if ctype == U.ctype.block then
+        ctx.cmode = O.blockwise(params)
+    else
+        ctx.cmode = O.linewise(params)
+    end
 
     U.is_fn(cfg.post_hook, ctx)
 end
