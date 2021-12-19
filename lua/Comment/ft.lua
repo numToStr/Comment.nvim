@@ -55,6 +55,7 @@ local L = {
     sql = { M.dash, M.cxx_b },
     swift = { M.cxx_l, M.cxx_b },
     sxhkdrc = { M.hash },
+    teal = { M.dash, M.dash_bracket },
     terraform = { M.hash, M.cxx_b },
     tex = { M.latex },
     template = { M.double_hash },
