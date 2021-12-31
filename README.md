@@ -235,12 +235,12 @@ Read [doc/API.md](./doc/API.md) to see all the API/functions that are exported f
 
 ### 🌳 Treesitter
 
-This plugin also has the basic support of treesitter for calculating `commentstring` which works most of the time and might be all that someone needs. But due to the nature of the parsed tree, this implementation has some known limitations.
+This plugin has native **treesitter** support for calculating `commentstring` which works for multiple (injected/embedded) languages like Vue or Markdown. But due to the nature of the parsed tree, this implementation has some known limitations.
 
 1. No `jsx/tsx` support. Its implementation was quite complicated.
 2. Invalid comment on the region where one language ends and the other starts. [Read more](https://github.com/numToStr/Comment.nvim/pull/62#issuecomment-972790418)
 
-For more advance use cases you should use [nvim-ts-context-commentstring](https://github.com/JoosepAlviste/nvim-ts-context-commentstring). See [`pre_hook`](#pre-hook) section for the integration.
+For advance use cases, use [nvim-ts-context-commentstring](https://github.com/JoosepAlviste/nvim-ts-context-commentstring). See [`pre_hook`](#pre-hook) section for the integration.
 
 <a id="hooks"></a>
 
@@ -289,7 +289,7 @@ There are two hook methods i.e `pre_hook` and `post_hook` which are called befor
 {
     ---@param ctx Ctx
     post_hook = function(ctx)
-        if ctx.range.srow == ctx.range.srow then
+        if ctx.range.srow == ctx.range.erow then
             -- do something with the current line
         else
             -- do something with lines range
@@ -341,7 +341,7 @@ ignore = '^const(.*)=(%s?)%((.*)%)(%s?)=>'
 
 ### 🗨️ Filetypes + Languages
 
-Most languages/filetypes have support for comments via `commentstring` but there might be a filetype that is not supported. There are two ways to enable commenting for unsupported filetypes:
+Most languages/filetypes have native support for comments via `commentstring` but there might be a filetype that is not supported. There are two ways to enable commenting for unsupported filetypes:
 
 1.  You can set `commentstring` for that particular filetype like the following
 
