@@ -244,7 +244,7 @@ end
 ---@param cfg Config
 ---@param ctype CType
 function O.count(count, cfg, ctype)
-    local lines, range = U.get_count_lines(count)
+    local lines, range = U.get_count_lines(count == 0 and 1 or count)
 
     ---@type Ctx
     local ctx = {
