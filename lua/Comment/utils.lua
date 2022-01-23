@@ -259,29 +259,4 @@ function U.is_commented(lcs_esc, rcs_esc, pp)
     end
 end
 
----Wrapper for setting up keybindings
-U.K = setmetatable({
-    ex = { noremap = false, silent = true, expr = true },
-    no = { noremap = true, silent = true },
-    re = { noremap = false, silent = true },
-}, {
-    __index = function(p, mode)
-        return setmetatable({
-            re = function(key, action)
-                A.nvim_set_keymap(mode, key, action, p.re)
-            end,
-            nore = function(key, action)
-                A.nvim_set_keymap(mode, key, action, p.no)
-            end,
-            expr = function(key, action)
-                A.nvim_set_keymap(mode, key, action, p.ex)
-            end,
-        }, {
-            __call = function(this, key, action)
-                this.nore(key, action)
-            end,
-        })
-    end,
-})
-
 return U
