@@ -1,8 +1,8 @@
 local K = vim.keymap.set
 
 -- Count mappings
-K('n', '<Plug>(comment_toggle_linewise_count)', '<CMD>lua require("Comment.api").toggle_linewise_count()<CR>')
-K('n', '<Plug>(comment_toggle_blockwise_count)', '<CMD>lua require("Comment.api").toggle_blockwise_count()<CR>')
+K('n', '<Plug>(comment_toggle_linewise_count)', '<CMD>lua require("Comment.api").locked.toggle_linewise_count()<CR>')
+K('n', '<Plug>(comment_toggle_blockwise_count)', '<CMD>lua require("Comment.api").locked.toggle_blockwise_count()<CR>')
 
 -- Toggle mappings
 K(
@@ -24,10 +24,10 @@ K('n', '<Plug>(comment_toggle_blockwise)', '<CMD>lua require("Comment.api").call
 K(
     'x',
     '<Plug>(comment_toggle_linewise_visual)',
-    '<ESC><CMD>lua require("Comment.api").toggle_linewise_op(vim.fn.visualmode())<CR>'
+    '<ESC><CMD>lua require("Comment.api").locked.toggle_linewise_op(vim.fn.visualmode())<CR>'
 )
 K(
     'x',
     '<Plug>(comment_toggle_blockwise_visual)',
-    '<ESC><CMD>lua require("Comment.api").toggle_blockwise_op(vim.fn.visualmode())<CR>'
+    '<ESC><CMD>lua require("Comment.api").locked.toggle_blockwise_op(vim.fn.visualmode())<CR>'
 )
