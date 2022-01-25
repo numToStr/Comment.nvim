@@ -57,6 +57,7 @@ local L = {
     python = { M.hash }, -- Python doesn't have block comments
     php = { M.cxx_l, M.cxx_b },
     readline = { M.hash },
+    ruby = { M.hash },
     rust = { M.cxx_l, M.cxx_b },
     scala = { M.cxx_l, M.cxx_b },
     sh = { M.hash },
