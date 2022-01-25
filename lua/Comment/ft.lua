@@ -61,6 +61,7 @@ local L = {
     scala = { M.cxx_l, M.cxx_b },
     sh = { M.hash },
     sql = { M.dash, M.cxx_b },
+    svelte = { M.html_b, M.html_b },
     swift = { M.cxx_l, M.cxx_b },
     sxhkdrc = { M.hash },
     teal = { M.dash, M.dash_bracket },
