@@ -17,6 +17,7 @@ local M = {
 ---Lang table that contains commentstring (linewise/blockwise) for mutliple filetypes
 ---@type table { filetype = { linewise, blockwise } }
 local L = {
+    bash = { M.hash },
     bib = { M.latex },
     c = { M.cxx_l, M.cxx_b },
     cmake = { M.hash, '#[[%s]]' },
