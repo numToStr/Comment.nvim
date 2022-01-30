@@ -188,12 +188,26 @@ end
 -------------- ADDITIONAL API --------------
 --------------------------------------------
 
----Callback function to provide dot-repeat support and store last cursor position
+---Wraps API function with `lockmarks` to preserve marks while changing text/lines
+C.locked = setmetatable({}, {
+    __index = function(_, cb)
+        ---Actual function which will be attached to operatorfunc
+        ---@param vmode VMode
+        return function(vmode)
+            return A.nvim_command(string.format([[lockmarks lua require('Comment.api').%s("%s")]], cb, vmode))
+        end
+    end,
+})
+
+---Callback function which does the following
+---     1. Prevides dot-repeat support
+---     2. Preserves jumps and marks
+---     3. Store last cursor position
 ---NOTE: We are using `config` to store the position as it is a kinda global
 ---@param cb string Name of the API function to call
 function C.call(cb)
     local cfg = Config:get()
-    A.nvim_set_option('operatorfunc', "v:lua.require'Comment.api'." .. cb)
+    A.nvim_set_option('operatorfunc', string.format("v:lua.require'Comment.api'.locked.%s", cb))
     cfg.__pos = cfg.sticky and A.nvim_win_get_cursor(0)
 end
 
@@ -214,13 +228,13 @@ function C.setup(config)
             map(
                 'n',
                 cfg.toggler.line,
-                [[v:count == 0 ? '<CMD>lua require("Comment.api").call("toggle_current_linewise_op")<CR>g@$' : '<CMD>lua require("Comment.api").toggle_linewise_count()<CR>']],
+                [[v:count == 0 ? '<CMD>lua require("Comment.api").call("toggle_current_linewise_op")<CR>g@$' : '<CMD>lua require("Comment.api").locked.toggle_linewise_count()<CR>']],
                 expr
             )
             map(
                 'n',
                 cfg.toggler.block,
-                [[v:count == 0 ? '<CMD>lua require("Comment.api").call("toggle_current_blockwise_op")<CR>g@$' : '<CMD>lua require("Comment.api").toggle_blockwise_count()<CR>']],
+                [[v:count == 0 ? '<CMD>lua require("Comment.api").call("toggle_current_blockwise_op")<CR>g@$' : '<CMD>lua require("Comment.api").locked.toggle_blockwise_count()<CR>']],
                 expr
             )
             map('n', cfg.opleader.line, '<CMD>lua require("Comment.api").call("toggle_linewise_op")<CR>g@', map_opt)
@@ -230,22 +244,22 @@ function C.setup(config)
             map(
                 'x',
                 cfg.opleader.line,
-                '<ESC><CMD>lua require("Comment.api").toggle_linewise_op(vim.fn.visualmode())<CR>',
+                '<ESC><CMD>lua require("Comment.api").locked.toggle_linewise_op(vim.fn.visualmode())<CR>',
                 map_opt
             )
             map(
                 'x',
                 cfg.opleader.block,
-                '<ESC><CMD>lua require("Comment.api").toggle_blockwise_op(vim.fn.visualmode())<CR>',
+                '<ESC><CMD>lua require("Comment.api").locked.toggle_blockwise_op(vim.fn.visualmode())<CR>',
                 map_opt
             )
         end
 
         -- Extra Mappings
         if cfg.mappings.extra then
-            map('n', cfg.extra.below, '<CMD>lua require("Comment.api").insert_linewise_below()<CR>', map_opt)
-            map('n', cfg.extra.above, '<CMD>lua require("Comment.api").insert_linewise_above()<CR>', map_opt)
-            map('n', cfg.extra.eol, '<CMD>lua require("Comment.api").insert_linewise_eol()<CR>', map_opt)
+            map('n', cfg.extra.below, '<CMD>lua require("Comment.api").locked.insert_linewise_below()<CR>', map_opt)
+            map('n', cfg.extra.above, '<CMD>lua require("Comment.api").locked.insert_linewise_above()<CR>', map_opt)
+            map('n', cfg.extra.eol, '<CMD>lua require("Comment.api").locked.insert_linewise_eol()<CR>', map_opt)
         end
 
         -- Extended Mappings
@@ -260,11 +274,16 @@ function C.setup(config)
             map('n', 'g<b', '<CMD>lua require("Comment.api").call("uncomment_current_blockwise_op")<CR>g@$', map_opt)
 
             -- VISUAL mode extended
-            map('x', 'g>', '<ESC><CMD>lua require("Comment.api").comment_linewise_op(vim.fn.visualmode())<CR>', map_opt)
+            map(
+                'x',
+                'g>',
+                '<ESC><CMD>lua require("Comment.api").locked.comment_linewise_op(vim.fn.visualmode())<CR>',
+                map_opt
+            )
             map(
                 'x',
                 'g<',
-                '<ESC><CMD>lua require("Comment.api").uncomment_linewise_op(vim.fn.visualmode())<CR>',
+                '<ESC><CMD>lua require("Comment.api").locked.uncomment_linewise_op(vim.fn.visualmode())<CR>',
                 map_opt
             )
         end
