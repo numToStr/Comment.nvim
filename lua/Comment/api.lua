@@ -194,7 +194,9 @@ C.locked = setmetatable({}, {
         ---Actual function which will be attached to operatorfunc
         ---@param vmode VMode
         return function(vmode)
-            return A.nvim_command(('lockmarks lua require("Comment.api").%s("%s")'):format(cb, vmode))
+            return A.nvim_command(
+                ('lockmarks lua require("Comment.api").%s(%s)'):format(cb, vmode and ('%q'):format(vmode))
+            )
         end
     end,
 })
