@@ -63,23 +63,23 @@ These APIs powers the [extra-mappings](../README.md#extra-mappings) and also pro
 ---@param cfg? Config
 require('Comment.api').insert_linewise_below(cfg)
 
----Insert a blockwise-comment below
----@param cfg? Config
-require('Comment.api').insert_blockwise_below(cfg)
-
 ---Insert a linewise-comment above
 ---@param cfg? Config
 require('Comment.api').insert_linewise_above(cfg)
 
+---Insert a linewise-comment at the end-of-line
+---@param cfg? Config
+require('Comment.api').insert_linewise_eol(cfg)
+
 --######### BLOCKWISE #########--
+
+---Insert a blockwise-comment below
+---@param cfg? Config
+require('Comment.api').insert_blockwise_below(cfg)
 
 ---Insert a blockwise-comment above
 ---@param cfg? Config
 require('Comment.api').insert_blockwise_above(cfg)
-
----Insert a linewise-comment at the end-of-line
----@param cfg? Config
-require('Comment.api').insert_linewise_eol(cfg)
 
 ---Insert a blockwise-comment at the end-of-line
 ---@param cfg? Config
