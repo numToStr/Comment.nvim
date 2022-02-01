@@ -94,13 +94,20 @@ function ft.set(lang, val)
     return ft
 end
 
----Get a commentstring from the filtype List
+---Get a commentstring from the filtype list
 ---@param lang Lang
 ---@param ctype CType
 ---@return string
 function ft.get(lang, ctype)
-    local l = L[lang]
+    local l = ft.lang(lang)
     return l and l[ctype]
+end
+
+---Get the commentstring(s) from the filtype list
+---@param lang Lang
+---@return string
+function ft.lang(lang)
+    return L[lang]
 end
 
 ---Calculate commentstring w/ the power of treesitter
