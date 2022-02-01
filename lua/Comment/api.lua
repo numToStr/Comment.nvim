@@ -194,7 +194,7 @@ C.locked = setmetatable({}, {
         ---Actual function which will be attached to operatorfunc
         ---@param vmode VMode
         return function(vmode)
-            return A.nvim_command(string.format([[lockmarks lua require('Comment.api').%s("%s")]], cb, vmode))
+            return A.nvim_command(('lockmarks lua require("Comment.api").%s("%s")'):format(cb, vmode))
         end
     end,
 })
@@ -207,7 +207,7 @@ C.locked = setmetatable({}, {
 ---@param cb string Name of the API function to call
 function C.call(cb)
     local cfg = Config:get()
-    A.nvim_set_option('operatorfunc', string.format("v:lua.require'Comment.api'.locked.%s", cb))
+    A.nvim_set_option('operatorfunc', ("v:lua.require'Comment.api'.locked.%s"):format(cb))
     cfg.__pos = cfg.sticky and A.nvim_win_get_cursor(0)
 end
 
