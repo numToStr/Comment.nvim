@@ -213,7 +213,7 @@ These mappings are disabled by default. (config: `mappings.extended`)
 `gcw` - Toggle from the current cursor position to the next word
 `gc$` - Toggle from the current cursor position to the end of line
 `gc}` - Toggle until the next blank line
-`gc5l` - Toggle 5 lines after the current cursor position
+`gc5j` - Toggle 5 lines after the current cursor position
 `gc8k` - Toggle 8 lines before the current cursor position
 `gcip` - Toggle inside of paragraph
 `gca}` - Toggle around curly brackets
