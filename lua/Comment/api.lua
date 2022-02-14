@@ -225,14 +225,18 @@ function C.setup(config)
         -- Basic Mappings
         if cfg.mappings.basic then
             -- NORMAL mode mappings
-            K('n', cfg.toggler.line, function()
-                return vim.v.count == 0 and '<Plug>(comment_toggle_current_linewise)'
-                    or '<Plug>(comment_toggle_linewise_count)'
-            end, { expr = true, remap = true })
-            K('n', cfg.toggler.block, function()
-                return vim.v.count == 0 and '<Plug>(comment_toggle_current_blockwise)'
-                    or '<Plug>(comment_toggle_blockwise_count)'
-            end, { expr = true, remap = true })
+            K(
+                'n',
+                cfg.toggler.line,
+                "v:count == 0 ? '<Plug>(comment_toggle_current_linewise)' : '<Plug>(comment_toggle_linewise_count)'",
+                { expr = true, remap = true }
+            )
+            K(
+                'n',
+                cfg.toggler.block,
+                "v:count == 0 ? '<Plug>(comment_toggle_current_blockwise)' : '<Plug>(comment_toggle_blockwise_count)'",
+                { expr = true, remap = true }
+            )
 
             K('n', cfg.opleader.line, '<Plug>(comment_toggle_linewise)')
             K('n', cfg.opleader.block, '<Plug>(comment_toggle_blockwise)')
