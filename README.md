@@ -153,7 +153,7 @@ These mappings are enabled by default. (config: `mappings.basic`)
 `[count]gcc` - Toggles the number of line given as a prefix-count using linewise
 `[count]gbc` - Toggles the number of line given as a prefix-count using blockwise
 `gc[count]{motion}` - (Op-pending) Toggles the region using linewise comment
-`gb[count]{motion}` - (Op-pending) Toggles the region using linewise comment
+`gb[count]{motion}` - (Op-pending) Toggles the region using blockwise comment
 ```
 
 <a id="count-prefix">
