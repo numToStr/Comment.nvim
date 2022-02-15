@@ -12,7 +12,8 @@ local M = {
     fsharp_b = '(*%s*)',
     html = '<!--%s-->',
     latex = '%%s',
-    lisp = ';;%s',
+    lisp_l = ';;%s',
+    lisp_b = '#|%s|#',
 }
 
 ---Lang table that contains commentstring (linewise/blockwise) for mutliple filetypes
@@ -30,7 +31,7 @@ local L = {
     dhall = { M.dash, M.haskell_b },
     dot = { M.cxx_l, M.cxx_b },
     elm = { M.dash, M.haskell_b },
-    fennel = { M.lisp },
+    fennel = { M.lisp_l },
     fish = { M.hash },
     fsharp = { M.cxx_l, M.fsharp_b },
     gdb = { M.hash },
@@ -48,7 +49,7 @@ local L = {
     jsonc = { M.cxx_l },
     julia = { M.hash, '#=%s=#' },
     lidris = { M.dash, M.haskell_b },
-    lisp = { M.lisp },
+    lisp = { M.lisp_l, M.lisp_b },
     lua = { M.dash, M.dash_bracket },
     markdown = { M.html, M.html },
     make = { M.hash },
@@ -64,7 +65,7 @@ local L = {
     ruby = { M.hash },
     rust = { M.cxx_l, M.cxx_b },
     scala = { M.cxx_l, M.cxx_b },
-    scheme = { M.lisp },
+    scheme = { M.lisp_l, M.lisp_b },
     sh = { M.hash },
     sql = { M.dash, M.cxx_b },
     svelte = { M.html, M.html },
