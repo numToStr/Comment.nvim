@@ -35,6 +35,7 @@ local L = {
     fish = { M.hash },
     fsharp = { M.cxx_l, M.fsharp_b },
     gdb = { M.hash },
+    gleam = { M.cxx_l },
     go = { M.cxx_l, M.cxx_b },
     graphql = { M.hash },
     groovy = { M.cxx_l, M.cxx_b },
