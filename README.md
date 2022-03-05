@@ -156,10 +156,6 @@ These mappings are enabled by default. (config: `mappings.basic`)
 `gb[count]{motion}` - (Op-pending) Toggles the region using blockwise comment
 ```
 
-<a id="count-prefix">
-
-> NOTE: Dot repeat is not supported with `[count]gcc` and `[count]gbc`
-
 - VISUAL mode
 
 ```help
