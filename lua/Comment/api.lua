@@ -35,7 +35,15 @@ end
 ---Toggle linewise-comment over multiple lines using `vim.v.count`
 ---@param cfg? Config
 function C.toggle_linewise_count(cfg)
-    Op.count(vim.v.count, cfg or Config:get(), U.ctype.line)
+    local c = Config:get()
+    Op.count(c.__count or vim.v.count, cfg or c, U.ctype.line)
+end
+
+---@private
+---(Operator-Pending) Toggle linewise-comment over using `vim.v.count`
+---@param cfg? Config
+function C.toggle_linewise_count_op(_, cfg)
+    C.toggle_linewise_count(cfg)
 end
 
 --######### BLOCKWISE #########--
@@ -63,7 +71,15 @@ end
 ---Toggle blockwise-comment over multiple lines using `vim.v.count`
 ---@param cfg? Config
 function C.toggle_blockwise_count(cfg)
-    Op.count(vim.v.count, cfg or Config:get(), U.ctype.block)
+    local c = Config:get()
+    Op.count(c.__count or vim.v.count, cfg or c, U.ctype.block)
+end
+
+---@private
+---(Operator-Pending) Toggle blockwise-comment over `vim.v.count`
+---@param cfg? Config
+function C.toggle_blockwise_count_op(_, cfg)
+    C.toggle_blockwise_count(cfg)
 end
 
 ---------------------------------------
@@ -211,6 +227,7 @@ function C.call(cb)
     local cfg = Config:get()
     A.nvim_set_option('operatorfunc', ("v:lua.require'Comment.api'.locked.%s"):format(cb))
     cfg.__pos = cfg.sticky and A.nvim_win_get_cursor(0)
+    cfg.__count = vim.v.count
 end
 
 ---Configures the whole plugin

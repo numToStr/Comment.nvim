@@ -1,8 +1,16 @@
 local K = vim.keymap.set
 
 -- Count mappings
-K('n', '<Plug>(comment_toggle_linewise_count)', '<CMD>lua require("Comment.api").locked.toggle_linewise_count()<CR>')
-K('n', '<Plug>(comment_toggle_blockwise_count)', '<CMD>lua require("Comment.api").locked.toggle_blockwise_count()<CR>')
+K(
+    'n',
+    '<Plug>(comment_toggle_linewise_count)',
+    '<CMD>lua require("Comment.api").call("toggle_linewise_count_op")<CR>g@$'
+)
+K(
+    'n',
+    '<Plug>(comment_toggle_blockwise_count)',
+    '<CMD>lua require("Comment.api").call("toggle_blockwise_count_op")<CR>g@$'
+)
 
 -- Toggle mappings
 K(
