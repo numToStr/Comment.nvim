@@ -56,6 +56,7 @@ local L = {
     make = { M.hash },
     mbsyncrc = { M.double_hash },
     meson = { M.hash },
+    norg = { "+%s+" }, -- blockwise comments work unexpected
     nix = { M.hash, M.cxx_b },
     ocaml = { M.fsharp_b, M.fsharp_b },
     plantuml = { "'%s", "/'%s'/" },
