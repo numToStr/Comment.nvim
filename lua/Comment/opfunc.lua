@@ -100,7 +100,7 @@ end
 ---@return integer CMode
 function O.linewise(p)
     local lcs_esc, rcs_esc = U.escape(p.lcs), U.escape(p.rcs)
-    local pattern = U.get_pattern(p.cfg.ignore)
+    local pattern = U.is_fn(p.cfg.ignore)
     local padding, pp = U.get_padding(p.cfg.padding)
     local is_commented = U.is_commented(lcs_esc, rcs_esc, pp)
 

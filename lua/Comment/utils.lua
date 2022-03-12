@@ -93,17 +93,13 @@ function U.escape(str)
 end
 
 ---Call a function if exists
----@param fn function Hook function
+---@param fn function Wanna be function
 ---@return boolean|string
 function U.is_fn(fn, ...)
-    return type(fn) == 'function' and fn(...)
-end
-
----Helper to compute the ignore pattern
----@param ig string|function
----@return boolean|string
-function U.get_pattern(ig)
-    return ig and (type(ig) == 'string' and ig or U.is_fn(ig))
+    if type(fn) == 'function' then
+        return fn(...)
+    end
+    return fn
 end
 
 ---Check if the given line is ignored or not with the given pattern
