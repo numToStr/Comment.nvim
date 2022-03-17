@@ -66,11 +66,11 @@ end
 
 ---Helper to get padding (I was tired to check this everywhere)
 ---NOTE: We can also use function to calculate padding if someone wants more spacing
----@param flag boolean
+---@param flag boolean|fun():boolean
 ---@return string string Padding chars
 ---@return string string Padding pattern
 function U.get_padding(flag)
-    if not flag then
+    if not U.is_fn(flag) then
         return '', ''
     end
     return ' ', '%s?'
