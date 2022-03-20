@@ -67,7 +67,7 @@ Following are the **default** config for the [`setup()`](#setup). If you want to
 ```lua
 {
     ---Add a space b/w comment and the line
-    ---@type boolean
+    ---@type boolean|fun():boolean
     padding = true,
 
     ---Whether the cursor should stay at its position

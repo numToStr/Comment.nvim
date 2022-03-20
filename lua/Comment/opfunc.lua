@@ -1,7 +1,8 @@
 local U = require('Comment.utils')
+local Config = require('Comment.config')
 local A = vim.api
 
-local O = {}
+local Op = {}
 
 ---@alias VMode '"line"'|'"char"'|'"v"'|'"V"' Vim Mode. Read `:h map-operator`
 
@@ -27,7 +28,7 @@ local O = {}
 ---@param cmode CMode
 ---@param ctype CType
 ---@param cmotion CMotion
-function O.opfunc(vmode, cfg, cmode, ctype, cmotion)
+function Op.opfunc(vmode, cfg, cmode, ctype, cmotion)
     -- comment/uncomment logic
     --
     -- 1. type == line
@@ -75,11 +76,11 @@ function O.opfunc(vmode, cfg, cmode, ctype, cmotion)
     }
 
     if block_x then
-        ctx.cmode = O.blockwise_x(params)
+        ctx.cmode = Op.blockwise_x(params)
     elseif ctype == U.ctype.block and not same_line then
-        ctx.cmode = O.blockwise(params, partial_block)
+        ctx.cmode = Op.blockwise(params, partial_block)
     else
-        ctx.cmode = O.linewise(params)
+        ctx.cmode = Op.linewise(params)
     end
 
     -- We only need to restore cursor if both sticky and position are available
@@ -87,9 +88,9 @@ function O.opfunc(vmode, cfg, cmode, ctype, cmotion)
     --
     -- And I found out that if someone presses `gc` but doesn't provide operators and
     -- does visual comments then cursor jumps to previous stored position. Thus the check for visual modes
-    if cfg.sticky and cfg.__pos and cmotion ~= U.cmotion.v and cmotion ~= U.cmotion.V then
-        A.nvim_win_set_cursor(0, cfg.__pos)
-        cfg.__pos = nil
+    if cfg.sticky and Config.position and cmotion ~= U.cmotion.v and cmotion ~= U.cmotion.V then
+        A.nvim_win_set_cursor(0, Config.position)
+        Config.position = nil
     end
 
     U.is_fn(cfg.post_hook, ctx)
@@ -98,7 +99,7 @@ end
 ---Linewise commenting
 ---@param p OpFnParams
 ---@return integer CMode
-function O.linewise(p)
+function Op.linewise(p)
     local lcs_esc, rcs_esc = U.escape(p.lcs), U.escape(p.rcs)
     local pattern = U.is_fn(p.cfg.ignore)
     local padding, pp = U.get_padding(p.cfg.padding)
@@ -161,7 +162,7 @@ end
 ---@param p OpFnParams
 ---@param partial boolean Whether to do a partial or full comment
 ---@return integer CMode
-function O.blockwise(p, partial)
+function Op.blockwise(p, partial)
     -- Block wise, only when there are more than 1 lines
     local sln, eln = p.lines[1], p.lines[#p.lines]
     local lcs_esc, rcs_esc = U.escape(p.lcs), U.escape(p.rcs)
@@ -210,7 +211,7 @@ end
 ---Blockwise (left-right/x-axis motion) commenting
 ---@param p OpFnParams
 ---@return integer CMode
-function O.blockwise_x(p)
+function Op.blockwise_x(p)
     local line = p.lines[1]
     local first = line:sub(0, p.range.scol)
     local mid = line:sub(p.range.scol + 1, p.range.ecol + 1)
@@ -243,7 +244,7 @@ end
 ---@param count integer Number of lines
 ---@param cfg Config
 ---@param ctype CType
-function O.count(count, cfg, ctype)
+function Op.count(count, cfg, ctype)
     local lines, range = U.get_count_lines(count)
 
     ---@type Ctx
@@ -266,12 +267,12 @@ function O.count(count, cfg, ctype)
     }
 
     if ctype == U.ctype.block then
-        ctx.cmode = O.blockwise(params)
+        ctx.cmode = Op.blockwise(params)
     else
-        ctx.cmode = O.linewise(params)
+        ctx.cmode = Op.linewise(params)
     end
 
     U.is_fn(cfg.post_hook, ctx)
 end
 
-return O
+return Op
