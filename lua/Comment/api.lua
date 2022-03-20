@@ -1,7 +1,7 @@
 local U = require('Comment.utils')
 local Ex = require('Comment.extra')
 local Op = require('Comment.opfunc')
-local Config = require('Comment.config'):new()
+local Config = require('Comment.config')
 local A = vim.api
 
 local C = {}
@@ -35,8 +35,7 @@ end
 ---Toggle linewise-comment over multiple lines using `vim.v.count`
 ---@param cfg? Config
 function C.toggle_linewise_count(cfg)
-    local c = Config:get()
-    Op.count(c.__count or vim.v.count, cfg or c, U.ctype.line)
+    Op.count(Config.count or vim.v.count, cfg or Config:get(), U.ctype.line)
 end
 
 ---@private
@@ -71,8 +70,7 @@ end
 ---Toggle blockwise-comment over multiple lines using `vim.v.count`
 ---@param cfg? Config
 function C.toggle_blockwise_count(cfg)
-    local c = Config:get()
-    Op.count(c.__count or vim.v.count, cfg or c, U.ctype.block)
+    Op.count(Config.count or vim.v.count, cfg or Config:get(), U.ctype.block)
 end
 
 ---@private
@@ -224,10 +222,9 @@ C.locked = setmetatable({}, {
 ---NOTE: We are using `config` to store the position as it is a kinda global
 ---@param cb string Name of the API function to call
 function C.call(cb)
-    local cfg = Config:get()
     A.nvim_set_option('operatorfunc', ("v:lua.require'Comment.api'.locked.%s"):format(cb))
-    cfg.__pos = cfg.sticky and A.nvim_win_get_cursor(0)
-    cfg.__count = vim.v.count
+    Config.position = Config:get().sticky and A.nvim_win_get_cursor(0)
+    Config.count = vim.v.count
 end
 
 ---Configures the whole plugin

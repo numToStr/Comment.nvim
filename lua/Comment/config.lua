@@ -43,15 +43,14 @@
 ---@field extra ExtraMapping
 ---@field pre_hook fun(ctx: Ctx):string Function to be called before comment/uncomment
 ---@field post_hook fun(ctx:Ctx) Function to be called after comment/uncomment
----@field __pos number[] To be used to restore cursor position
----@field __count number Helps with dot-repeat support for count prefix
 
 ---@class RootConfig
 ---@field config Config
-local Config = {}
-
-function Config.default()
-    return {
+---@field position number[] To be used to restore cursor position
+---@field count number Helps with dot-repeat support for count prefix
+local Config = {
+    state = {},
+    config = {
         padding = true,
         sticky = true,
         mappings = {
@@ -72,14 +71,8 @@ function Config.default()
             below = 'gco',
             eol = 'gcA',
         },
-    }
-end
-
----Creates a new config instance
----@return RootConfig
-function Config:new()
-    return setmetatable({ config = self.default() }, { __index = self })
-end
+    },
+}
 
 ---Update the config
 ---@param cfg Config
@@ -97,4 +90,11 @@ function Config:get()
     return self.config
 end
 
-return Config
+return setmetatable(Config, {
+    __index = function(this, k)
+        return this.state[k]
+    end,
+    __newindex = function(this, k, v)
+        this.state[k] = v
+    end,
+})
