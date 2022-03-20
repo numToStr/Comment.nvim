@@ -67,9 +67,17 @@ function E.insert_eol(ctype, cfg)
     local padding = U.get_padding(cfg.padding)
 
     -- NOTE:
-    -- 1. Python is the only language that recommends 2 spaces between the statement and the comment
-    -- 2. Other than that, I am assuming that the users wants a space b/w the end of line and start of the comment
-    local space = vim.bo.filetype == 'python' and '  ' or ' '
+    -- 1. If the line is empty, don't put any space in front of the comment
+    -- 2. Python is the only language that recommends 2 spaces between the statement and the comment
+    -- 3. Other than that, I am assuming that the users wants a space b/w the end of line and start of the comment
+    local space
+    if line:match('^$') then
+        space = ''
+    elseif vim.bo.filetype == 'python' then
+        space = '  '
+    else
+        space = ' '
+    end
     local ll = line .. space .. lcs .. padding
 
     -- We need RHS of cstr, if we are doing block comments or if RHS exists
