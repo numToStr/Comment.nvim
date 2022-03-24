@@ -1,45 +1,57 @@
 local J = {
     comment = '{/*%s*/}',
-    valid = { 'jsx_element', 'jsx_fragment', 'jsx_text', '<', '>' },
 }
 
-local function is_jsx_tree(lang)
+local query = [[
+    ; If somehow we can group all the attributes into one
+    (jsx_opening_element [(jsx_attribute) (comment)] @nojsx)
+
+    ; If somehow we can group all the comments into one
+    (jsx_expression (comment)) @jsx
+
+    (jsx_expression
+        [(object) (call_expression)] @nojsx)
+
+    (parenthesized_expression
+        [(jsx_fragment) (jsx_element)] @jsx)
+
+    (return_statement
+        [(jsx_fragment) (jsx_element)] @jsx)
+]]
+
+local function is_jsx(lang)
     -- Name of the treesitter parsers that supports jsx syntax
     return lang == 'tsx' or lang == 'javascript'
 end
 
-local function is_jsx_node(node)
-    if not node then
-        return false
-    end
-    return vim.tbl_contains(J.valid, node:type())
-end
+local function capture(parser, range)
+    local lang = parser:lang()
 
-local function capture(child, range)
-    local lang = child:lang()
-
-    local rng = {
-        range.srow - 1,
-        range.scol,
-        range.erow - 1,
-        range.ecol,
-    }
-
-    if not (is_jsx_tree(lang) and child:contains(rng)) then
+    if not is_jsx(lang) then
         return
     end
 
-    for _, tree in ipairs(child:trees()) do
-        local root = tree:root()
-        local node = root:descendant_for_range(unpack(rng))
-        local srow, _, erow = node:range()
-        if srow <= range.srow - 1 and erow >= range.erow - 1 then
-            local nxt, prev = node:next_sibling(), node:prev_sibling()
-            if is_jsx_node(prev) or is_jsx_node(node) or is_jsx_node(nxt) then
-                return J.comment
+    local Q = vim.treesitter.query.parse_query(lang, query)
+
+    local lines, group
+
+    for _, tree in ipairs(parser:trees()) do
+        for id, node in Q:iter_captures(tree:root(), parser:source(), range.srow - 1, range.erow) do
+            local srow, _, erow = node:range()
+            -- print(Q.captures[id])
+            -- print(srow, range.srow - 1)
+            -- print(erow, range.erow - 1)
+            -- print(srow <= range.srow - 1 and erow >= range.erow - 1)
+            if srow <= range.srow - 1 and erow >= range.erow - 1 then
+                local region = erow - srow
+                if not lines or region < lines then
+                    lines, group = region, Q.captures[id]
+                end
             end
         end
     end
+
+    return group == 'jsx' and J.comment
 end
 
 function J.calculate(ctx)
@@ -49,14 +61,27 @@ function J.calculate(ctx)
         return
     end
 
+    local rng = {
+        ctx.range.srow - 1,
+        ctx.range.scol,
+        ctx.range.erow - 1,
+        ctx.range.ecol,
+    }
+
+    -- This is for `markdown` which embeds multiple `tsx` blocks
     for _, child in pairs(P:children()) do
-        local captured = capture(child, ctx.range)
-        if captured then
-            return captured
+        if child:contains(rng) then
+            local captured = capture(child, ctx.range)
+            if captured then
+                return captured
+            end
         end
     end
 
-    return capture(P, ctx.range)
+    if P:contains(rng) then
+        -- This is for `tsx` itself
+        return capture(P, ctx.range)
+    end
 end
 
 return J

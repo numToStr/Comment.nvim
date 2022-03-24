@@ -32,6 +32,12 @@ const Yoo = () => {
         >
           hello
         </p>
+        <div>
+          {getUser({
+            name: "numToStr",
+            job: "making plugins",
+          })}
+        </div>
       </section>
     </div>
   );
