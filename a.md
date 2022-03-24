@@ -17,6 +17,8 @@ const Yoo = () => {
       <section>
         <p>hello</p>
         <p
+          he="llo"
+          wor="ld"
           attr={{
             ...window,
             hello: () => {
