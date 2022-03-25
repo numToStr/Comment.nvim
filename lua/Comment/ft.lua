@@ -138,7 +138,6 @@ function ft.calculate(ctx)
 
     for lang, tree in pairs(langtree:children()) do
         if tree:contains(range) then
-            -- If the language is in range but commentstring is not found, then fallback to filetype commentstring
             return ft.get(lang, ctx.ctype) or default
         end
     end
