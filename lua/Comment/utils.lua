@@ -116,8 +116,8 @@ end
 ---@return CRange
 function U.get_region(vmode)
     if not vmode then
-        local row, col = unpack(A.nvim_win_get_cursor(0))
-        return { srow = row, scol = col, erow = row, ecol = col }
+        local row = unpack(A.nvim_win_get_cursor(0))
+        return { srow = row, scol = 0, erow = row, ecol = 0 }
     end
 
     local m = A.nvim_buf_get_mark
