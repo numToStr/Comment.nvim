@@ -117,32 +117,41 @@ function ft.lang(lang)
     return L[lang]
 end
 
+---Get the commenstring by walking the tree recursively
+---NOTE: This ignores `comment` parser as this is useless
+---@param tree userdata Tree to be walked
+---@param range number[] Range to check for
+---@return userdata
+function ft.contains(tree, range)
+    for lang, child in pairs(tree:children()) do
+        if lang ~= 'comment' and child:contains(range) then
+            return ft.contains(child, range)
+        end
+    end
+
+    return tree
+end
+
 ---Calculate commentstring w/ the power of treesitter
 ---@param ctx Ctx
 ---@return string
 function ft.calculate(ctx)
     local buf = A.nvim_get_current_buf()
-    local ok, langtree = pcall(vim.treesitter.get_parser, buf)
+    local ok, parser = pcall(vim.treesitter.get_parser, buf)
     local default = ft.get(A.nvim_buf_get_option(buf, 'filetype'), ctx.ctype)
 
     if not ok then
         return default
     end
 
-    local range = {
+    local lang = ft.contains(parser, {
         ctx.range.srow - 1,
         ctx.range.scol,
         ctx.range.erow - 1,
         ctx.range.ecol,
-    }
+    }):lang()
 
-    for lang, tree in pairs(langtree:children()) do
-        if tree:contains(range) then
-            return ft.get(lang, ctx.ctype) or default
-        end
-    end
-
-    return default
+    return ft.get(lang, ctx.ctype) or default
 end
 
 return setmetatable(ft, {
