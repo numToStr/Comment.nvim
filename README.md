@@ -226,7 +226,9 @@ These mappings are disabled by default. (config: `mappings.extended`)
 
 ### ⚙️ API
 
-Read [doc/API.md](./doc/API.md) to see all the API/functions that are exported from the plugin.
+- [Plug Mappings](./doc/plugs.md) - Excellent for creating custom keybindings
+
+- [Lua API](./doc/API.md) - Details the Lua API. Great for making custom comment function.
 
 <a id="treesitter"></a>
 
