@@ -20,9 +20,10 @@
 -- [x] Disable `extra` mapping by default
 -- [x] Provide more arguments to pre and post hooks
 -- [x] `ignore` as a function
+-- [x] Return the operator's starting and ending position in pre and post hook
+-- [x] Restore cursor position in some motion operator (try `gcip`)
 -- [ ] Doc comment ie. /** */ (for js)
 -- [ ] Header comment
--- [ ] Dot support for `[count]gcc`
 
 -- FIXME
 -- [x] visual mode not working correctly
@@ -37,20 +38,19 @@
 -- [x] Optimize blockwise mode (just modifiy the start and end line)
 -- [x] Weird commenting when the first line is empty and the whole is indented
 -- [x] no padding support in block-x
--- [ ] Dot repeat support for visual mode mappings
--- [ ] Weird comments, if you do comments on already commented lines incl. an extra empty line
 
 -- THINK:
--- [x] Should i return the operator's starting and ending position in pre-hook
--- [x] Restore cursor position in some motion operator (try `gcip`)
--- 3. It is possible that, commentstring is updated inside pre-hook as we want to use it but we can't
---    bcz the filetype is also present in the lang-table (and it has high priority than vim.bo.commentstring)
--- 4. When there is an uncommented empty line b/w two commented blocks. It should uncomment instead of commenting again in toggle.
--- 5. Conflict when uncommenting interchangebly with line/block wise comment
--- 6. `ignore` is missing in blockwise and blockwise_x but on the other hand this doesn't make much sense
--- 7. Parse `comments` if block comment is missing in the plugin
+-- [ ] Dot support for `[count]gcc` and `[count]gbc`
+-- [ ] Parse `comments` if block comment is missing in the plugin
+
+-- ITS_OK:
+-- 1. Weird comments, if you do comments on already commented lines incl. an extra empty line
+-- 2. Conflict when uncommenting interchangebly with line/block wise comment
+-- 3. `ignore` doesn't work in blockwise and blockwise_x
+-- 4. When a empty line is b/w two commented blocks then it should uncomment instead of commenting again in toggle.
 
 -- DROPPED:
--- Insert mode mapping (also move the cursor after commentstring)
--- Use `nvim_buf_get_text` instead of `nvim_buf_get_lines`. Blocked by https://github.com/neovim/neovim/pull/15181
--- Use `nvim_buf_set_text` instead of `nvim_buf_set_lines`
+-- 1. Insert mode mapping (also move the cursor after commentstring)
+-- 2. Use `nvim_buf_get_text` instead of `nvim_buf_get_lines`. Blocked by https://github.com/neovim/neovim/pull/15181
+-- 3. Use `nvim_buf_set_text` instead of `nvim_buf_set_lines`
+-- 4. Dot repeat support for visual mode mappings (Doesn't make sense)

@@ -63,23 +63,23 @@ These APIs powers the [extra-mappings](../README.md#extra-mappings) and also pro
 ---@param cfg? Config
 require('Comment.api').insert_linewise_below(cfg)
 
----Insert a blockwise-comment below
----@param cfg? Config
-require('Comment.api').insert_blockwise_below(cfg)
-
 ---Insert a linewise-comment above
 ---@param cfg? Config
 require('Comment.api').insert_linewise_above(cfg)
 
+---Insert a linewise-comment at the end-of-line
+---@param cfg? Config
+require('Comment.api').insert_linewise_eol(cfg)
+
 --######### BLOCKWISE #########--
+
+---Insert a blockwise-comment below
+---@param cfg? Config
+require('Comment.api').insert_blockwise_below(cfg)
 
 ---Insert a blockwise-comment above
 ---@param cfg? Config
 require('Comment.api').insert_blockwise_above(cfg)
-
----Insert a linewise-comment at the end-of-line
----@param cfg? Config
-require('Comment.api').insert_linewise_eol(cfg)
 
 ---Insert a blockwise-comment at the end-of-line
 ---@param cfg? Config
@@ -158,37 +158,31 @@ require('Comment.api').call(cb)
 Following are some example keybindings using the APIs.
 
 ```lua
-local function map(mode, lhs, rhs)
-    vim.api.nvim_set_keymap(mode, lhs, rhs, { noremap = true, silent = true })
-end
-
----
-
 -- # NORMAL mode
 
 -- Linewise toggle current line using C-/
-map('n', '<C-_>', '<CMD>lua require("Comment.api").toggle_current_linewise()<CR>')
+vim.keymap.set('n', '<C-_>', '<CMD>lua require("Comment.api").toggle_current_linewise()<CR>')
 -- or with dot-repeat support
--- map('n', '<C-_>', '<CMD>lua require("Comment.api").call("toggle_current_linewise_op")<CR>g@$')
+-- vim.keymap.set('n', '<C-_>', '<CMD>lua require("Comment.api").call("toggle_current_linewise_op")<CR>g@$')
 
 -- Blockwise toggle current line using C-\
-map('n', '<C-\\>', '<CMD>lua require("Comment.api").toggle_current_blockwise()<CR>')
+vim.keymap.set('n', '<C-\\>', '<CMD>lua require("Comment.api").toggle_current_blockwise()<CR>')
 -- or with dot-repeat support
--- map('n', '<C-\\>', '<CMD>lua require("Comment.api").call("toggle_current_blockwise_op")<CR>g@$')
+-- vim.keymap.set('n', '<C-\\>', '<CMD>lua require("Comment.api").call("toggle_current_blockwise_op")<CR>g@$')
 
 -- Linewise toggle multiple line using <leader>gc with dot-repeat support
 -- Example: <leader>gc3j will comment 4 lines
-map('n', '<leader>gc', '<CMD>lua require("Comment.api").call("toggle_linewise_op")<CR>g@')
+vim.keymap.set('n', '<leader>gc', '<CMD>lua require("Comment.api").call("toggle_linewise_op")<CR>g@')
 
 -- Blockwise toggle multiple line using <leader>gc with dot-repeat support
 -- Example: <leader>gb3j will comment 4 lines
-map('n', '<leader>gb', '<CMD>lua require("Comment.api").call("toggle_blockwise_op")<CR>g@')
+vim.keymap.set('n', '<leader>gb', '<CMD>lua require("Comment.api").call("toggle_blockwise_op")<CR>g@')
 
 -- # VISUAL mode
 
 -- Linewise toggle using C-/
-map('x', '<C-_>', '<ESC><CMD>lua require("Comment.api").toggle_linewise_op(vim.fn.visualmode())<CR>')
+vim.keymap.set('x', '<C-_>', '<ESC><CMD>lua require("Comment.api").toggle_linewise_op(vim.fn.visualmode())<CR>')
 
 -- Blockwise toggle using <leader>gb
-map('x', '<leader>gb', '<ESC><CMD>lua require("Comment.api").toggle_blockwise_op(vim.fn.visualmode())<CR>')
+vim.keymap.set('x', '<leader>gb', '<ESC><CMD>lua require("Comment.api").toggle_blockwise_op(vim.fn.visualmode())<CR>')
 ```

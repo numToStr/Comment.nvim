@@ -111,7 +111,8 @@ Following are the **default** config for the [`setup()`](#setup). If you want to
     },
 
     ---Create basic (operator-pending) and extended mappings for NORMAL + VISUAL mode
-    ---@type table
+    ---NOTE: If `mappings = false` then the plugin won't create any mappings
+    ---@type boolean|table
     mappings = {
         ---Operator-pending mapping
         ---Includes `gcc`, `gbc`, `gc[count]{motion}` and `gb[count]{motion}`
@@ -225,7 +226,9 @@ These mappings are disabled by default. (config: `mappings.extended`)
 
 ### ⚙️ API
 
-Read [doc/API.md](./doc/API.md) to see all the API/functions that are exported from the plugin.
+- [Plug Mappings](./doc/plugs.md) - Excellent for creating custom keybindings
+
+- [Lua API](./doc/API.md) - Details the Lua API. Great for making custom comment function.
 
 <a id="treesitter"></a>
 
