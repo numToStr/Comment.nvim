@@ -260,7 +260,7 @@ There are two hook methods i.e `pre_hook` and `post_hook` which are called befor
         if vim.bo.filetype == 'typescriptreact' then
             local U = require('Comment.utils')
 
-            -- Detemine whether to use linewise or blockwise commentstring
+            -- Determine whether to use linewise or blockwise commentstring
             local type = ctx.ctype == U.ctype.line and '__default' or '__multiline'
 
             -- Determine the location where to calculate commentstring from
