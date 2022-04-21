@@ -234,7 +234,7 @@ function C.setup(config)
     local cfg = Config:set(config):get()
 
     if cfg.mappings then
-        local K = vim.keymap.set
+        local K = vim.api.nvim_keymap_set
 
         -- Basic Mappings
         if cfg.mappings.basic then
