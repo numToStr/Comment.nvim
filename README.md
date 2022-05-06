@@ -238,6 +238,7 @@ This plugin has native **treesitter** support for calculating `commentstring` wh
 
 1. No `jsx/tsx` support. Its implementation was quite complicated.
 2. Invalid comment on the region where one language ends and the other starts. [Read more](https://github.com/numToStr/Comment.nvim/pull/62#issuecomment-972790418)
+3. Unexpected comment on a line with multiple languages. [#144](https://github.com/numToStr/Comment.nvim/issues/144)
 
 For advance use cases, use [nvim-ts-context-commentstring](https://github.com/JoosepAlviste/nvim-ts-context-commentstring). See [`pre_hook`](#pre-hook) section for the integration.
 
