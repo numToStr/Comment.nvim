@@ -22,6 +22,7 @@ local L = {
     bash = { M.hash },
     bib = { M.latex },
     c = { M.cxx_l, M.cxx_b },
+    cabal = { M.dash },
     cmake = { M.hash, '#[[%s]]' },
     conf = { M.hash },
     conkyrc = { M.dash, M.dash_bracket },
