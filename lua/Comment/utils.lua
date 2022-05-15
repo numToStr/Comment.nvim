@@ -1,44 +1,51 @@
+---@mod comment.utils Utilities
+
 local A = vim.api
 
 local U = {}
 
----Range of the selection that needs to be commented
----@class CRange
+---@alias CommentLines string[] List of lines inside the start and end index
+
+---@class CommentRange Range of the selection that needs to be commented
 ---@field srow number Starting row
 ---@field scol number Starting column
 ---@field erow number Ending row
 ---@field ecol number Ending column
 
----@alias CLines string[] List of lines inside the start and end index
-
----Comment modes - Can be manual or computed in operator-pending phase
----@class CMode
+---@class CommentMode Comment modes - Can be manual or computed via operator-mode
 ---@field toggle number Toggle action
 ---@field comment number Comment action
 ---@field uncomment number Uncomment action
+
+---An object containing comment modes
+---@type CommentMode
 U.cmode = {
     toggle = 0,
     comment = 1,
     uncomment = 2,
 }
 
----Comment string types
----@class CType
+---@class CommentType Comment types
 ---@field line number Use linewise commentstring
 ---@field block number Use blockwise commentstring
+
+---An object containing comment types
+---@type CommentType
 U.ctype = {
     line = 1,
     block = 2,
 }
 
----Comment motion types
----@class CMotion
----@field _ number Compute from vim mode (@see VMode)
+---@class CommentMotion Comment motion types
+---@field private _ number Compute from vim mode. See |OpMode|
 ---@field line number Line motion (ie. `gc2j`)
 ---@field char number Character/left-right motion (ie. `gc2j`)
 ---@field block number Visual operator-pending motion
 ---@field v number Visual motion
 ---@field V number Visual-line motion
+
+---An object containing comment motions
+---@type CommentMotion
 U.cmotion = {
     _ = 0,
     line = 1,
@@ -64,8 +71,8 @@ function U.grab_indent(s)
     return indent, len
 end
 
----Helper to get padding (I was tired to check this everywhere)
----NOTE: We can also use function to calculate padding if someone wants more spacing
+---Helper to get padding character and regex pattern
+---NOTE: Use a function for conditional padding
 ---@param flag boolean|fun():boolean
 ---@return string string Padding chars
 ---@return string string Padding pattern
@@ -111,11 +118,11 @@ function U.ignore(ln, pat)
 end
 
 ---Get region for line movement or visual selection
----NOTE: Returns the current line, if `vmode` is not given.
----@param vmode? VMode
----@return CRange
-function U.get_region(vmode)
-    if not vmode then
+---NOTE: Returns the current line region, if `opmode` is not given.
+---@param opmode? OpMode
+---@return CommentRange
+function U.get_region(opmode)
+    if not opmode then
         local row = unpack(A.nvim_win_get_cursor(0))
         return { srow = row, scol = 0, erow = row, ecol = 0 }
     end
@@ -124,7 +131,7 @@ function U.get_region(vmode)
     local buf = 0
     local sln, eln
 
-    if vmode:match('[vV]') then
+    if string.match(opmode, '[vV]') then
         sln, eln = m(buf, '<'), m(buf, '>')
     else
         sln, eln = m(buf, '['), m(buf, ']')
@@ -135,8 +142,8 @@ end
 
 ---Get lines from the current position to the given count
 ---@param count number
----@return CLines
----@return CRange
+---@return CommentLines
+---@return CommentRange
 function U.get_count_lines(count)
     local pos = A.nvim_win_get_cursor(0)
     local srow = pos[1]
@@ -147,8 +154,8 @@ function U.get_count_lines(count)
 end
 
 ---Get lines from a NORMAL/VISUAL mode
----@param range CRange
----@return CLines
+---@param range CommentRange
+---@return CommentLines
 function U.get_lines(range)
     -- If start and end is same, then just return the current line
     if range.srow == range.erow then
@@ -177,12 +184,12 @@ function U.unwrap_cstr(cstr)
     return not U.is_empty(lcs) and vim.trim(lcs), not U.is_empty(rcs) and vim.trim(rcs)
 end
 
----Unwraps the commentstring by taking it from the following places in the respective order.
----1. pre_hook (optionally a string can be returned)
----2. ft_table (extra commentstring table in the plugin)
----3. commentstring (already set or added in pre_hook)
----@param cfg Config
----@param ctx Ctx
+---Unwraps the commentstring by taking it from the following places
+---     1. pre_hook (optionally a string can be returned)
+---     2. ft_table (extra commentstring table in the plugin)
+---     3. commentstring (already set or added in pre_hook)
+---@param cfg CommentConfig
+---@param ctx CommentCtx
 ---@return string string Left side of the commentstring
 ---@return string string Right side of the commentstring
 function U.parse_cstr(cfg, ctx)
@@ -201,7 +208,7 @@ end
 ---@param lcs string Left side of the commentstring
 ---@param rcs string Right side of the commentstring
 ---@param padding string Padding chars b/w comment and line
----@param min_indent string|nil Pre-determine indentation (useful) when dealing w/ multiple lines
+---@param min_indent? string Minimum indent to use with multiple lines
 ---@return string string Commented string
 function U.comment_str(ln, lcs, rcs, padding, min_indent)
     if U.is_empty(ln) then
@@ -223,7 +230,7 @@ end
 ---@param ln string Line that needs to be uncommented
 ---@param lcs_esc string (Escaped) Left side of the commentstring
 ---@param rcs_esc string (Escaped) Right side of the commentstring
----@param pp string Padding pattern (@see U.get_padding)
+---@param pp string Padding pattern. See |U.get_padding|
 ---@return string string Uncommented string
 function U.uncomment_str(ln, lcs_esc, rcs_esc, pp)
     local ll = lcs_esc and lcs_esc .. pp or ''
@@ -244,8 +251,8 @@ end
 ---Check if the given string is commented or not
 ---@param lcs_esc string (Escaped) Left side of the commentstring
 ---@param rcs_esc string (Escaped) Right side of the commentstring
----@param pp string Padding pattern (@see U.get_padding)
----@return fun(line: string):boolean
+---@param pp string Padding pattern. See |U.get_padding|
+---@return fun(line:string):boolean
 function U.is_commented(lcs_esc, rcs_esc, pp)
     local ll = lcs_esc and '^%s*' .. lcs_esc .. pp or ''
     local rr = rcs_esc and pp .. rcs_esc .. '$' or ''

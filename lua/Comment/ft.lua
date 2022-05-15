@@ -1,3 +1,5 @@
+---@mod comment.ft Language or Filetype detection
+
 local A = vim.api
 
 ---Common commentstring shared b/w mutliple languages
@@ -92,15 +94,15 @@ local L = {
     xml = { M.html, M.html },
     xdefaults = { '!%s' },
     yaml = { M.hash },
-    zig = { M.cxx_l }, -- Zig doesn't have block comments. waaaattttt!
+    zig = { M.cxx_l }, -- Zig doesn't have block comments
 }
 
 local ft = {}
 
----@alias Lang string Filetype/Language of the buffer
+---@alias CommentLang string Filetype/Language of the buffer
 
 ---Sets a commentstring(s) for a filetype/language
----@param lang Lang
+---@param lang CommentLang
 ---@param val string|string[]
 function ft.set(lang, val)
     L[lang] = type(val) == 'string' and { val } or val
@@ -108,8 +110,8 @@ function ft.set(lang, val)
 end
 
 ---Get a commentstring from the filtype list
----@param lang Lang
----@param ctype CType
+---@param lang CommentLang
+---@param ctype CommentType
 ---@return string
 function ft.get(lang, ctype)
     local l = ft.lang(lang)
@@ -117,13 +119,13 @@ function ft.get(lang, ctype)
 end
 
 ---Get the commentstring(s) from the filtype list
----@param lang Lang
+---@param lang CommentLang
 ---@return string
 function ft.lang(lang)
     return L[lang]
 end
 
----Get the commenstring by walking the tree recursively
+---Get the tree in range by walking the whole tree recursively
 ---NOTE: This ignores `comment` parser as this is useless
 ---@param tree userdata Tree to be walked
 ---@param range number[] Range to check for
@@ -139,7 +141,7 @@ function ft.contains(tree, range)
 end
 
 ---Calculate commentstring w/ the power of treesitter
----@param ctx Ctx
+---@param ctx CommentCtx
 ---@return string
 function ft.calculate(ctx)
     local buf = A.nvim_get_current_buf()

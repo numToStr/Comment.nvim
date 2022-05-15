@@ -1,34 +1,35 @@
+---@mod comment.opfunc Operator-mode
+
 local U = require('Comment.utils')
 local Config = require('Comment.config')
 local A = vim.api
 
 local Op = {}
 
----@alias VMode '"line"'|'"char"'|'"v"'|'"V"' Vim Mode. Read `:h map-operator`
+---@alias OpMode 'line'|'char'|'v'|'V' Vim operator-mode motions. Read `:h map-operator`
 
----Comment context
----@class Ctx
----@field ctype CType
----@field cmode CMode
----@field cmotion CMotion
----@field range CRange
+---@class CommentCtx Comment context
+---@field ctype CommentType
+---@field cmode CommentMode
+---@field cmotion CommentMotion
+---@field range CommentRange
 
----Operator function parameter
----@class OpFnParams
----@field cfg Config
----@field cmode CMode
+---@class OpFnParams Operator-mode function parameters
+---@field cfg CommentConfig
+---@field cmode CommentMode
 ---@field lines table List of lines
 ---@field rcs string RHS of commentstring
 ---@field lcs string LHS of commentstring
----@field range CRange
+---@field range CommentRange
 
 ---Common operatorfunc callback
----@param vmode VMode
----@param cfg Config
----@param cmode CMode
----@param ctype CType
----@param cmotion CMotion
-function Op.opfunc(vmode, cfg, cmode, ctype, cmotion)
+---This function contains the core logic for comment/uncomment
+---@param opmode OpMode
+---@param cfg CommentConfig
+---@param cmode CommentMode
+---@param ctype CommentType
+---@param cmotion CommentMotion
+function Op.opfunc(opmode, cfg, cmode, ctype, cmotion)
     -- comment/uncomment logic
     --
     -- 1. type == line
@@ -47,14 +48,14 @@ function Op.opfunc(vmode, cfg, cmode, ctype, cmotion)
     --          - add cstr RHS to end of the last line
     --      * update the lines
 
-    cmotion = cmotion == U.cmotion._ and U.cmotion[vmode] or cmotion
+    cmotion = cmotion == U.cmotion._ and U.cmotion[opmode] or cmotion
 
-    local range = U.get_region(vmode)
+    local range = U.get_region(opmode)
     local same_line = range.srow == range.erow
     local partial_block = cmotion == U.cmotion.char or cmotion == U.cmotion.v
     local block_x = partial_block and same_line
 
-    ---@type Ctx
+    ---@type CommentCtx
     local ctx = {
         cmode = cmode,
         cmotion = cmotion,
@@ -96,13 +97,13 @@ function Op.opfunc(vmode, cfg, cmode, ctype, cmotion)
     U.is_fn(cfg.post_hook, ctx)
 end
 
----Linewise commenting
----@param p OpFnParams
+---Line commenting
+---@param param OpFnParams
 ---@return integer CMode
-function Op.linewise(p)
-    local lcs_esc, rcs_esc = U.escape(p.lcs), U.escape(p.rcs)
-    local pattern = U.is_fn(p.cfg.ignore)
-    local padding, pp = U.get_padding(p.cfg.padding)
+function Op.linewise(param)
+    local lcs_esc, rcs_esc = U.escape(param.lcs), U.escape(param.rcs)
+    local pattern = U.is_fn(param.cfg.ignore)
+    local padding, pp = U.get_padding(param.cfg.padding)
     local is_commented = U.is_commented(lcs_esc, rcs_esc, pp)
 
     -- While commenting a region, there could be lines being both commented and non-commented
@@ -115,11 +116,11 @@ function Op.linewise(p)
     local min_indent = nil
 
     -- If the given comde is uncomment then we actually don't want to compute the cmode or min_indent
-    if p.cmode ~= U.cmode.uncomment then
-        for _, line in ipairs(p.lines) do
+    if param.cmode ~= U.cmode.uncomment then
+        for _, line in ipairs(param.lines) do
             -- I wish lua had `continue` statement [sad noises]
             if not U.ignore(line, pattern) then
-                if cmode == U.cmode.uncomment and p.cmode == U.cmode.toggle then
+                if cmode == U.cmode.uncomment and param.cmode == U.cmode.toggle then
                     local is_cmt = is_commented(line)
                     if not is_cmt then
                         cmode = U.cmode.comment
@@ -128,7 +129,7 @@ function Op.linewise(p)
 
                 -- If local `cmode` == comment or the given cmode ~= uncomment, then only calculate min_indent
                 -- As calculating min_indent only makes sense when we actually want to comment the lines
-                if not U.is_empty(line) and (cmode == U.cmode.comment or p.cmode == U.cmode.comment) then
+                if not U.is_empty(line) and (cmode == U.cmode.comment or param.cmode == U.cmode.comment) then
                     local indent = U.grab_indent(line)
                     if not min_indent or #min_indent > #indent then
                         min_indent = indent
@@ -139,52 +140,52 @@ function Op.linewise(p)
     end
 
     -- If the comment mode given is not toggle than force that mode
-    if p.cmode ~= U.cmode.toggle then
-        cmode = p.cmode
+    if param.cmode ~= U.cmode.toggle then
+        cmode = param.cmode
     end
 
     local uncomment = cmode == U.cmode.uncomment
-    for i, line in ipairs(p.lines) do
+    for i, line in ipairs(param.lines) do
         if not U.ignore(line, pattern) then
             if uncomment then
-                p.lines[i] = U.uncomment_str(line, lcs_esc, rcs_esc, pp)
+                param.lines[i] = U.uncomment_str(line, lcs_esc, rcs_esc, pp)
             else
-                p.lines[i] = U.comment_str(line, p.lcs, p.rcs, padding, min_indent)
+                param.lines[i] = U.comment_str(line, param.lcs, param.rcs, padding, min_indent)
             end
         end
     end
-    A.nvim_buf_set_lines(0, p.range.srow - 1, p.range.erow, false, p.lines)
+    A.nvim_buf_set_lines(0, param.range.srow - 1, param.range.erow, false, param.lines)
 
     return cmode
 end
 
----Full/Partial Blockwise commenting
----@param p OpFnParams
----@param partial boolean Whether to do a partial or full comment
+---Full/Partial Block commenting
+---@param param OpFnParams
+---@param partial? boolean Comment the partial region (visual mode)
 ---@return integer CMode
-function Op.blockwise(p, partial)
+function Op.blockwise(param, partial)
     -- Block wise, only when there are more than 1 lines
-    local sln, eln = p.lines[1], p.lines[#p.lines]
-    local lcs_esc, rcs_esc = U.escape(p.lcs), U.escape(p.rcs)
-    local padding, pp = U.get_padding(p.cfg.padding)
+    local sln, eln = param.lines[1], param.lines[#param.lines]
+    local lcs_esc, rcs_esc = U.escape(param.lcs), U.escape(param.rcs)
+    local padding, pp = U.get_padding(param.cfg.padding)
 
     -- These string should be checked for comment/uncomment
     local sln_check, eln_check
     if partial then
-        sln_check = sln:sub(p.range.scol + 1)
-        eln_check = eln:sub(0, p.range.ecol + 1)
+        sln_check = sln:sub(param.range.scol + 1)
+        eln_check = eln:sub(0, param.range.ecol + 1)
     else
         sln_check, eln_check = sln, eln
     end
 
     -- If given mode is toggle then determine whether to comment or not
     local cmode
-    if p.cmode == U.cmode.toggle then
+    if param.cmode == U.cmode.toggle then
         local s_cmt = U.is_commented(lcs_esc, nil, pp)(sln_check)
         local e_cmt = U.is_commented(nil, rcs_esc, pp)(eln_check)
         cmode = (s_cmt and e_cmt) and U.cmode.uncomment or U.cmode.comment
     else
-        cmode = p.cmode
+        cmode = param.cmode
     end
 
     local l1, l2
@@ -193,46 +194,46 @@ function Op.blockwise(p, partial)
         l1 = U.uncomment_str(sln_check, lcs_esc, nil, pp)
         l2 = U.uncomment_str(eln_check, nil, rcs_esc, pp)
     else
-        l1 = U.comment_str(sln_check, p.lcs, nil, padding)
-        l2 = U.comment_str(eln_check, nil, p.rcs, padding)
+        l1 = U.comment_str(sln_check, param.lcs, nil, padding)
+        l2 = U.comment_str(eln_check, nil, param.rcs, padding)
     end
 
     if partial then
-        l1 = sln:sub(0, p.range.scol) .. l1
-        l2 = l2 .. eln:sub(p.range.ecol + 2)
+        l1 = sln:sub(0, param.range.scol) .. l1
+        l2 = l2 .. eln:sub(param.range.ecol + 2)
     end
 
-    A.nvim_buf_set_lines(0, p.range.srow - 1, p.range.srow, false, { l1 })
-    A.nvim_buf_set_lines(0, p.range.erow - 1, p.range.erow, false, { l2 })
+    A.nvim_buf_set_lines(0, param.range.srow - 1, param.range.srow, false, { l1 })
+    A.nvim_buf_set_lines(0, param.range.erow - 1, param.range.erow, false, { l2 })
 
     return cmode
 end
 
----Blockwise (left-right/x-axis motion) commenting
----@param p OpFnParams
+---Block (left-right motion) commenting
+---@param param OpFnParams
 ---@return integer CMode
-function Op.blockwise_x(p)
-    local line = p.lines[1]
-    local first = line:sub(0, p.range.scol)
-    local mid = line:sub(p.range.scol + 1, p.range.ecol + 1)
-    local last = line:sub(p.range.ecol + 2)
+function Op.blockwise_x(param)
+    local line = param.lines[1]
+    local first = line:sub(0, param.range.scol)
+    local mid = line:sub(param.range.scol + 1, param.range.ecol + 1)
+    local last = line:sub(param.range.ecol + 2)
 
-    local padding, pp = U.get_padding(p.cfg.padding)
+    local padding, pp = U.get_padding(param.cfg.padding)
 
-    local yes, _, stripped = U.is_commented(U.escape(p.lcs), U.escape(p.rcs), pp)(mid)
+    local yes, _, stripped = U.is_commented(U.escape(param.lcs), U.escape(param.rcs), pp)(mid)
 
     local cmode
-    if p.cmode == U.cmode.toggle then
+    if param.cmode == U.cmode.toggle then
         cmode = yes and U.cmode.uncomment or U.cmode.comment
     else
-        cmode = p.cmode
+        cmode = param.cmode
     end
 
     if cmode == U.cmode.uncomment then
         A.nvim_set_current_line(first .. (stripped or mid) .. last)
     else
-        local lcs = p.lcs and p.lcs .. padding or ''
-        local rcs = p.rcs and padding .. p.rcs or ''
+        local lcs = param.lcs and param.lcs .. padding or ''
+        local rcs = param.rcs and padding .. param.rcs or ''
         A.nvim_set_current_line(first .. lcs .. mid .. rcs .. last)
     end
 
@@ -242,12 +243,12 @@ end
 ---Toggle line comment with count i.e vim.v.count
 ---Example: `10gl` will comment 10 lines
 ---@param count integer Number of lines
----@param cfg Config
----@param ctype CType
+---@param cfg CommentConfig
+---@param ctype CommentType
 function Op.count(count, cfg, ctype)
     local lines, range = U.get_count_lines(count)
 
-    ---@type Ctx
+    ---@type CommentCtx
     local ctx = {
         cmode = U.cmode.toggle,
         cmotion = U.cmotion.line,
