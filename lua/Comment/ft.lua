@@ -68,6 +68,7 @@ local L = {
     purescript = { M.dash, M.haskell_b },
     python = { M.hash }, -- Python doesn't have block comments
     php = { M.cxx_l, M.cxx_b },
+    r = { M.hash }, -- R doesn't have block comments
     readline = { M.hash },
     ruby = { M.hash },
     rust = { M.cxx_l, M.cxx_b },
