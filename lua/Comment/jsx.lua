@@ -3,11 +3,9 @@ local J = {
 }
 
 local query = [[
-    ; If somehow we can group all the attributes into one
     (jsx_opening_element [(jsx_attribute) (comment)] @nojsx)
 
-    ; If somehow we can group all the comments into one
-    (jsx_expression (comment)) @jsx
+    ((jsx_expression (comment)) @jsx)
 
     (jsx_expression
         [(object) (call_expression)] @nojsx)
@@ -19,11 +17,60 @@ local query = [[
         [(jsx_fragment) (jsx_element)] @jsx)
 ]]
 
+local trees = {
+    typescriptreact = 'tsx',
+    javascriptreact = 'javascript',
+}
+
+---Checks whether parser's language matches the filetype that supports jsx syntax
+---@param lang string
+---@return boolean
 local function is_jsx(lang)
-    -- Name of the treesitter parsers that supports jsx syntax
-    return lang == 'tsx' or lang == 'javascript'
+    return lang == trees.typescriptreact or lang == trees.javascriptreact
 end
 
+-- This function is a workaround for `+` treesitter quantifier
+-- which is currently not supported by neovim (wip: https://github.com/neovim/neovim/pull/15330)
+-- because of this we can't query consecutive comment or attributes nodes,
+-- and group them as single range, hence this function
+---@param q table
+---@param tree table
+---@param parser table
+---@param range CRange
+---@return table
+local function normalize(q, tree, parser, range)
+    local prev, section, sections = nil, 0, {}
+
+    for id, node in q:iter_captures(tree:root(), parser:source(), range.srow - 1, range.erow) do
+        if id ~= prev then
+            section = section + 1
+        end
+
+        local srow, _, erow = node:range()
+        local key = string.format('%s.%s', id, section)
+        if sections[key] == nil then
+            sections[key] = { id = id, range = { srow = srow, erow = erow } }
+        else
+            -- storing the smallest starting row and biggest ending row
+            local r = sections[key].range
+            if srow < r.srow then
+                sections[key].range.srow = srow
+            end
+            if erow > r.erow then
+                sections[key].range.erow = erow
+            end
+        end
+
+        prev = id
+    end
+
+    return sections
+end
+
+---Runs the query and returns the commentstring by checking the cursor range
+---@param parser table
+---@param range CRange
+---@return boolean
 local function capture(parser, range)
     local lang = parser:lang()
 
@@ -33,35 +80,40 @@ local function capture(parser, range)
 
     local Q = vim.treesitter.query.parse_query(lang, query)
 
-    local lines, group
+    local id, lines = 0, nil
 
     for _, tree in ipairs(parser:trees()) do
-        for id, node in Q:iter_captures(tree:root(), parser:source(), range.srow - 1, range.erow) do
-            local srow, _, erow = node:range()
-            -- print(Q.captures[id])
-            -- print(srow, range.srow - 1)
-            -- print(erow, range.erow - 1)
-            -- print(srow <= range.srow - 1 and erow >= range.erow - 1)
-            if srow <= range.srow - 1 and erow >= range.erow - 1 then
-                local region = erow - srow
+        for _, section in pairs(normalize(Q, tree, parser, range)) do
+            if section.range.srow <= range.srow - 1 and section.range.erow >= range.erow - 1 then
+                local region = section.range.erow - section.range.srow
                 if not lines or region < lines then
-                    lines, group = region, Q.captures[id]
+                    id, lines = section.id, region
                 end
             end
         end
     end
 
-    return group == 'jsx' and J.comment
+    return Q.captures[id] == 'jsx'
 end
 
+---Calculates the `jsx` commentstring
+---@param ctx Ctx
+---@return string?
 function J.calculate(ctx)
-    local ok, P = pcall(vim.treesitter.get_parser)
+    local buf = vim.api.nvim_get_current_buf()
+    local filetype = vim.api.nvim_buf_get_option(buf, 'filetype')
+
+    -- NOTE:
+    -- `get_parser` panics for `{type,java}scriptreact` filetype
+    -- bcz their parser's name is different from their filetype
+    -- Maybe report the issue to `nvim-treesitter` or core(?)
+    local ok, tree = pcall(vim.treesitter.get_parser, buf, trees[filetype] or filetype)
 
     if not ok then
         return
     end
 
-    local rng = {
+    local range = {
         ctx.range.srow - 1,
         ctx.range.scol,
         ctx.range.erow - 1,
@@ -69,19 +121,14 @@ function J.calculate(ctx)
     }
 
     -- This is for `markdown` which embeds multiple `tsx` blocks
-    for _, child in pairs(P:children()) do
-        if child:contains(rng) then
-            local captured = capture(child, ctx.range)
-            if captured then
-                return captured
-            end
+    for _, child in pairs(tree:children()) do
+        if child:contains(range) and capture(child, ctx.range) then
+            return J.comment
         end
     end
 
-    if P:contains(rng) then
-        -- This is for `tsx` itself
-        return capture(P, ctx.range)
-    end
+    -- This is for `tsx` itself
+    return (tree:contains(range) and capture(tree, ctx.range)) and J.comment
 end
 
 return J
