@@ -127,11 +127,11 @@ Following are the **default** config for the [`setup()`](#setup). If you want to
     },
 
     ---Pre-hook, called before commenting the line
-    ---@type fun(ctx: Ctx):string
+    ---@type fun(ctx: CommentCtx):string
     pre_hook = nil,
 
     ---Post-hook, called after commenting is done
-    ---@type fun(ctx: Ctx)
+    ---@type fun(ctx: CommentCtx)
     post_hook = nil,
 }
 ```
@@ -255,7 +255,7 @@ There are two hook methods i.e `pre_hook` and `post_hook` which are called befor
 ```lua
 -- NOTE: The example below is a proper integration and it is RECOMMENDED.
 {
-    ---@param ctx Ctx
+    ---@param ctx CommentCtx
     pre_hook = function(ctx)
         -- Only calculate commentstring for tsx filetypes
         if vim.bo.filetype == 'typescriptreact' then
@@ -287,7 +287,7 @@ There are two hook methods i.e `pre_hook` and `post_hook` which are called befor
 
 ```lua
 {
-    ---@param ctx Ctx
+    ---@param ctx CommentCtx
     post_hook = function(ctx)
         if ctx.range.srow == ctx.range.erow then
             -- do something with the current line
@@ -411,21 +411,21 @@ The following object is provided as an argument to `pre_hook` and `post_hook` fu
 
 ```lua
 ---Comment context
----@class Ctx
----@field ctype CType
----@field cmode CMode
----@field cmotion CMotion
----@field range CRange
+---@class CommentCtx
+---@field ctype CommentType
+---@field cmode CommentMode
+---@field cmotion CommentMotion
+---@field range CommentRange
 
 ---Range of the selection that needs to be commented
----@class CRange
+---@class CommentRange
 ---@field srow number Starting row
 ---@field scol number Starting column
 ---@field erow number Ending row
 ---@field ecol number Ending column
 ```
 
-`CType` (Comment type), `CMode` (Comment mode) and `CMotion` (Comment motion) all of them are exported from the plugin's utils for reuse
+`CommentType`, `CommentMode` and `CommentMotion` all of them are exported from the plugin's utils for reuse
 
 ```lua
 require('Comment.utils').ctype.{line,block}

@@ -1,21 +1,19 @@
----LHS of toggle mappings in NORMAL + VISUAL mode
----@class Toggler
+---@mod comment.config Configuration
+
+---@class Toggler LHS of toggle mappings in NORMAL + VISUAL mode
 ---@field line string Linewise comment keymap
 ---@field block string Blockwise comment keymap
 
----LHS of operator-pending mappings in NORMAL + VISUAL mode
----@class Opleader
+---@class Opleader LHS of operator-mode mappings in NORMAL + VISUAL mode
 ---@field line string Linewise comment keymap
 ---@field block string Blockwise comment keymap
 
----LHS of extra mappings
----@class ExtraMapping
+---@class ExtraMapping LHS of extra mappings
 ---@field above string Mapping to add comment on the line above
 ---@field below string Mapping to add comment on the line below
 ---@field eol string Mapping to add comment at the end of line
 
----Whether to create basic (operator-pending) and extended mappings
----@class Mappings
+---@class Mappings Create default mappings
 ---Enable operator-pending mapping
 ---Includes `gcc`, `gbc`, `gc[count]{motion}` and `gb[count]{motion}`
 ---NOTE: These mappings can be changed individually by `opleader` and `toggler` config
@@ -27,8 +25,7 @@
 ---Includes `g>`, `g<`, `g>[count]{motion}` and `g<[count]{motion}`
 ---@field extended boolean
 
----Plugin's config
----@class Config
+---@class CommentConfig Plugin's configuration
 ---@field padding boolean Add a space b/w comment and the line
 ---Whether the cursor should stay at its position
 ---NOTE: This only affects NORMAL mode mappings and doesn't work with dot-repeat
@@ -41,11 +38,12 @@
 ---@field toggler Toggler
 ---@field opleader Opleader
 ---@field extra ExtraMapping
----@field pre_hook fun(ctx: Ctx):string Function to be called before comment/uncomment
----@field post_hook fun(ctx:Ctx) Function to be called after comment/uncomment
+---@field pre_hook fun(ctx:CommentCtx):string Function to be called before comment/uncomment
+---@field post_hook fun(ctx:CommentCtx) Function to be called after comment/uncomment
 
+---@private
 ---@class RootConfig
----@field config Config
+---@field config CommentConfig
 ---@field position number[] To be used to restore cursor position
 ---@field count number Helps with dot-repeat support for count prefix
 local Config = {
@@ -75,7 +73,7 @@ local Config = {
 }
 
 ---Update the config
----@param cfg Config
+---@param cfg? CommentConfig
 ---@return RootConfig
 function Config:set(cfg)
     if cfg then
@@ -85,7 +83,7 @@ function Config:set(cfg)
 end
 
 ---Get the config
----@return Config
+---@return CommentConfig
 function Config:get()
     return self.config
 end

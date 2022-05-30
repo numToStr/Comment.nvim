@@ -1,15 +1,17 @@
+---@mod comment.extra Extra functions
+
 local U = require('Comment.utils')
 local A = vim.api
 
-local E = {}
+local extra = {}
 
 ---@param count number Line index
----@param ctype CType
----@param cfg Config
+---@param ctype CommentType
+---@param cfg CommentConfig
 local function ins_on_line(count, ctype, cfg)
     local row, col = unpack(A.nvim_win_get_cursor(0))
 
-    ---@type Ctx
+    ---@type CommentCtx
     local ctx = {
         cmode = U.cmode.comment,
         cmotion = U.cmotion.line,
@@ -35,26 +37,26 @@ local function ins_on_line(count, ctype, cfg)
 end
 
 ---Add a comment below the current line and goes to INSERT mode
----@param ctype CType
----@param cfg Config
-function E.insert_below(ctype, cfg)
+---@param ctype CommentType
+---@param cfg CommentConfig
+function extra.insert_below(ctype, cfg)
     ins_on_line(0, ctype, cfg)
 end
 
 ---Add a comment above the current line and goes to INSERT mode
----@param ctype CType
----@param cfg Config
-function E.insert_above(ctype, cfg)
+---@param ctype CommentType
+---@param cfg CommentConfig
+function extra.insert_above(ctype, cfg)
     ins_on_line(-1, ctype, cfg)
 end
 
 ---Add a comment at the end of current line and goes to INSERT mode
----@param ctype CType
----@param cfg Config
-function E.insert_eol(ctype, cfg)
+---@param ctype CommentType
+---@param cfg CommentConfig
+function extra.insert_eol(ctype, cfg)
     local srow, scol = unpack(A.nvim_win_get_cursor(0))
 
-    ---@type Ctx
+    ---@type CommentCtx
     local ctx = {
         cmode = U.cmode.comment,
         cmotion = U.cmotion.line,
@@ -91,4 +93,4 @@ function E.insert_eol(ctype, cfg)
     U.is_fn(cfg.post_hook, ctx)
 end
 
-return E
+return extra
