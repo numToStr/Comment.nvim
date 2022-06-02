@@ -5,6 +5,8 @@ local J = {
 local query = [[
     (jsx_opening_element [(jsx_attribute) (comment)] @nojsx)
 
+    (jsx_self_closing_element [(jsx_attribute) (comment)] @nojsx)
+
     ((jsx_expression (comment)) @jsx)
 
     (jsx_expression
