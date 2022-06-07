@@ -7,7 +7,6 @@
 
 - Supports treesitter. [Read more](#treesitter)
 - Supports `commentstring`. [Read more](#commentstring)
-- Prefers single-line/linewise comments
 - Supports line (`//`) and block (`/* */`) comments
 - Dot (`.`) repeat support for `gcc`, `gbc` and friends
 - Count support for `[count]gcc` and `[count]gbc`
@@ -43,6 +42,8 @@ lua require('Comment').setup()
 ### ⚒️ Setup
 
 First you need to call the `setup()` method to create the default mappings.
+
+> NOTE: If you are facing **Keybindings are mapped but they are not working** issue then please try [this](https://github.com/numToStr/Comment.nvim/issues/115#issuecomment-1032290098)
 
 - Lua
 
@@ -294,7 +295,7 @@ There are two hook methods i.e `pre_hook` and `post_hook` which are called befor
         else
             -- do something with lines range
         end
-    end
+    end,
 }
 ```
 
