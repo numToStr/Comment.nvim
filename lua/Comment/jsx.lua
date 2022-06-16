@@ -82,17 +82,24 @@ local function capture(parser, range)
 
     local Q = vim.treesitter.query.parse_query(lang, query)
 
-    local id, lines = 0, nil
+    local id, lnum, lines = 0, nil, nil
 
     for _, tree in ipairs(parser:trees()) do
         for _, section in pairs(normalize(Q, tree, parser, range)) do
             if section.range.srow <= range.srow - 1 and section.range.erow >= range.erow - 1 then
                 local region = section.range.erow - section.range.srow
                 if not lines or region < lines then
-                    id, lines = section.id, region
+                    id, lnum, lines = section.id, section.range.srow, region
                 end
             end
         end
+    end
+
+    -- NOTE:
+    -- This is for the case when the opening element and attributes are on the same line,
+    -- so to prevent invalid comment, we can check if the line looks like an element
+    if lnum ~= nil and string.match(vim.fn.getline(lnum + 1), '%s+<%w+%s.*>$') then
+        return true
     end
 
     return Q.captures[id] == 'jsx'
