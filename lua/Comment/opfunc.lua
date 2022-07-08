@@ -9,14 +9,14 @@ local Op = {}
 ---@alias OpMode 'line'|'char'|'v'|'V' Vim operator-mode motions. Read `:h map-operator`
 
 ---@class CommentCtx Comment context
----@field ctype CommentType
----@field cmode CommentMode
----@field cmotion CommentMotion
+---@field ctype number CommentType
+---@field cmode number CommentMode
+---@field cmotion number CommentMotion
 ---@field range CommentRange
 
 ---@class OpFnParams Operator-mode function parameters
 ---@field cfg CommentConfig
----@field cmode CommentMode
+---@field cmode number See |comment.utils.cmode|
 ---@field lines table List of lines
 ---@field rcs string RHS of commentstring
 ---@field lcs string LHS of commentstring
@@ -26,9 +26,9 @@ local Op = {}
 ---This function contains the core logic for comment/uncomment
 ---@param opmode OpMode
 ---@param cfg CommentConfig
----@param cmode CommentMode
----@param ctype CommentType
----@param cmotion CommentMotion
+---@param cmode number CommentMode
+---@param ctype number CommentType
+---@param cmotion number CommentMotion
 function Op.opfunc(opmode, cfg, cmode, ctype, cmotion)
     -- comment/uncomment logic
     --
@@ -99,10 +99,10 @@ end
 
 ---Line commenting
 ---@param param OpFnParams
----@return integer CMode
+---@return number
 function Op.linewise(param)
-    local lcs_esc, rcs_esc = U.escape(param.lcs), U.escape(param.rcs)
-    local pattern = U.is_fn(param.cfg.ignore)
+    local lcs_esc, rcs_esc = vim.pesc(param.lcs), vim.pesc(param.rcs)
+    local pattern = U.is_fn(param.cfg.ignore) --[[@as string]]
     local padding, pp = U.get_padding(param.cfg.padding)
     local is_commented = U.is_commented(lcs_esc, rcs_esc, pp)
 
@@ -113,6 +113,7 @@ function Op.linewise(param)
     -- When commenting multiple line, it is to be expected that indentation should be preserved
     -- So, When looping over multiple lines we need to store the indentation of the mininum length (except empty line)
     -- Which will be used to semantically comment rest of the lines
+    ---@type integer
     local min_indent = nil
 
     -- If the given comde is uncomment then we actually don't want to compute the cmode or min_indent
@@ -130,9 +131,9 @@ function Op.linewise(param)
                 -- If local `cmode` == comment or the given cmode ~= uncomment, then only calculate min_indent
                 -- As calculating min_indent only makes sense when we actually want to comment the lines
                 if not U.is_empty(line) and (cmode == U.cmode.comment or param.cmode == U.cmode.comment) then
-                    local indent = U.grab_indent(line)
-                    if not min_indent or #min_indent > #indent then
-                        min_indent = indent
+                    local _, len = U.grab_indent(line)
+                    if not min_indent or min_indent > len then
+                        min_indent = len
                     end
                 end
             end
@@ -162,11 +163,11 @@ end
 ---Full/Partial Block commenting
 ---@param param OpFnParams
 ---@param partial? boolean Comment the partial region (visual mode)
----@return integer CMode
+---@return number
 function Op.blockwise(param, partial)
     -- Block wise, only when there are more than 1 lines
     local sln, eln = param.lines[1], param.lines[#param.lines]
-    local lcs_esc, rcs_esc = U.escape(param.lcs), U.escape(param.rcs)
+    local lcs_esc, rcs_esc = vim.pesc(param.lcs), vim.pesc(param.rcs)
     local padding, pp = U.get_padding(param.cfg.padding)
 
     -- These string should be checked for comment/uncomment
@@ -211,7 +212,7 @@ end
 
 ---Block (left-right motion) commenting
 ---@param param OpFnParams
----@return integer CMode
+---@return number
 function Op.blockwise_x(param)
     local line = param.lines[1]
     local first = line:sub(0, param.range.scol)
@@ -242,9 +243,9 @@ end
 
 ---Toggle line comment with count i.e vim.v.count
 ---Example: `10gl` will comment 10 lines
----@param count integer Number of lines
+---@param count number Number of lines
 ---@param cfg CommentConfig
----@param ctype CommentType
+---@param ctype number CommentType
 function Op.count(count, cfg, ctype)
     local lines, range = U.get_count_lines(count)
 

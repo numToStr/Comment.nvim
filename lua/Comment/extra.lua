@@ -6,7 +6,7 @@ local A = vim.api
 local extra = {}
 
 ---@param count number Line index
----@param ctype CommentType
+---@param ctype number See |CommentType|
 ---@param cfg CommentConfig
 local function ins_on_line(count, ctype, cfg)
     local row, col = unpack(A.nvim_win_get_cursor(0))
@@ -37,21 +37,21 @@ local function ins_on_line(count, ctype, cfg)
 end
 
 ---Add a comment below the current line and goes to INSERT mode
----@param ctype CommentType
+---@param ctype number See |CommentType|
 ---@param cfg CommentConfig
 function extra.insert_below(ctype, cfg)
     ins_on_line(0, ctype, cfg)
 end
 
 ---Add a comment above the current line and goes to INSERT mode
----@param ctype CommentType
+---@param ctype number See |CommentType|
 ---@param cfg CommentConfig
 function extra.insert_above(ctype, cfg)
     ins_on_line(-1, ctype, cfg)
 end
 
 ---Add a comment at the end of current line and goes to INSERT mode
----@param ctype CommentType
+---@param ctype number See |CommentType|
 ---@param cfg CommentConfig
 function extra.insert_eol(ctype, cfg)
     local srow, scol = unpack(A.nvim_win_get_cursor(0))

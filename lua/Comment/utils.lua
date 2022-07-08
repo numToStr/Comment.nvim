@@ -63,11 +63,12 @@ function U.is_empty(ln)
 end
 
 ---Takes out the leading indent from lines
----@param s string
+---@param str string
 ---@return string string Indent chars
----@return number string Length of the indent chars
-function U.grab_indent(s)
-    local _, len, indent = s:find('^(%s*)')
+---@return integer integer Length of the indent chars
+function U.grab_indent(str)
+    -- local _, len = string.find(str, '^%s*')
+    local _, len, indent = string.find(str, '^(%s*)')
     return indent, len
 end
 
@@ -92,16 +93,9 @@ function U.move_n_insert(row, col)
     A.nvim_feedkeys('a', 'ni', true)
 end
 
----Convert the string to a escaped string, if given
----@param str string
----@return string|boolean
-function U.escape(str)
-    return str and vim.pesc(str)
-end
-
 ---Call a function if exists
----@param fn function Wanna be function
----@return boolean|string
+---@param fn unknown|fun():unknown Wanna be function
+---@return unknown
 function U.is_fn(fn, ...)
     if type(fn) == 'function' then
         return fn(...)
@@ -114,7 +108,7 @@ end
 ---@param pat string Lua regex
 ---@return boolean
 function U.ignore(ln, pat)
-    return pat and ln:find(pat) ~= nil
+    return pat and string.find(ln, pat) ~= nil
 end
 
 ---Get region for line movement or visual selection
@@ -127,15 +121,8 @@ function U.get_region(opmode)
         return { srow = row, scol = 0, erow = row, ecol = 0 }
     end
 
-    local m = A.nvim_buf_get_mark
-    local buf = 0
-    local sln, eln
-
-    if string.match(opmode, '[vV]') then
-        sln, eln = m(buf, '<'), m(buf, '>')
-    else
-        sln, eln = m(buf, '['), m(buf, ']')
-    end
+    local marks = string.match(opmode, '[vV]') ~= nil and { '<', '>' } or { '[', ']' }
+    local sln, eln = A.nvim_buf_get_mark(0, marks[1]), A.nvim_buf_get_mark(0, marks[2])
 
     return { srow = sln[1], scol = sln[2], erow = eln[1], ecol = eln[2] }
 end
@@ -145,8 +132,7 @@ end
 ---@return CommentLines
 ---@return CommentRange
 function U.get_count_lines(count)
-    local pos = A.nvim_win_get_cursor(0)
-    local srow = pos[1]
+    local srow = unpack(A.nvim_win_get_cursor(0))
     local erow = (srow + count) - 1
     local lines = A.nvim_buf_get_lines(0, srow - 1, erow, false)
 
@@ -167,27 +153,23 @@ end
 
 ---Validates and unwraps the given commentstring
 ---@param cstr string
----@return string|boolean
----@return string|boolean
+---@return string string Left side of the commentstring
+---@return string string Right side of the commentstring
 function U.unwrap_cstr(cstr)
-    local lcs, rcs = cstr:match('(.*)%%s(.*)')
+    local left, right = string.match(cstr, '(.*)%%s(.*)')
 
-    if not (lcs or rcs) then
-        return vim.notify(
-            ("[Comment] Invalid commentstring - %q. Run ':h commentstring' for help."):format(cstr),
-            vim.log.levels.ERROR
-        )
-    end
+    assert(
+        (left or right),
+        string.format("[Comment] Invalid commentstring - %q. Run ':h commentstring' for help.", cstr)
+    )
 
-    -- Return false if a part is empty, otherwise trim it
-    -- Bcz it is better to deal with boolean rather than checking empty string length everywhere
-    return not U.is_empty(lcs) and vim.trim(lcs), not U.is_empty(rcs) and vim.trim(rcs)
+    return vim.trim(left), vim.trim(right)
 end
 
 ---Unwraps the commentstring by taking it from the following places
----     1. pre_hook (optionally a string can be returned)
----     2. ft_table (extra commentstring table in the plugin)
----     3. commentstring (already set or added in pre_hook)
+---     1. `pre_hook` (optionally a string can be returned)
+---     2. `ft.lua` (extra commentstring table in the plugin)
+---     3. `commentstring` (already set or added in pre_hook)
 ---@param cfg CommentConfig
 ---@param ctx CommentCtx
 ---@return string string Left side of the commentstring
@@ -208,19 +190,19 @@ end
 ---@param lcs string Left side of the commentstring
 ---@param rcs string Right side of the commentstring
 ---@param padding string Padding chars b/w comment and line
----@param min_indent? string Minimum indent to use with multiple lines
+---@param min_indent? integer Minimum indent to use with multiple lines
 ---@return string string Commented string
 function U.comment_str(ln, lcs, rcs, padding, min_indent)
     if U.is_empty(ln) then
-        return (min_indent or '') .. ((lcs or '') .. (rcs or ''))
+        return string.rep(' ', min_indent or 0) .. (lcs .. rcs)
     end
 
-    local indent, chars = ln:match('^(%s*)(.*)')
+    local indent, chars = string.match(ln, '^(%s*)(.*)')
 
-    local lcs_new = lcs and lcs .. padding or ''
-    local rcs_new = rcs and padding .. rcs or ''
+    local lcs_new = U.is_empty(lcs) and lcs or lcs .. padding
+    local rcs_new = U.is_empty(rcs) and rcs or padding .. rcs
 
-    local pos = #(min_indent or indent)
+    local pos = min_indent or #indent
     local l_indent = indent:sub(0, pos) .. lcs_new .. indent:sub(pos + 1)
 
     return l_indent .. chars .. rcs_new
@@ -233,15 +215,15 @@ end
 ---@param pp string Padding pattern. See |U.get_padding|
 ---@return string string Uncommented string
 function U.uncomment_str(ln, lcs_esc, rcs_esc, pp)
-    local ll = lcs_esc and lcs_esc .. pp or ''
-    local rr = rcs_esc and rcs_esc .. '$?' or ''
+    local ll = U.is_empty(lcs_esc) and lcs_esc or lcs_esc .. pp
+    local rr = U.is_empty(rcs_esc) and rcs_esc or rcs_esc .. '$?'
 
     local indent, chars = ln:match('(%s*)' .. ll .. '(.*)' .. rr)
 
     -- If the line (after cstring) is empty then just return ''
     -- bcz when uncommenting multiline this also doesn't preserve leading whitespace as the line was previously empty
     if U.is_empty(chars) then
-        return ''
+        return chars
     end
 
     -- When padding is enabled then trim one trailing space char
@@ -249,8 +231,8 @@ function U.uncomment_str(ln, lcs_esc, rcs_esc, pp)
 end
 
 ---Check if the given string is commented or not
----@param lcs_esc string (Escaped) Left side of the commentstring
----@param rcs_esc string (Escaped) Right side of the commentstring
+---@param lcs_esc? string (Escaped) Left side of the commentstring
+---@param rcs_esc? string (Escaped) Right side of the commentstring
 ---@param pp string Padding pattern. See |U.get_padding|
 ---@return fun(line:string):boolean
 function U.is_commented(lcs_esc, rcs_esc, pp)

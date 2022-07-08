@@ -115,7 +115,7 @@ end
 
 ---Get a commentstring from the filtype list
 ---@param lang CommentLang
----@param ctype CommentType
+---@param ctype number See |CommentType|
 ---@return string
 function ft.get(lang, ctype)
     local l = ft.lang(lang)
