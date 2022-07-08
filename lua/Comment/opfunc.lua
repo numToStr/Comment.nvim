@@ -145,13 +145,17 @@ function Op.linewise(param)
         cmode = param.cmode
     end
 
-    local uncomment = cmode == U.cmode.uncomment
-    for i, line in ipairs(param.lines) do
-        if not U.ignore(line, pattern) then
-            if uncomment then
+    if cmode == U.cmode.uncomment then
+        for i, line in ipairs(param.lines) do
+            if not U.ignore(line, pattern) then
                 param.lines[i] = U.uncomment_str(line, lcs_esc, rcs_esc, pp)
-            else
-                param.lines[i] = U.comment_str(line, param.lcs, param.rcs, padding, min_indent)
+            end
+        end
+    else
+        local comment = U.commenter(param.lcs, param.rcs, padding, min_indent)
+        for i, line in ipairs(param.lines) do
+            if not U.ignore(line, pattern) then
+                param.lines[i] = comment(line)
             end
         end
     end
@@ -221,7 +225,7 @@ function Op.blockwise_x(param)
 
     local padding, pp = U.get_padding(param.cfg.padding)
 
-    local yes, _, stripped = U.is_commented(U.escape(param.lcs), U.escape(param.rcs), pp)(mid)
+    local yes, _, stripped = U.is_commented(vim.pesc(param.lcs), vim.pesc(param.rcs), pp)(mid)
 
     local cmode
     if param.cmode == U.cmode.toggle then

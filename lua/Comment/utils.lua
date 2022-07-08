@@ -185,6 +185,28 @@ function U.parse_cstr(cfg, ctx)
     return U.unwrap_cstr(cstr)
 end
 
+---Returns a closure which is used to comment a line
+---@param left string Left side of the commentstring
+---@param right string Right side of the commentstring
+---@param padding string Padding between comment chars and line
+---@param indent integer Left indentation to use with multiple lines
+---@return fun(line:string):string
+function U.commenter(left, right, padding, indent)
+    local ll = U.is_empty(left) and left or table.concat({ left, padding })
+    local rr = U.is_empty(right) and right or table.concat({ padding, right })
+    local repl = string.format('%%1%s%%2%s', ll, rr)
+    local pattern = indent > 0 and string.format('^(%s)(.*)', string.rep('%s', indent)) or '^(%s-)(.*)'
+
+    local empty = table.concat({ string.rep(' ', indent), left, right })
+
+    return function(line)
+        if U.is_empty(line) then
+            return empty
+        end
+        return string.gsub(line, pattern, repl, 1)
+    end
+end
+
 ---Converts the given string into a commented string
 ---@param ln string String that needs to be commented
 ---@param lcs string Left side of the commentstring
