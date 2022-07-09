@@ -8,9 +8,9 @@ local U = {}
 
 ---@class CommentRange Range of the selection that needs to be commented
 ---@field srow number Starting row
----@field scol number Starting column
+---@field scol integer Starting column
 ---@field erow number Ending row
----@field ecol number Ending column
+---@field ecol integer Ending column
 
 ---@class CommentMode Comment modes - Can be manual or computed via operator-mode
 ---@field toggle number Toggle action
@@ -189,15 +189,18 @@ end
 ---@param left string Left side of the commentstring
 ---@param right string Right side of the commentstring
 ---@param padding string Padding between comment chars and line
----@param indent integer Left indentation to use with multiple lines
+---@param scol integer Left indentation to use with multiple lines
+---@param ecol integer Left indentation to use with multiple lines
 ---@return fun(line:string):string
-function U.commenter(left, right, padding, indent)
+function U.commenter(left, right, scol, ecol, padding)
+    local middle = ecol > 0 and table.concat({ '(', string.rep('.', (ecol - scol) + 1), ')' }) or ''
+    local pattern = scol > 0 and table.concat({ '^(', string.rep('.', scol), ')', middle, '(.*)' }) or '^(%s-)(.*)'
+
     local ll = U.is_empty(left) and left or table.concat({ left, padding })
     local rr = U.is_empty(right) and right or table.concat({ padding, right })
-    local repl = string.format('%%1%s%%2%s', ll, rr)
-    local pattern = indent > 0 and string.format('^(%s)(.*)', string.rep('%s', indent)) or '^(%s-)(.*)'
+    local repl = table.concat({ '%1', ll, '%2', rr, (scol > 0 and ecol > 0) and '%3' or '' })
 
-    local empty = table.concat({ string.rep(' ', indent), left, right })
+    local empty = table.concat({ string.rep(' ', scol), left, right })
 
     return function(line)
         if U.is_empty(line) then
@@ -253,16 +256,19 @@ function U.uncomment_str(ln, lcs_esc, rcs_esc, pp)
 end
 
 ---Check if the given string is commented or not
----@param lcs_esc? string (Escaped) Left side of the commentstring
----@param rcs_esc? string (Escaped) Right side of the commentstring
----@param pp string Padding pattern. See |U.get_padding|
----@return fun(line:string):boolean
-function U.is_commented(lcs_esc, rcs_esc, pp)
-    local ll = lcs_esc and '^%s*' .. lcs_esc .. pp or ''
-    local rr = rcs_esc and pp .. rcs_esc .. '$' or ''
+---@param left string Escaped Left side of the commentstring
+---@param right string Right side of the commentstring
+---@param padding? string Padding chars. See |U.get_padding|
+---@return fun(line:string,scol?:integer,ecol?:integer):boolean
+function U.is_commented2(left, right, padding)
+    local pp = padding and '%s' or ''
+    local ll = U.is_empty(left) and left or table.concat({ '^%s*', vim.pesc(left), pp })
+    local rr = U.is_empty(right) and right or table.concat({ pp, vim.pesc(right), '$' })
+    local pattern = table.concat({ ll, '.-', rr })
 
-    return function(line)
-        return line:find(ll .. '(.-)' .. rr)
+    return function(line, scol, ecol)
+        local ln = (scol and ecol) and string.sub(line, scol + 1, ecol + 1) or line
+        return string.find(ln, pattern)
     end
 end
 
