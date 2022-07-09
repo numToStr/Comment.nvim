@@ -193,12 +193,18 @@ end
 ---@param ecol integer Left indentation to use with multiple lines
 ---@return fun(line:string):string
 function U.commenter(left, right, scol, ecol, padding)
-    local middle = ecol > 0 and table.concat({ '(', string.rep('.', (ecol - scol) + 1), ')' }) or ''
-    local pattern = scol > 0 and table.concat({ '^(', string.rep('.', scol), ')', middle, '(.*)' }) or '^(%s-)(.*)'
+    local is_both = (scol > 0 and ecol > 0)
+    local middle = is_both and table.concat({ '(', string.rep('.', (ecol - scol) + 1), ')' }) or ''
+
+    local only_right = scol < 0 and ecol > 0
+    local pattern = only_right and table.concat({ '^(', string.rep('.', ecol), ')', '(.*)' })
+        or scol > 0 and table.concat({ '^(', string.rep('.', scol), ')', middle, '(.*)' })
+        or '^(%s*)(.*)'
 
     local ll = U.is_empty(left) and left or table.concat({ left, padding })
     local rr = U.is_empty(right) and right or table.concat({ padding, right })
-    local repl = table.concat({ '%1', ll, '%2', rr, (scol > 0 and ecol > 0) and '%3' or '' })
+    local switch = only_right and { rr, '%2' } or { '%2', rr }
+    local repl = table.concat({ '%1', ll, table.concat(switch), (scol > 0 and ecol > 0) and '%3' or '' })
 
     local empty = table.concat({ string.rep(' ', scol), left, right })
 
@@ -208,29 +214,6 @@ function U.commenter(left, right, scol, ecol, padding)
         end
         return string.gsub(line, pattern, repl, 1)
     end
-end
-
----Converts the given string into a commented string
----@param ln string String that needs to be commented
----@param lcs string Left side of the commentstring
----@param rcs string Right side of the commentstring
----@param padding string Padding chars b/w comment and line
----@param min_indent? integer Minimum indent to use with multiple lines
----@return string string Commented string
-function U.comment_str(ln, lcs, rcs, padding, min_indent)
-    if U.is_empty(ln) then
-        return string.rep(' ', min_indent or 0) .. (lcs .. rcs)
-    end
-
-    local indent, chars = string.match(ln, '^(%s*)(.*)')
-
-    local lcs_new = U.is_empty(lcs) and lcs or lcs .. padding
-    local rcs_new = U.is_empty(rcs) and rcs or padding .. rcs
-
-    local pos = min_indent or #indent
-    local l_indent = indent:sub(0, pos) .. lcs_new .. indent:sub(pos + 1)
-
-    return l_indent .. chars .. rcs_new
 end
 
 ---Converts the given string into a uncommented string
@@ -258,16 +241,15 @@ end
 ---Check if the given string is commented or not
 ---@param left string Escaped Left side of the commentstring
 ---@param right string Right side of the commentstring
----@param padding? string Padding chars. See |U.get_padding|
+---@param pp string Padding pattern. See |U.get_padding|
 ---@return fun(line:string,scol?:integer,ecol?:integer):boolean
-function U.is_commented2(left, right, padding)
-    local pp = padding and '%s' or ''
+function U.is_commented2(left, right, pp)
     local ll = U.is_empty(left) and left or table.concat({ '^%s*', vim.pesc(left), pp })
     local rr = U.is_empty(right) and right or table.concat({ pp, vim.pesc(right), '$' })
     local pattern = table.concat({ ll, '.-', rr })
 
     return function(line, scol, ecol)
-        local ln = (scol and ecol) and string.sub(line, scol + 1, ecol + 1) or line
+        local ln = (scol == nil and ecol == nil) and line or string.sub(line, scol, ecol)
         return string.find(ln, pattern)
     end
 end
