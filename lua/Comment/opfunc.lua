@@ -55,6 +55,14 @@ function Op.opfunc(opmode, cfg, cmode, ctype, cmotion)
     local partial_block = cmotion == U.cmotion.char or cmotion == U.cmotion.v
     local block_x = partial_block and same_line
 
+    local lines = U.get_lines(range)
+
+    -- sometimes there might be a case when there are no lines
+    -- like, executing a text object returns nothing
+    if #lines == 0 then
+        return
+    end
+
     ---@type CommentCtx
     local ctx = {
         cmode = cmode,
@@ -64,7 +72,6 @@ function Op.opfunc(opmode, cfg, cmode, ctype, cmotion)
     }
 
     local lcs, rcs = U.parse_cstr(cfg, ctx)
-    local lines = U.get_lines(range)
 
     ---@type OpFnParams
     local params = {
