@@ -62,14 +62,12 @@ function U.is_empty(ln)
     return #ln == 0
 end
 
----Takes out the leading indent from lines
+---Get the length of the indentation
 ---@param str string
----@return string string Indent chars
----@return integer integer Length of the indent chars
-function U.grab_indent(str)
-    -- local _, len = string.find(str, '^%s*')
-    local _, len, indent = string.find(str, '^(%s*)')
-    return indent, len
+---@return integer integer Length of indent chars
+function U.indent_len(str)
+    local _, len = string.find(str, '^%s*')
+    return len
 end
 
 ---Helper to get padding character and regex pattern
@@ -82,15 +80,6 @@ function U.get_padding(flag)
         return '', ''
     end
     return ' ', '%s?'
-end
-
--- FIXME This prints `a` in i_CTRL-o
----Moves the cursor and enters INSERT mode
----@param row number Starting row
----@param col number Ending column
-function U.move_n_insert(row, col)
-    A.nvim_win_set_cursor(0, { row, col })
-    A.nvim_feedkeys('a', 'ni', true)
 end
 
 ---Call a function if exists
@@ -239,7 +228,7 @@ function U.uncomment_str(ln, lcs_esc, rcs_esc, pp)
 end
 
 ---Check if the given string is commented or not
----@param left string Escaped Left side of the commentstring
+---@param left string Left side of the commentstring
 ---@param right string Right side of the commentstring
 ---@param pp string Padding pattern. See |U.get_padding|
 ---@return fun(line:string,scol?:integer,ecol?:integer):boolean

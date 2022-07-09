@@ -5,6 +5,15 @@ local A = vim.api
 
 local extra = {}
 
+-- FIXME This prints `a` in i_CTRL-o
+---Moves the cursor and enters INSERT mode
+---@param row number Starting row
+---@param col number Ending column
+local function move_n_insert(row, col)
+    A.nvim_win_set_cursor(0, { row, col })
+    A.nvim_feedkeys('a', 'ni', true)
+end
+
 ---@param count number Line index
 ---@param ctype number See |CommentType|
 ---@param cfg CommentConfig
@@ -18,21 +27,20 @@ local function ins_on_line(count, ctype, cfg)
         ctype = ctype,
         range = { srow = row, scol = col, erow = row, ecol = col },
     }
-    local lcs, rcs = U.parse_cstr(cfg, ctx)
 
+    local srow = row + count
+    local lcs, rcs = U.parse_cstr(cfg, ctx)
     local line = A.nvim_get_current_line()
-    local indent = U.grab_indent(line)
+    local indent = U.indent_len(line)
     local padding = U.get_padding(cfg.padding)
 
     -- We need RHS of cstr, if we are doing block comments or if RHS exists
     -- because even in line comment RHS do exists for some filetypes like jsx_element, ocaml
-    local if_rcs = (ctype == U.ctype.block or rcs) and padding .. rcs or ''
+    local if_rcs = U.is_empty(rcs) and rcs or padding .. rcs
 
-    local srow = row + count
-    local ll = indent .. lcs .. padding
-    A.nvim_buf_set_lines(0, srow, srow, false, { ll .. if_rcs })
-    local erow, ecol = srow + 1, #ll - 1
-    U.move_n_insert(erow, ecol)
+    A.nvim_buf_set_lines(0, srow, srow, false, { table.concat({ string.rep(' ', indent), lcs, padding, if_rcs }) })
+
+    move_n_insert(srow + 1, indent + #lcs + #padding - 1)
     U.is_fn(cfg.post_hook, ctx)
 end
 
@@ -70,7 +78,7 @@ function extra.insert_eol(ctype, cfg)
 
     -- We need RHS of cstr, if we are doing block comments or if RHS exists
     -- because even in line comment RHS do exists for some filetypes like jsx_element, ocaml
-    local if_rcs = rcs and padding .. rcs or ''
+    local if_rcs = U.is_empty(rcs) and rcs or padding .. rcs
 
     local ecol
     if U.is_empty(line) then
@@ -89,7 +97,7 @@ function extra.insert_eol(ctype, cfg)
         A.nvim_buf_set_lines(0, srow - 1, srow, false, { ll .. if_rcs })
     end
 
-    U.move_n_insert(srow, ecol)
+    move_n_insert(srow, ecol)
     U.is_fn(cfg.post_hook, ctx)
 end
 
