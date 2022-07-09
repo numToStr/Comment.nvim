@@ -43,7 +43,7 @@ lua require('Comment').setup()
 
 First you need to call the `setup()` method to create the default mappings.
 
-> NOTE: If you are facing **Keybindings are mapped but they are not working** issue then please try [this](https://github.com/numToStr/Comment.nvim/issues/115#issuecomment-1032290098)
+> **Note** - If you are facing **Keybindings are mapped but they are not working** issue then please try [this](https://github.com/numToStr/Comment.nvim/issues/115#issuecomment-1032290098)
 
 - Lua
 
@@ -243,6 +243,8 @@ This plugin has native **treesitter** support for calculating `commentstring` wh
 
 For advance use cases, use [nvim-ts-context-commentstring](https://github.com/JoosepAlviste/nvim-ts-context-commentstring). See [`pre_hook`](#pre-hook) section for the integration.
 
+> **Note** - This plugin does not depend on [nvim-treesitter](https://github.com/nvim-treesitter/nvim-treesitter) however it is recommended in order to easily install tree-sitter parsers.
+
 <a id="hooks"></a>
 
 ### 🎣 Hooks
@@ -355,6 +357,8 @@ vim.api.nvim_command('set commentstring=//%s')
 
 > Run `:h commentstring` for more help
 
+<a id="ft-lua"></a>
+
 2. You can also use this plugin interface to store both line and block commentstring for the filetype. You can treat this as a more powerful version of the `commentstring`
 
 ```lua
@@ -394,7 +398,7 @@ Although, `Comment.nvim` supports neovim's `commentstring` but unfortunately it 
 
 - [`pre_hook`](#hooks) - If a string is returned from this method then it will be used for commenting.
 
-- [`ft_table`](#languages) - If the current filetype is found in the table, then the string there will be used.
+- [`ft.lua`](#ft-lua) - If the current filetype is found in the table, then the string there will be used.
 
 - `commentstring` - Neovim's native commentstring for the filetype
 

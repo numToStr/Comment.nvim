@@ -110,7 +110,7 @@ function U.get_region(opmode)
         return { srow = row, scol = 0, erow = row, ecol = 0 }
     end
 
-    local marks = string.match(opmode, '[vV]') ~= nil and { '<', '>' } or { '[', ']' }
+    local marks = string.match(opmode, '[vV]') and { '<', '>' } or { '[', ']' }
     local sln, eln = A.nvim_buf_get_mark(0, marks[1]), A.nvim_buf_get_mark(0, marks[2])
 
     return { srow = sln[1], scol = sln[2], erow = eln[1], ecol = eln[2] }
@@ -174,6 +174,7 @@ function U.parse_cstr(cfg, ctx)
     return U.unwrap_cstr(cstr)
 end
 
+--FIXME: this is a mess
 ---Returns a closure which is used to comment a line
 ---@param left string Left side of the commentstring
 ---@param right string Right side of the commentstring
