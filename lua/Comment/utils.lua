@@ -243,7 +243,7 @@ end
 ---@param right string Right side of the commentstring
 ---@param pp string Padding pattern. See |U.get_padding|
 ---@return fun(line:string,scol?:integer,ecol?:integer):boolean
-function U.is_commented2(left, right, pp)
+function U.is_commented(left, right, pp)
     local ll = U.is_empty(left) and left or table.concat({ '^%s*', vim.pesc(left), pp })
     local rr = U.is_empty(right) and right or table.concat({ pp, vim.pesc(right), '$' })
     local pattern = table.concat({ ll, '.-', rr })

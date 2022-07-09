@@ -103,7 +103,7 @@ end
 function Op.linewise(param)
     local pattern = U.is_fn(param.cfg.ignore)
     local padding, pp = U.get_padding(param.cfg.padding)
-    local check = U.is_commented2(param.lcs, param.rcs, pp)
+    local check = U.is_commented(param.lcs, param.rcs, pp)
 
     -- While commenting a region, there could be lines being both commented and non-commented
     -- So, if any line is uncommented then we should comment the whole block or vise-versa
@@ -173,8 +173,8 @@ function Op.blockwise(param, partial)
     -- If given mode is toggle then determine whether to comment or not
     local cmode = param.cmode
     if cmode == U.cmode.toggle then
-        local s_cmt = U.is_commented2(param.lcs, '', pp)(sln, scol, -1)
-        local e_cmt = U.is_commented2('', param.rcs, pp)(eln, 1, ecol)
+        local s_cmt = U.is_commented(param.lcs, '', pp)(sln, scol, -1)
+        local e_cmt = U.is_commented('', param.rcs, pp)(eln, 1, ecol)
         cmode = (s_cmt and e_cmt) and U.cmode.uncomment or U.cmode.comment
     end
 
@@ -218,7 +218,7 @@ function Op.blockwise_x(param)
 
     local cmode = param.cmode
     if cmode == U.cmode.toggle then
-        local is_cmt = U.is_commented2(param.lcs, param.rcs, pp)(line, param.range.scol, param.range.ecol + 1)
+        local is_cmt = U.is_commented(param.lcs, param.rcs, pp)(line, param.range.scol, param.range.ecol + 1)
         cmode = is_cmt and U.cmode.uncomment or U.cmode.comment
     end
 
