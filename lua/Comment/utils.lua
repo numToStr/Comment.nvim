@@ -174,35 +174,62 @@ function U.parse_cstr(cfg, ctx)
     return U.unwrap_cstr(cstr)
 end
 
---FIXME: this is a mess
+---@class CommenterOpts
+---@field left string Left side of the commentstring
+---@field right string Right side of the commentstring
+---@field scol? integer Left indentation to use with multiple lines
+---@field ecol? integer Left indentation to use with multiple lines
+---@field padding string Padding between comment chars and line
+
 ---Returns a closure which is used to comment a line
----@param left string Left side of the commentstring
----@param right string Right side of the commentstring
----@param padding string Padding between comment chars and line
----@param scol integer Left indentation to use with multiple lines
----@param ecol integer Left indentation to use with multiple lines
----@return fun(line:string):string
-function U.commenter(left, right, scol, ecol, padding)
-    local is_both = (scol > 0 and ecol > 0)
-    local middle = is_both and table.concat({ '(', string.rep('.', (ecol - scol) + 1), ')' }) or ''
-
-    local only_right = scol < 0 and ecol > 0
-    local pattern = only_right and table.concat({ '^(', string.rep('.', ecol), ')', '(.*)' })
-        or scol > 0 and table.concat({ '^(', string.rep('.', scol), ')', middle, '(.*)' })
-        or '^(%s*)(.*)'
-
-    local ll = U.is_empty(left) and left or table.concat({ left, padding })
-    local rr = U.is_empty(right) and right or table.concat({ padding, right })
-    local switch = only_right and { rr, '%2' } or { '%2', rr }
-    local repl = table.concat({ '%1', ll, table.concat(switch), (scol > 0 and ecol > 0) and '%3' or '' })
-
-    local empty = table.concat({ string.rep(' ', scol), left, right })
+---If given {string[]} to the closure then it will do blockwise
+---else it will do linewise
+---@param opt CommenterOpts
+---@return fun(line:string|string[]):string
+function U.commenter(opt)
+    local ll = U.is_empty(opt.left) and opt.left or table.concat({ opt.left, opt.padding })
+    local rr = U.is_empty(opt.right) and opt.right or table.concat({ opt.padding, opt.right })
+    local empty = table.concat({ string.rep(' ', opt.scol or 0), opt.left, opt.right })
 
     return function(line)
+        -------------------
+        -- for blockwise --
+        -------------------
+        if vim.tbl_islist(line) then
+            local first, last = unpack(line)
+            if opt.scol and opt.ecol then
+                local sfirst = string.sub(first, 0, opt.scol)
+                local slast = string.sub(first, opt.scol + 1, -1)
+                local efirst = string.sub(last, 0, opt.ecol + 1)
+                local elast = string.sub(last, opt.ecol + 2, -1)
+                return (sfirst .. ll .. slast), (efirst .. rr .. elast)
+            end
+            return string.gsub(first, '^(%s*)', '%1' .. ll), (last .. rr)
+        end
+
+        ------------------
+        -- for linewise --
+        ------------------
         if U.is_empty(line) then
             return empty
         end
-        return string.gsub(line, pattern, repl, 1)
+
+        -- for single line
+        if opt.scol and not opt.ecol then
+            -- line == 0 -> start from 0 col
+            if opt.scol == 0 then
+                return (ll .. line)
+            end
+            local first = string.sub(line, 0, opt.scol)
+            local last = string.sub(line, opt.scol + 1, -1)
+            return table.concat({ first, ll, last, rr })
+        end
+
+        -- for current-line blockwise
+        local first = string.sub(line, 0, opt.scol)
+        local mid = string.sub(line, opt.scol + 1, opt.ecol + 1)
+        local last = string.sub(line, opt.ecol + 2, -1)
+        return table.concat({ first, ll, mid, rr, last })
     end
 end
 
@@ -239,7 +266,7 @@ function U.is_commented(left, right, pp)
     local pattern = table.concat({ ll, '.-', rr })
 
     return function(line, scol, ecol)
-        local ln = (scol == nil and ecol == nil) and line or string.sub(line, scol, ecol)
+        local ln = (scol == nil or ecol == nil) and line or string.sub(line, scol + 1, ecol == -1 and ecol or ecol + 1)
         return string.find(ln, pattern)
     end
 end
