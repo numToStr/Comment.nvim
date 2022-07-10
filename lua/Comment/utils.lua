@@ -174,61 +174,60 @@ function U.parse_cstr(cfg, ctx)
     return U.unwrap_cstr(cstr)
 end
 
----@class CommenterOpts
----@field left string Left side of the commentstring
----@field right string Right side of the commentstring
----@field scol? integer Left indentation to use with multiple lines
----@field ecol? integer Left indentation to use with multiple lines
----@field padding string Padding between comment chars and line
-
 ---Returns a closure which is used to comment a line
 ---If given {string[]} to the closure then it will do blockwise
 ---else it will do linewise
----@param opt CommenterOpts
+---@param left string Left side of the commentstring
+---@param right string Right side of the commentstring
+---@param scol? integer Left indentation to use with multiple lines
+---@param ecol? integer Left indentation to use with multiple lines
+---@param padding string Padding between comment chars and line
 ---@return fun(line:string|string[]):string
-function U.commenter(opt)
-    local ll = U.is_empty(opt.left) and opt.left or table.concat({ opt.left, opt.padding })
-    local rr = U.is_empty(opt.right) and opt.right or table.concat({ opt.padding, opt.right })
-    local empty = table.concat({ string.rep(' ', opt.scol or 0), opt.left, opt.right })
+function U.commenter(left, right, scol, ecol, padding)
+    local ll = U.is_empty(left) and left or (left .. padding)
+    local rr = U.is_empty(right) and right or (padding .. right)
+    local empty = string.rep(' ', scol or 0) .. left .. right
+    local is_lw = scol and not ecol
 
     return function(line)
+        ------------------
+        -- for linewise --
+        ------------------
+        if is_lw then
+            if U.is_empty(line) then
+                return empty
+            end
+            -- line == 0 -> start from 0 col
+            if scol == 0 then
+                return (ll .. line)
+            end
+            local first = string.sub(line, 0, scol)
+            local last = string.sub(line, scol + 1, -1)
+            return table.concat({ first, ll, last, rr })
+        end
+
         -------------------
         -- for blockwise --
         -------------------
         if vim.tbl_islist(line) then
             local first, last = unpack(line)
-            if opt.scol and opt.ecol then
-                local sfirst = string.sub(first, 0, opt.scol)
-                local slast = string.sub(first, opt.scol + 1, -1)
-                local efirst = string.sub(last, 0, opt.ecol + 1)
-                local elast = string.sub(last, opt.ecol + 2, -1)
+            -- If both columns are given then we can assume it's a partial block
+            if scol and ecol then
+                local sfirst = string.sub(first, 0, scol)
+                local slast = string.sub(first, scol + 1, -1)
+                local efirst = string.sub(last, 0, ecol + 1)
+                local elast = string.sub(last, ecol + 2, -1)
                 return (sfirst .. ll .. slast), (efirst .. rr .. elast)
             end
             return string.gsub(first, '^(%s*)', '%1' .. ll), (last .. rr)
         end
 
-        ------------------
-        -- for linewise --
-        ------------------
-        if U.is_empty(line) then
-            return empty
-        end
-
-        -- for single line
-        if opt.scol and not opt.ecol then
-            -- line == 0 -> start from 0 col
-            if opt.scol == 0 then
-                return (ll .. line)
-            end
-            local first = string.sub(line, 0, opt.scol)
-            local last = string.sub(line, opt.scol + 1, -1)
-            return table.concat({ first, ll, last, rr })
-        end
-
-        -- for current-line blockwise
-        local first = string.sub(line, 0, opt.scol)
-        local mid = string.sub(line, opt.scol + 1, opt.ecol + 1)
-        local last = string.sub(line, opt.ecol + 2, -1)
+        --------------------------------
+        -- for current-line blockwise --
+        --------------------------------
+        local first = string.sub(line, 0, scol)
+        local mid = string.sub(line, scol + 1, ecol + 1)
+        local last = string.sub(line, ecol + 2, -1)
         return table.concat({ first, ll, mid, rr, last })
     end
 end
@@ -261,9 +260,9 @@ end
 ---@param pp string Padding pattern. See |U.get_padding|
 ---@return fun(line:string,scol?:integer,ecol?:integer):boolean
 function U.is_commented(left, right, pp)
-    local ll = U.is_empty(left) and left or table.concat({ '^%s*', vim.pesc(left), pp })
-    local rr = U.is_empty(right) and right or table.concat({ pp, vim.pesc(right), '$' })
-    local pattern = table.concat({ ll, '.-', rr })
+    local ll = U.is_empty(left) and left or '^%s*' .. vim.pesc(left) .. pp
+    local rr = U.is_empty(right) and right or pp .. vim.pesc(right) .. '$'
+    local pattern = ll .. '.-' .. rr
 
     return function(line, scol, ecol)
         local ln = (scol == nil or ecol == nil) and line or string.sub(line, scol + 1, ecol == -1 and ecol or ecol + 1)

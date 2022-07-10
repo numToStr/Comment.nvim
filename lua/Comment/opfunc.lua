@@ -116,9 +116,9 @@ function Op.linewise(param)
     -- So, if any line is uncommented then we should comment the whole block or vise-versa
     local cmode = U.cmode.uncomment
 
-    -- When commenting multiple line, it is to be expected that indentation should be preserved
-    -- So, When looping over multiple lines we need to store the indentation of the mininum length (except empty line)
-    -- Which will be used to semantically comment rest of the lines
+    ---When commenting multiple line, it is to be expected that indentation should be preserved
+    ---So, When looping over multiple lines we need to store the indentation of the mininum length (except empty line)
+    ---Which will be used to semantically comment rest of the lines
     ---@type integer
     local min_indent = nil
 
@@ -151,12 +151,7 @@ function Op.linewise(param)
             end
         end
     else
-        local comment = U.commenter({
-            left = param.lcs,
-            right = param.rcs,
-            scol = min_indent,
-            padding = padding,
-        })
+        local comment = U.commenter(param.lcs, param.rcs, min_indent, nil, padding)
         for i, line in ipairs(param.lines) do
             if not U.ignore(line, pattern) then
                 param.lines[i] = comment(line)
@@ -213,13 +208,7 @@ function Op.blockwise(param, partial)
             l2 = l2 .. eln:sub(param.range.ecol + 2)
         end
     else
-        l1, l2 = U.commenter({
-            left = param.lcs,
-            right = param.rcs,
-            scol = scol,
-            ecol = ecol,
-            padding = padding,
-        })({ sln, eln })
+        l1, l2 = U.commenter(param.lcs, param.rcs, scol, ecol, padding)({ sln, eln })
     end
 
     A.nvim_buf_set_lines(0, param.range.srow - 1, param.range.srow, false, { l1 })
@@ -250,13 +239,7 @@ function Op.blockwise_x(param)
 
         A.nvim_set_current_line(first .. mid .. last)
     else
-        local commented = U.commenter({
-            left = param.lcs,
-            right = param.rcs,
-            scol = param.range.scol,
-            ecol = param.range.ecol,
-            padding = padding,
-        })(line)
+        local commented = U.commenter(param.lcs, param.rcs, param.range.scol, param.range.ecol, padding)(line)
         A.nvim_set_current_line(commented)
     end
 
