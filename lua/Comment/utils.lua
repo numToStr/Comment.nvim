@@ -290,9 +290,10 @@ end
 ---Check if the given string is commented or not
 ---@param left string Left side of the commentstring
 ---@param right string Right side of the commentstring
----@param pp string Padding pattern. See |U.get_padding|
+---@param padding boolean Is padding enabled?
 ---@return fun(line:string,scol?:integer,ecol?:integer):boolean
-function U.is_commented(left, right, pp)
+function U.is_commented(left, right, padding)
+    local pp = padding and '%s?' or ''
     local ll = U.is_empty(left) and left or '^%s*' .. vim.pesc(left) .. pp
     local rr = U.is_empty(right) and right or pp .. vim.pesc(right) .. '$'
     local pattern = ll .. '.-' .. rr
