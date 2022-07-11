@@ -144,7 +144,7 @@ function Op.linewise(param)
     end
 
     if cmode == U.cmode.uncomment then
-        local uncomment = U.uncommenter(param.lcs, param.rcs, pp)
+        local uncomment = U.uncommenter(param.lcs, param.rcs, nil, nil, pp)
         for i, line in ipairs(param.lines) do
             if not U.ignore(line, pattern) then
                 param.lines[i] = uncomment(line)
@@ -189,8 +189,7 @@ function Op.blockwise(param, partial)
 
     local l1, l2
     if cmode == U.cmode.uncomment then
-        l1 = U.uncommenter(param.lcs, '', pp, scol, nil)(sln)
-        l2 = U.uncommenter('', param.rcs, pp, nil, ecol)(eln)
+        l1, l2 = U.uncommenter(param.lcs, param.rcs, scol, ecol, pp)({ sln, eln })
     else
         l1, l2 = U.commenter(param.lcs, param.rcs, scol, ecol, padding)({ sln, eln })
     end
@@ -217,7 +216,7 @@ function Op.blockwise_x(param)
     end
 
     if cmode == U.cmode.uncomment then
-        local uncommented = U.uncommenter(param.lcs, param.rcs, pp, scol, ecol)(line)
+        local uncommented = U.uncommenter(param.lcs, param.rcs, scol, ecol, pp)(line)
         A.nvim_set_current_line(uncommented)
     else
         local commented = U.commenter(param.lcs, param.rcs, scol, ecol, padding)(line)

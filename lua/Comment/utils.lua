@@ -7,15 +7,15 @@ local U = {}
 ---@alias CommentLines string[] List of lines inside the start and end index
 
 ---@class CommentRange Range of the selection that needs to be commented
----@field srow number Starting row
+---@field srow integer Starting row
 ---@field scol integer Starting column
----@field erow number Ending row
+---@field erow integer Ending row
 ---@field ecol integer Ending column
 
 ---@class CommentMode Comment modes - Can be manual or computed via operator-mode
----@field toggle number Toggle action
----@field comment number Comment action
----@field uncomment number Uncomment action
+---@field toggle integer Toggle action
+---@field comment integer Comment action
+---@field uncomment integer Uncomment action
 
 ---An object containing comment modes
 ---@type CommentMode
@@ -26,8 +26,8 @@ U.cmode = {
 }
 
 ---@class CommentType Comment types
----@field line number Use linewise commentstring
----@field block number Use blockwise commentstring
+---@field line integer Use linewise commentstring
+---@field block integer Use blockwise commentstring
 
 ---An object containing comment types
 ---@type CommentType
@@ -179,8 +179,8 @@ end
 ---else it will do linewise
 ---@param left string Left side of the commentstring
 ---@param right string Right side of the commentstring
----@param scol? integer Left indentation to use with multiple lines
----@param ecol? integer Left indentation to use with multiple lines
+---@param scol? integer Starting column
+---@param ecol? integer Ending column
 ---@param padding string Padding between comment chars and line
 ---@return fun(line:string|string[]):string
 function U.commenter(left, right, scol, ecol, padding)
@@ -237,36 +237,53 @@ end
 ---Returns a closure which is used to uncomment a line
 ---@param left string Left side of the commentstring
 ---@param right string Right side of the commentstring
+---@param scol? integer Starting column
+---@param ecol? integer Ending column
 ---@param pp string Padding pattern. See |U.get_padding|
----@return fun(line:string):string
-function U.uncommenter(left, right, pp, scol, ecol)
+---@return fun(line:string|string[]):string
+function U.uncommenter(left, right, scol, ecol, pp)
     local ll = U.is_empty(left) and left or vim.pesc(left) .. pp
     local rr = U.is_empty(right) and right or pp .. vim.pesc(right)
 
-    local pattern
+    -- FIXME: padding len
+    local lll, rrr = #left + 1, #right + 1
+    local is_lw = not (scol and scol)
+    local pattern = is_lw and '^(%s*)' .. ll .. '(.-)' .. rr .. '$' or ''
 
-    -- FIXME: maybe use string.sub
-    if scol and ecol then
-        -- current-line blockwise
-        pattern = table.concat({ '(', string.rep('.', scol), ')', ll, '(.-)', rr, '(.*)' })
-    elseif scol and not ecol then
-        -- LHS of Partial blockwise
-        pattern = table.concat({ '^(', string.rep('.', scol), ')', ll, '(.*)' })
-    elseif not scol and ecol then
-        -- RHS of Partial blockwise
-        pattern = table.concat({ '^(', string.rep('.', ecol - #right), ')', rr, '(.*)' })
-    else
-        -- this works for linewise and blockwise in line-opmode
-        pattern = '^(%s*)' .. ll .. '(.-)' .. rr .. '$'
-    end
-
-    -- TODO: take string[] for blockwise
     return function(line)
-        local a, b, c = string.match(line, pattern)
+        -------------------
+        -- for blockwise --
+        -------------------
+        if type(line) == 'table' then
+            local first, last = unpack(line)
+            -- If both columns are given then we can assume it's a partial block
+            if scol and ecol then
+                local sfirst = string.sub(first, 0, scol)
+                local slast = string.sub(first, scol + lll + 1, -1)
+                local efirst = string.sub(last, 0, ecol - rrr + 1)
+                local elast = string.sub(last, ecol + 2, -1)
+                return (sfirst .. slast), (efirst .. elast)
+            end
+            return string.gsub(first, '^(%s*)' .. ll, '%1'), string.gsub(last, rr .. '$', '')
+        end
 
-        -- If the line (after LHS) is empty then just return ''
-        -- bcz the line previously (before comment) was empty
-        return U.is_empty(b) and b or a .. b .. (c or '')
+        ------------------
+        -- for linewise --
+        ------------------
+        if is_lw then
+            local a, b, c = string.match(line, pattern)
+            -- If the line (before LHS) is just whitespace then just return ''
+            -- bcz the line previously (before comment) was empty
+            return string.find(a, '^%s$') and a or a .. b .. (c or '')
+        end
+
+        --------------------------------
+        -- for current-line blockwise --
+        --------------------------------
+        local first = string.sub(line, 0, scol)
+        local mid = string.sub(line, scol + lll + 1, ecol - rrr + 1)
+        local last = string.sub(line, ecol + 2, -1)
+        return first .. mid .. last
     end
 end
 
