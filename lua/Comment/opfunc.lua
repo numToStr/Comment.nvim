@@ -109,8 +109,8 @@ end
 ---@return number
 function Op.linewise(param)
     local pattern = U.is_fn(param.cfg.ignore)
-    local padding, pp = U.get_padding(param.cfg.padding)
-    local check = U.is_commented(param.lcs, param.rcs, param.cfg.padding)
+    local padding = U.is_fn(param.cfg.padding)
+    local check = U.is_commented(param.lcs, param.rcs, padding)
 
     -- While commenting a region, there could be lines being both commented and non-commented
     -- So, if any line is uncommented then we should comment the whole block or vise-versa
@@ -144,7 +144,7 @@ function Op.linewise(param)
     end
 
     if cmode == U.cmode.uncomment then
-        local uncomment = U.uncommenter(param.lcs, param.rcs, nil, nil, pp)
+        local uncomment = U.uncommenter(param.lcs, param.rcs, nil, nil, padding)
         for i, line in ipairs(param.lines) do
             if not U.ignore(line, pattern) then
                 param.lines[i] = uncomment(line)
@@ -173,7 +173,7 @@ end
 function Op.blockwise(param, partial)
     local sln, eln = param.lines[1], param.lines[#param.lines]
 
-    local padding, pp = U.get_padding(param.cfg.padding)
+    local padding = U.is_fn(param.cfg.padding)
     local scol, ecol = nil, nil
     if partial then
         scol, ecol = param.range.scol, param.range.ecol
@@ -182,14 +182,14 @@ function Op.blockwise(param, partial)
     -- If given mode is toggle then determine whether to comment or not
     local cmode = param.cmode
     if cmode == U.cmode.toggle then
-        local s_cmt = U.is_commented(param.lcs, '', param.cfg.padding)(sln, scol, -1)
-        local e_cmt = U.is_commented('', param.rcs, param.cfg.padding)(eln, 0, ecol)
+        local s_cmt = U.is_commented(param.lcs, '', padding)(sln, scol, -1)
+        local e_cmt = U.is_commented('', param.rcs, padding)(eln, 0, ecol)
         cmode = (s_cmt and e_cmt) and U.cmode.uncomment or U.cmode.comment
     end
 
     local l1, l2
     if cmode == U.cmode.uncomment then
-        l1, l2 = U.uncommenter(param.lcs, param.rcs, scol, ecol, pp)({ sln, eln })
+        l1, l2 = U.uncommenter(param.lcs, param.rcs, scol, ecol, padding)({ sln, eln })
     else
         l1, l2 = U.commenter(param.lcs, param.rcs, scol, ecol, padding)({ sln, eln })
     end
@@ -206,17 +206,17 @@ end
 function Op.blockwise_x(param)
     local line = param.lines[1]
 
-    local padding, pp = U.get_padding(param.cfg.padding)
+    local padding = U.is_fn(param.cfg.padding)
     local scol, ecol = param.range.scol, param.range.ecol
 
     local cmode = param.cmode
     if cmode == U.cmode.toggle then
-        local is_cmt = U.is_commented(param.lcs, param.rcs, param.cfg.padding)(line, scol, ecol)
+        local is_cmt = U.is_commented(param.lcs, param.rcs, padding)(line, scol, ecol)
         cmode = is_cmt and U.cmode.uncomment or U.cmode.comment
     end
 
     if cmode == U.cmode.uncomment then
-        local uncommented = U.uncommenter(param.lcs, param.rcs, scol, ecol, pp)(line)
+        local uncommented = U.uncommenter(param.lcs, param.rcs, scol, ecol, padding)(line)
         A.nvim_set_current_line(uncommented)
     else
         local commented = U.commenter(param.lcs, param.rcs, scol, ecol, padding)(line)

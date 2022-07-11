@@ -70,18 +70,23 @@ function U.indent_len(str)
     return len
 end
 
----Helper to get padding character and regex pattern
----NOTE: Use a function for conditional padding
----@param flag boolean|fun():boolean
----@return string string Padding chars
----@return string string Padding pattern
-function U.get_padding(flag)
-    if not U.is_fn(flag) then
-        return '', ''
-    end
-    return ' ', '%s?'
+---@private
+---Helper to get padding character
+---@param flag boolean
+---@return string string
+function U.get_pad(flag)
+    return flag and ' ' or ''
 end
 
+---@private
+---Helper to get padding pattern
+---@param flag boolean
+---@return string string
+function U.get_padpat(flag)
+    return flag and '%s?' or ''
+end
+
+---@private
 ---Call a function if exists
 ---@param fn unknown|fun():unknown Wanna be function
 ---@return unknown
@@ -181,11 +186,12 @@ end
 ---@param right string Right side of the commentstring
 ---@param scol? integer Starting column
 ---@param ecol? integer Ending column
----@param padding string Padding between comment chars and line
+---@param padding boolean Is padding enabled?
 ---@return fun(line:string|string[]):string
 function U.commenter(left, right, scol, ecol, padding)
-    local ll = U.is_empty(left) and left or (left .. padding)
-    local rr = U.is_empty(right) and right or (padding .. right)
+    local pad = U.get_pad(padding)
+    local ll = U.is_empty(left) and left or (left .. pad)
+    local rr = U.is_empty(right) and right or (pad .. right)
     local empty = string.rep(' ', scol or 0) .. left .. right
     local is_lw = scol and not ecol
 
@@ -239,14 +245,13 @@ end
 ---@param right string Right side of the commentstring
 ---@param scol? integer Starting column
 ---@param ecol? integer Ending column
----@param pp string Padding pattern. See |U.get_padding|
+---@param padding boolean Is padding enabled?
 ---@return fun(line:string|string[]):string
-function U.uncommenter(left, right, scol, ecol, pp)
+function U.uncommenter(left, right, scol, ecol, padding)
+    local pp, plen = U.get_padpat(padding), padding and 1 or 0
+    local left_len, right_len = #left + plen, #right + plen
     local ll = U.is_empty(left) and left or vim.pesc(left) .. pp
     local rr = U.is_empty(right) and right or pp .. vim.pesc(right)
-
-    -- FIXME: padding len
-    local lll, rrr = #left + 1, #right + 1
     local is_lw = not (scol and scol)
     local pattern = is_lw and '^(%s*)' .. ll .. '(.-)' .. rr .. '$' or ''
 
@@ -259,8 +264,8 @@ function U.uncommenter(left, right, scol, ecol, pp)
             -- If both columns are given then we can assume it's a partial block
             if scol and ecol then
                 local sfirst = string.sub(first, 0, scol)
-                local slast = string.sub(first, scol + lll + 1, -1)
-                local efirst = string.sub(last, 0, ecol - rrr + 1)
+                local slast = string.sub(first, scol + left_len + 1, -1)
+                local efirst = string.sub(last, 0, ecol - right_len + 1)
                 local elast = string.sub(last, ecol + 2, -1)
                 return (sfirst .. slast), (efirst .. elast)
             end
@@ -272,16 +277,16 @@ function U.uncommenter(left, right, scol, ecol, pp)
         ------------------
         if is_lw then
             local a, b, c = string.match(line, pattern)
-            -- If the line (before LHS) is just whitespace then just return ''
+            -- If there is nothing after LHS then just return ''
             -- bcz the line previously (before comment) was empty
-            return string.find(a, '^%s$') and a or a .. b .. (c or '')
+            return U.is_empty(b) and b or a .. b .. (c or '')
         end
 
         --------------------------------
         -- for current-line blockwise --
         --------------------------------
         local first = string.sub(line, 0, scol)
-        local mid = string.sub(line, scol + lll + 1, ecol - rrr + 1)
+        local mid = string.sub(line, scol + left_len + 1, ecol - right_len + 1)
         local last = string.sub(line, ecol + 2, -1)
         return first .. mid .. last
     end
@@ -293,7 +298,7 @@ end
 ---@param padding boolean Is padding enabled?
 ---@return fun(line:string,scol?:integer,ecol?:integer):boolean
 function U.is_commented(left, right, padding)
-    local pp = padding and '%s?' or ''
+    local pp = U.get_padpat(padding)
     local ll = U.is_empty(left) and left or '^%s*' .. vim.pesc(left) .. pp
     local rr = U.is_empty(right) and right or pp .. vim.pesc(right) .. '$'
     local pattern = ll .. '.-' .. rr

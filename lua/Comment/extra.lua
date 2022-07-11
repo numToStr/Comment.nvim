@@ -32,7 +32,7 @@ local function ins_on_line(count, ctype, cfg)
     local lcs, rcs = U.parse_cstr(cfg, ctx)
     local line = A.nvim_get_current_line()
     local indent = U.indent_len(line)
-    local padding = U.get_padding(cfg.padding)
+    local padding = U.get_pad(cfg.padding)
 
     -- We need RHS of cstr, if we are doing block comments or if RHS exists
     -- because even in line comment RHS do exists for some filetypes like jsx_element, ocaml
@@ -74,7 +74,7 @@ function extra.insert_eol(ctype, cfg)
     local lcs, rcs = U.parse_cstr(cfg, ctx)
 
     local line = A.nvim_get_current_line()
-    local padding = U.get_padding(cfg.padding)
+    local padding = U.get_pad(cfg.padding)
 
     -- We need RHS of cstr, if we are doing block comments or if RHS exists
     -- because even in line comment RHS do exists for some filetypes like jsx_element, ocaml
