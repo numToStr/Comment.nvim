@@ -59,7 +59,7 @@ function Op.opfunc(opmode, cfg, cmode, ctype, cmotion)
 
     -- sometimes there might be a case when there are no lines
     -- like, executing a text object returns nothing
-    if #lines == 0 then
+    if U.is_empty(lines) then
         return
     end
 
@@ -171,10 +171,9 @@ end
 ---@param partial? boolean Comment the partial region (visual mode)
 ---@return number
 function Op.blockwise(param, partial)
-    -- Block wise, only when there are more than 1 lines
     local sln, eln = param.lines[1], param.lines[#param.lines]
-    local padding, pp = U.get_padding(param.cfg.padding)
 
+    local padding, pp = U.get_padding(param.cfg.padding)
     local scol, ecol = nil, nil
     if partial then
         scol, ecol = param.range.scol, param.range.ecol
@@ -209,18 +208,19 @@ function Op.blockwise_x(param)
     local line = param.lines[1]
 
     local padding, pp = U.get_padding(param.cfg.padding)
+    local scol, ecol = param.range.scol, param.range.ecol
 
     local cmode = param.cmode
     if cmode == U.cmode.toggle then
-        local is_cmt = U.is_commented(param.lcs, param.rcs, pp)(line, param.range.scol, param.range.ecol)
+        local is_cmt = U.is_commented(param.lcs, param.rcs, pp)(line, scol, ecol)
         cmode = is_cmt and U.cmode.uncomment or U.cmode.comment
     end
 
     if cmode == U.cmode.uncomment then
-        local uncommented = U.uncommenter(param.lcs, param.rcs, pp, param.range.scol, param.range.ecol)(line)
+        local uncommented = U.uncommenter(param.lcs, param.rcs, pp, scol, ecol)(line)
         A.nvim_set_current_line(uncommented)
     else
-        local commented = U.commenter(param.lcs, param.rcs, param.range.scol, param.range.ecol, padding)(line)
+        local commented = U.commenter(param.lcs, param.rcs, scol, ecol, padding)(line)
         A.nvim_set_current_line(commented)
     end
 

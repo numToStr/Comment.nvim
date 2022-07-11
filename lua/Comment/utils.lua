@@ -56,10 +56,10 @@ U.cmotion = {
 }
 
 ---Check whether the line is empty
----@param ln string
+---@param iter string|string[]
 ---@return boolean
-function U.is_empty(ln)
-    return #ln == 0
+function U.is_empty(iter)
+    return #iter == 0
 end
 
 ---Get the length of the indentation
@@ -219,8 +219,9 @@ function U.commenter(left, right, scol, ecol, padding)
                 local elast = string.sub(last, ecol + 2, -1)
                 return (sfirst .. ll .. slast), (efirst .. rr .. elast)
             end
-            -- FIXME: if line is empty then don't add leading or trailing padding
-            return string.gsub(first, '^(%s*)', '%1' .. ll), (last .. rr)
+            first = U.is_empty(first) and left or string.gsub(first, '^(%s*)', '%1' .. ll)
+            last = U.is_empty(last) and right or (last .. rr)
+            return first, last
         end
 
         --------------------------------
@@ -259,6 +260,7 @@ function U.uncommenter(left, right, pp, scol, ecol)
         pattern = '^(%s*)' .. ll .. '(.-)' .. rr .. '$'
     end
 
+    -- TODO: take string[] for blockwise
     return function(line)
         local a, b, c = string.match(line, pattern)
 
@@ -278,6 +280,7 @@ function U.is_commented(left, right, pp)
     local rr = U.is_empty(right) and right or pp .. vim.pesc(right) .. '$'
     local pattern = ll .. '.-' .. rr
 
+    -- TODO: take string[] for blockwise
     return function(line, scol, ecol)
         local ln = (scol == nil or ecol == nil) and line or string.sub(line, scol + 1, ecol == -1 and ecol or ecol + 1)
         return string.find(ln, pattern)
