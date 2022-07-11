@@ -144,10 +144,10 @@ function Op.linewise(param)
     end
 
     if cmode == U.cmode.uncomment then
-        local lcs_esc, rcs_esc = vim.pesc(param.lcs), vim.pesc(param.rcs)
+        local uncomment = U.uncommenter(param.lcs, param.rcs, pp)
         for i, line in ipairs(param.lines) do
             if not U.ignore(line, pattern) then
-                param.lines[i] = U.uncomment_str(line, lcs_esc, rcs_esc, pp)
+                param.lines[i] = uncomment(line)
             end
         end
     else
@@ -190,23 +190,8 @@ function Op.blockwise(param, partial)
 
     local l1, l2
     if cmode == U.cmode.uncomment then
-        -- FIXME: remove all this logic when we have `U.uncommenter`
-        local sln_check, eln_check
-        if partial then
-            sln_check = sln:sub(param.range.scol + 1)
-            eln_check = eln:sub(0, param.range.ecol + 1)
-        else
-            sln_check, eln_check = sln, eln
-        end
-
-        local lcs_esc, rcs_esc = vim.pesc(param.lcs), vim.pesc(param.rcs)
-        l1 = U.uncomment_str(sln_check, lcs_esc, '', pp)
-        l2 = U.uncomment_str(eln_check, '', rcs_esc, pp)
-
-        if partial then
-            l1 = sln:sub(0, param.range.scol) .. l1
-            l2 = l2 .. eln:sub(param.range.ecol + 2)
-        end
+        l1 = U.uncommenter(param.lcs, '', pp, scol, nil)(sln)
+        l2 = U.uncommenter('', param.rcs, pp, nil, ecol)(eln)
     else
         l1, l2 = U.commenter(param.lcs, param.rcs, scol, ecol, padding)({ sln, eln })
     end
@@ -232,12 +217,8 @@ function Op.blockwise_x(param)
     end
 
     if cmode == U.cmode.uncomment then
-        -- FIXME: remove all this logic when we have `U.uncommenter`
-        local first = line:sub(0, param.range.scol)
-        local mid = line:sub(param.range.scol + #param.lcs + 2, param.range.ecol - #param.rcs)
-        local last = line:sub(param.range.ecol + 2)
-
-        A.nvim_set_current_line(first .. mid .. last)
+        local uncommented = U.uncommenter(param.lcs, param.rcs, pp, param.range.scol, param.range.ecol)(line)
+        A.nvim_set_current_line(uncommented)
     else
         local commented = U.commenter(param.lcs, param.rcs, param.range.scol, param.range.ecol, padding)(line)
         A.nvim_set_current_line(commented)

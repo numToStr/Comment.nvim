@@ -193,13 +193,13 @@ function U.commenter(left, right, scol, ecol, padding)
         ------------------
         -- for linewise --
         ------------------
+        if U.is_empty(line) then
+            return empty
+        end
         if is_lw then
-            if U.is_empty(line) then
-                return empty
-            end
             -- line == 0 -> start from 0 col
             if scol == 0 then
-                return (ll .. line)
+                return (ll .. line .. rr)
             end
             local first = string.sub(line, 0, scol)
             local last = string.sub(line, scol + 1, -1)
@@ -209,7 +209,7 @@ function U.commenter(left, right, scol, ecol, padding)
         -------------------
         -- for blockwise --
         -------------------
-        if vim.tbl_islist(line) then
+        if type(line) == 'table' then
             local first, last = unpack(line)
             -- If both columns are given then we can assume it's a partial block
             if scol and ecol then
@@ -219,6 +219,7 @@ function U.commenter(left, right, scol, ecol, padding)
                 local elast = string.sub(last, ecol + 2, -1)
                 return (sfirst .. ll .. slast), (efirst .. rr .. elast)
             end
+            -- FIXME: if line is empty then don't add leading or trailing padding
             return string.gsub(first, '^(%s*)', '%1' .. ll), (last .. rr)
         end
 
@@ -232,26 +233,39 @@ function U.commenter(left, right, scol, ecol, padding)
     end
 end
 
----Converts the given string into a uncommented string
----@param ln string Line that needs to be uncommented
----@param lcs_esc string (Escaped) Left side of the commentstring
----@param rcs_esc string (Escaped) Right side of the commentstring
+---Returns a closure which is used to uncomment a line
+---@param left string Left side of the commentstring
+---@param right string Right side of the commentstring
 ---@param pp string Padding pattern. See |U.get_padding|
----@return string string Uncommented string
-function U.uncomment_str(ln, lcs_esc, rcs_esc, pp)
-    local ll = U.is_empty(lcs_esc) and lcs_esc or lcs_esc .. pp
-    local rr = U.is_empty(rcs_esc) and rcs_esc or rcs_esc .. '$?'
+---@return fun(line:string):string
+function U.uncommenter(left, right, pp, scol, ecol)
+    local ll = U.is_empty(left) and left or vim.pesc(left) .. pp
+    local rr = U.is_empty(right) and right or pp .. vim.pesc(right)
 
-    local indent, chars = ln:match('(%s*)' .. ll .. '(.*)' .. rr)
+    local pattern
 
-    -- If the line (after cstring) is empty then just return ''
-    -- bcz when uncommenting multiline this also doesn't preserve leading whitespace as the line was previously empty
-    if U.is_empty(chars) then
-        return chars
+    -- FIXME: maybe use string.sub
+    if scol and ecol then
+        -- current-line blockwise
+        pattern = table.concat({ '(', string.rep('.', scol), ')', ll, '(.-)', rr, '(.*)' })
+    elseif scol and not ecol then
+        -- LHS of Partial blockwise
+        pattern = table.concat({ '^(', string.rep('.', scol), ')', ll, '(.*)' })
+    elseif not scol and ecol then
+        -- RHS of Partial blockwise
+        pattern = table.concat({ '^(', string.rep('.', ecol - #right), ')', rr, '(.*)' })
+    else
+        -- this works for linewise and blockwise in line-opmode
+        pattern = '^(%s*)' .. ll .. '(.-)' .. rr .. '$'
     end
 
-    -- When padding is enabled then trim one trailing space char
-    return indent .. chars:gsub(pp .. '$', '')
+    return function(line)
+        local a, b, c = string.match(line, pattern)
+
+        -- If the line (after LHS) is empty then just return ''
+        -- bcz the line previously (before comment) was empty
+        return U.is_empty(b) and b or a .. b .. (c or '')
+    end
 end
 
 ---Check if the given string is commented or not
