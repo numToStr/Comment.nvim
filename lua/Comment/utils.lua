@@ -253,7 +253,7 @@ function U.uncommenter(left, right, scol, ecol, padding)
     local ll = U.is_empty(left) and left or vim.pesc(left) .. pp
     local rr = U.is_empty(right) and right or pp .. vim.pesc(right)
     local is_lw = not (scol and scol)
-    local pattern = is_lw and '^(%s*)' .. ll .. '(.-)' .. rr .. '$' or ''
+    local pattern = is_lw and '^(%s*)' .. ll .. '(.-)' .. rr .. '$'
 
     return function(line)
         -------------------
@@ -295,18 +295,40 @@ end
 ---Check if the given string is commented or not
 ---@param left string Left side of the commentstring
 ---@param right string Right side of the commentstring
+---@param scol? integer Starting column
+---@param ecol? integer Ending column
 ---@param padding boolean Is padding enabled?
----@return fun(line:string,scol?:integer,ecol?:integer):boolean
-function U.is_commented(left, right, padding)
+---@return fun(line:string):boolean
+function U.is_commented(left, right, scol, ecol, padding)
     local pp = U.get_padpat(padding)
     local ll = U.is_empty(left) and left or '^%s*' .. vim.pesc(left) .. pp
     local rr = U.is_empty(right) and right or pp .. vim.pesc(right) .. '$'
     local pattern = ll .. '.-' .. rr
+    local is_full = scol == nil or ecol == nil
 
-    -- TODO: take string[] for blockwise
-    return function(line, scol, ecol)
-        local ln = (scol == nil or ecol == nil) and line or string.sub(line, scol + 1, ecol == -1 and ecol or ecol + 1)
-        return string.find(ln, pattern)
+    return function(line)
+        -------------------
+        -- for blockwise --
+        -------------------
+        if type(line) == 'table' then
+            local first, last = unpack(line)
+            if is_full then
+                return string.find(first, ll) and string.find(last, rr)
+            end
+            return string.find(string.sub(first, scol + 1, -1), ll) and string.find(string.sub(last, 0, ecol + 1), rr)
+        end
+
+        ------------------
+        -- for linewise --
+        ------------------
+        if is_full then
+            return string.find(line, pattern)
+        end
+
+        --------------------------------
+        -- for current-line blockwise --
+        --------------------------------
+        return string.find(string.sub(line, scol + 1, ecol + 1), pattern)
     end
 end
 
