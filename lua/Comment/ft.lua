@@ -21,6 +21,7 @@ local M = {
 ---Lang table that contains commentstring (linewise/blockwise) for mutliple filetypes
 ---@type table { filetype = { linewise, blockwise } }
 local L = {
+    arduino = { M.cxx_l, M.cxx_b },
     bash = { M.hash },
     bib = { M.latex },
     c = { M.cxx_l, M.cxx_b },
