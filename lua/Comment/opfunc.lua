@@ -120,7 +120,7 @@ function Op.linewise(param)
     ---So, When looping over multiple lines we need to store the indentation of the mininum length (except empty line)
     ---Which will be used to semantically comment rest of the lines
     ---@type integer
-    local min_indent = nil
+    local min_indent = -1
 
     -- If the given cmode is uncomment then we actually don't want to compute the cmode or min_indent
     if param.cmode ~= U.cmode.uncomment then
@@ -135,7 +135,7 @@ function Op.linewise(param)
                 -- As calculating min_indent only makes sense when we actually want to comment the lines
                 if not U.is_empty(line) and (cmode == U.cmode.comment or param.cmode == U.cmode.comment) then
                     local len = U.indent_len(line)
-                    if not min_indent or min_indent > len then
+                    if min_indent == -1 or min_indent > len then
                         min_indent = len
                     end
                 end

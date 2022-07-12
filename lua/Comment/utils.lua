@@ -199,10 +199,10 @@ function U.commenter(left, right, scol, ecol, padding)
         ------------------
         -- for linewise --
         ------------------
-        if U.is_empty(line) then
-            return empty
-        end
         if is_lw then
+            if U.is_empty(line) then
+                return empty
+            end
             -- line == 0 -> start from 0 col
             if scol == 0 then
                 return (ll .. line .. rr)
