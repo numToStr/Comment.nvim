@@ -216,18 +216,20 @@ function U.commenter(left, right, padding, scol, ecol)
         -- for blockwise --
         -------------------
         if type(line) == 'table' then
-            local first, last = unpack(line)
+            local first, last = line[1], line[#line]
             -- If both columns are given then we can assume it's a partial block
             if scol and ecol then
                 local sfirst = string.sub(first, 0, scol)
                 local slast = string.sub(first, scol + 1, -1)
                 local efirst = string.sub(last, 0, ecol + 1)
                 local elast = string.sub(last, ecol + 2, -1)
-                return (sfirst .. ll .. slast), (efirst .. rr .. elast)
+                line[1] = sfirst .. ll .. slast
+                line[#line] = efirst .. rr .. elast
+            else
+                line[1] = U.is_empty(first) and left or string.gsub(first, '^(%s*)', '%1' .. ll)
+                line[#line] = U.is_empty(last) and right or (last .. rr)
             end
-            first = U.is_empty(first) and left or string.gsub(first, '^(%s*)', '%1' .. ll)
-            last = U.is_empty(last) and right or (last .. rr)
-            return first, last
+            return line
         end
 
         --------------------------------
@@ -260,16 +262,20 @@ function U.uncommenter(left, right, padding, scol, ecol)
         -- for blockwise --
         -------------------
         if type(line) == 'table' then
-            local first, last = unpack(line)
+            local first, last = line[1], line[#line]
             -- If both columns are given then we can assume it's a partial block
             if scol and ecol then
                 local sfirst = string.sub(first, 0, scol)
                 local slast = string.sub(first, scol + left_len + 1, -1)
                 local efirst = string.sub(last, 0, ecol - right_len + 1)
                 local elast = string.sub(last, ecol + 2, -1)
-                return (sfirst .. slast), (efirst .. elast)
+                line[1] = sfirst .. slast
+                line[#line] = efirst .. elast
+            else
+                line[1] = string.gsub(first, '^(%s*)' .. ll, '%1')
+                line[#line] = string.gsub(last, rr .. '$', '')
             end
-            return string.gsub(first, '^(%s*)' .. ll, '%1'), string.gsub(last, rr .. '$', '')
+            return line
         end
 
         ------------------
@@ -298,7 +304,7 @@ end
 ---@param padding boolean Is padding enabled?
 ---@param scol? integer Starting column
 ---@param ecol? integer Ending column
----@return fun(line:string):boolean
+---@return fun(line:string|string[]):boolean
 function U.is_commented(left, right, padding, scol, ecol)
     local pp = U.get_padpat(padding)
     local ll = U.is_empty(left) and left or '^%s*' .. vim.pesc(left) .. pp
@@ -311,7 +317,7 @@ function U.is_commented(left, right, padding, scol, ecol)
         -- for blockwise --
         -------------------
         if type(line) == 'table' then
-            local first, last = unpack(line)
+            local first, last = line[1], line[#line]
             if is_full then
                 return string.find(first, ll) and string.find(last, rr)
             end
