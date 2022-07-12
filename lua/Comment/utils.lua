@@ -184,11 +184,11 @@ end
 ---else it will do linewise
 ---@param left string Left side of the commentstring
 ---@param right string Right side of the commentstring
+---@param padding boolean Is padding enabled?
 ---@param scol? integer Starting column
 ---@param ecol? integer Ending column
----@param padding boolean Is padding enabled?
 ---@return fun(line:string|string[]):string
-function U.commenter(left, right, scol, ecol, padding)
+function U.commenter(left, right, padding, scol, ecol)
     local pad = U.get_pad(padding)
     local ll = U.is_empty(left) and left or (left .. pad)
     local rr = U.is_empty(right) and right or (pad .. right)
@@ -243,11 +243,11 @@ end
 ---Returns a closure which is used to uncomment a line
 ---@param left string Left side of the commentstring
 ---@param right string Right side of the commentstring
+---@param padding boolean Is padding enabled?
 ---@param scol? integer Starting column
 ---@param ecol? integer Ending column
----@param padding boolean Is padding enabled?
 ---@return fun(line:string|string[]):string
-function U.uncommenter(left, right, scol, ecol, padding)
+function U.uncommenter(left, right, padding, scol, ecol)
     local pp, plen = U.get_padpat(padding), padding and 1 or 0
     local left_len, right_len = #left + plen, #right + plen
     local ll = U.is_empty(left) and left or vim.pesc(left) .. pp
@@ -295,11 +295,11 @@ end
 ---Check if the given string is commented or not
 ---@param left string Left side of the commentstring
 ---@param right string Right side of the commentstring
+---@param padding boolean Is padding enabled?
 ---@param scol? integer Starting column
 ---@param ecol? integer Ending column
----@param padding boolean Is padding enabled?
 ---@return fun(line:string):boolean
-function U.is_commented(left, right, scol, ecol, padding)
+function U.is_commented(left, right, padding, scol, ecol)
     local pp = U.get_padpat(padding)
     local ll = U.is_empty(left) and left or '^%s*' .. vim.pesc(left) .. pp
     local rr = U.is_empty(right) and right or pp .. vim.pesc(right) .. '$'
