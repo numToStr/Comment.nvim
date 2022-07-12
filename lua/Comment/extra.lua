@@ -83,7 +83,7 @@ function extra.insert_eol(ctype, cfg)
     local ecol
     if U.is_empty(line) then
         -- If line is empty, start comment at the correct indentation level
-        A.nvim_buf_set_lines(0, srow - 1, srow, false, { lcs .. padding .. if_rcs })
+        A.nvim_set_current_line(lcs .. padding .. if_rcs)
         A.nvim_command('normal! ==')
         ecol = #A.nvim_get_current_line() - #if_rcs - 1
     else
@@ -92,9 +92,8 @@ function extra.insert_eol(ctype, cfg)
         -- 2. Other than that, I am assuming that the users wants a space b/w the end of line and start of the comment
         local space = vim.bo.filetype == 'python' and '  ' or ' '
         local ll = line .. space .. lcs .. padding
-
+        A.nvim_set_current_line(ll .. if_rcs)
         ecol = #ll - 1
-        A.nvim_buf_set_lines(0, srow - 1, srow, false, { ll .. if_rcs })
     end
 
     move_n_insert(srow, ecol)
