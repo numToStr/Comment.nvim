@@ -424,10 +424,10 @@ The following object is provided as an argument to `pre_hook` and `post_hook` fu
 
 ---Range of the selection that needs to be commented
 ---@class CommentRange
----@field srow number Starting row
----@field scol number Starting column
----@field erow number Ending row
----@field ecol number Ending column
+---@field srow integer Starting row
+---@field scol integer Starting column
+---@field erow integer Ending row
+---@field ecol integer Ending column
 ```
 
 `CommentType`, `CommentMode` and `CommentMotion` all of them are exported from the plugin's utils for reuse

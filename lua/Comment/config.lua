@@ -44,8 +44,8 @@
 ---@private
 ---@class RootConfig
 ---@field config CommentConfig
----@field position number[] To be used to restore cursor position
----@field count number Helps with dot-repeat support for count prefix
+---@field position integer[] To be used to restore cursor position
+---@field count integer Helps with dot-repeat support for count prefix
 local Config = {
     state = {},
     config = {
@@ -88,6 +88,7 @@ function Config:get()
     return self.config
 end
 
+---@export ft
 return setmetatable(Config, {
     __index = function(this, k)
         return this.state[k]

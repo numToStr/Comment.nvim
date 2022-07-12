@@ -37,12 +37,12 @@ U.ctype = {
 }
 
 ---@class CommentMotion Comment motion types
----@field private _ number Compute from vim mode. See |OpMode|
----@field line number Line motion (ie. `gc2j`)
----@field char number Character/left-right motion (ie. `gc2j`)
----@field block number Visual operator-pending motion
----@field v number Visual motion
----@field V number Visual-line motion
+---@field private _ integer Compute from vim mode. See |OpMode|
+---@field line integer Line motion (ie. 'gc2j')
+---@field char integer Character/left-right motion (ie. 'gc2w')
+---@field block integer Visual operator-pending motion
+---@field v integer Visual motion (ie. 'v3jgc')
+---@field V integer Visual-line motion (ie. 'V10kgc')
 
 ---An object containing comment motions
 ---@type CommentMotion
@@ -55,6 +55,7 @@ U.cmotion = {
     V = 5,
 }
 
+---@private
 ---Check whether the line is empty
 ---@param iter string|string[]
 ---@return boolean
@@ -62,6 +63,7 @@ function U.is_empty(iter)
     return #iter == 0
 end
 
+---@private
 ---Get the length of the indentation
 ---@param str string
 ---@return integer integer Length of indent chars
@@ -97,6 +99,7 @@ function U.is_fn(fn, ...)
     return fn
 end
 
+---@private
 ---Check if the given line is ignored or not with the given pattern
 ---@param ln string Line to be ignored
 ---@param pat string Lua regex
@@ -122,7 +125,7 @@ function U.get_region(opmode)
 end
 
 ---Get lines from the current position to the given count
----@param count number
+---@param count integer Probably 'vim.v.count'
 ---@return CommentLines
 ---@return CommentRange
 function U.get_count_lines(count)
@@ -146,7 +149,7 @@ function U.get_lines(range)
 end
 
 ---Validates and unwraps the given commentstring
----@param cstr string
+---@param cstr string See 'commentstring'
 ---@return string string Left side of the commentstring
 ---@return string string Right side of the commentstring
 function U.unwrap_cstr(cstr)
@@ -160,10 +163,10 @@ function U.unwrap_cstr(cstr)
     return vim.trim(left), vim.trim(right)
 end
 
----Unwraps the commentstring by taking it from the following places
----     1. `pre_hook` (optionally a string can be returned)
----     2. `ft.lua` (extra commentstring table in the plugin)
----     3. `commentstring` (already set or added in pre_hook)
+---Parses commentstring from the following places in the respective order
+---  1. pre_hook - commentstring returned from the function
+---  2. ft.lua - commentstring table bundled with the plugin
+---  3. commentstring - Neovim's native. See 'commentstring'
 ---@param cfg CommentConfig
 ---@param ctx CommentCtx
 ---@return string string Left side of the commentstring
@@ -179,9 +182,10 @@ function U.parse_cstr(cfg, ctx)
     return U.unwrap_cstr(cstr)
 end
 
----Returns a closure which is used to comment a line
----If given {string[]} to the closure then it will do blockwise
----else it will do linewise
+---Returns a closure which is used to do comments
+---
+---If given {string[]} to the closure then it will do blockwise comment
+---else linewise comment will be done with the given {string}
 ---@param left string Left side of the commentstring
 ---@param right string Right side of the commentstring
 ---@param padding boolean Is padding enabled?
@@ -243,6 +247,9 @@ function U.commenter(left, right, padding, scol, ecol)
 end
 
 ---Returns a closure which is used to uncomment a line
+---
+---If given {string[]} to the closure then it will block uncomment
+---else linewise uncomment will be done with the given {string}
 ---@param left string Left side of the commentstring
 ---@param right string Right side of the commentstring
 ---@param padding boolean Is padding enabled?
@@ -299,6 +306,10 @@ function U.uncommenter(left, right, padding, scol, ecol)
 end
 
 ---Check if the given string is commented or not
+---
+---If given {string[]} to the closure, it will check the first and last line
+---with LHS and RHS of commentstring respectively else it will check the given
+---line with LHS and RHS (if given) of the commenstring
 ---@param left string Left side of the commentstring
 ---@param right string Right side of the commentstring
 ---@param padding boolean Is padding enabled?

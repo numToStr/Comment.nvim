@@ -7,15 +7,15 @@ local extra = {}
 
 -- FIXME This prints `a` in i_CTRL-o
 ---Moves the cursor and enters INSERT mode
----@param row number Starting row
----@param col number Ending column
+---@param row integer Starting row
+---@param col integer Ending column
 local function move_n_insert(row, col)
     A.nvim_win_set_cursor(0, { row, col })
     A.nvim_feedkeys('a', 'ni', true)
 end
 
----@param count number Line index
----@param ctype number See |CommentType|
+---@param count integer Line index
+---@param ctype integer
 ---@param cfg CommentConfig
 local function ins_on_line(count, ctype, cfg)
     local row, col = unpack(A.nvim_win_get_cursor(0))
@@ -45,21 +45,21 @@ local function ins_on_line(count, ctype, cfg)
 end
 
 ---Add a comment below the current line and goes to INSERT mode
----@param ctype number See |CommentType|
+---@param ctype integer See |comment.utils.ctype|
 ---@param cfg CommentConfig
 function extra.insert_below(ctype, cfg)
     ins_on_line(0, ctype, cfg)
 end
 
 ---Add a comment above the current line and goes to INSERT mode
----@param ctype number See |CommentType|
+---@param ctype integer See |comment.utils.ctype|
 ---@param cfg CommentConfig
 function extra.insert_above(ctype, cfg)
     ins_on_line(-1, ctype, cfg)
 end
 
 ---Add a comment at the end of current line and goes to INSERT mode
----@param ctype number See |CommentType|
+---@param ctype integer See |comment.utils.ctype|
 ---@param cfg CommentConfig
 function extra.insert_eol(ctype, cfg)
     local srow, scol = unpack(A.nvim_win_get_cursor(0))

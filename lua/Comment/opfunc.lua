@@ -6,18 +6,24 @@ local A = vim.api
 
 local Op = {}
 
----@alias OpMode 'line'|'char'|'v'|'V' Vim operator-mode motions. Read `:h map-operator`
+---Vim operator-mode motions.
+---Read `:h :map-operator`
+---@alias OpMode
+---| 'line' # Vertical motion
+---| 'char' # Horizontal motion
+---| 'v' # Visual Block motion
+---| 'V' # Visual Line motion
 
 ---@class CommentCtx Comment context
----@field ctype number CommentType
----@field cmode number CommentMode
----@field cmotion number CommentMotion
+---@field ctype integer See |comment.utils.ctype|
+---@field cmode integer See |comment.utils.cmode|
+---@field cmotion integer See |comment.utils.cmotion|
 ---@field range CommentRange
 
 ---@class OpFnParams Operator-mode function parameters
 ---@field cfg CommentConfig
----@field cmode number See |comment.utils.cmode|
----@field lines table List of lines
+---@field cmode integer See |comment.utils.cmode|
+---@field lines string[] List of lines
 ---@field rcs string RHS of commentstring
 ---@field lcs string LHS of commentstring
 ---@field range CommentRange
@@ -26,28 +32,10 @@ local Op = {}
 ---This function contains the core logic for comment/uncomment
 ---@param opmode OpMode
 ---@param cfg CommentConfig
----@param cmode number CommentMode
----@param ctype number CommentType
----@param cmotion number CommentMotion
+---@param cmode integer See |comment.utils.cmode|
+---@param ctype integer See |comment.utils.ctype|
+---@param cmotion integer See |comment.utils.cmotion|
 function Op.opfunc(opmode, cfg, cmode, ctype, cmotion)
-    -- comment/uncomment logic
-    --
-    -- 1. type == line
-    --      * decide whether to comment or not, if all the lines are commented then uncomment otherwise comment
-    --      * also, store the minimum indent from all the lines (exclude empty line)
-    --      * if comment the line, use cstr LHS and also considering the min indent
-    --      * if uncomment the line, remove cstr LHS from lines
-    --      * update the lines
-    -- 2. type == block
-    --      * check if the first and last is commented or not with cstr LHS and RHS respectively.
-    --      * if both lines commented
-    --          - remove cstr LHS from the first line
-    --          - remove cstr RHS to end of the last line
-    --      * if both lines uncommented
-    --          - add cstr LHS after the leading whitespace and before the first char of the first line
-    --          - add cstr RHS to end of the last line
-    --      * update the lines
-
     cmotion = cmotion == U.cmotion._ and U.cmotion[opmode] or cmotion
 
     local range = U.get_region(opmode)
@@ -103,7 +91,7 @@ end
 
 ---Line commenting
 ---@param param OpFnParams
----@return number
+---@return integer _ Returns a calculated comment mode
 function Op.linewise(param)
     local pattern = U.is_fn(param.cfg.ignore)
     local padding = U.is_fn(param.cfg.padding)
@@ -161,10 +149,10 @@ function Op.linewise(param)
     return cmode
 end
 
----Full/Partial/Current-line Block commenting
+---Full/Partial/Current-Line Block commenting
 ---@param param OpFnParams
 ---@param partial? boolean Comment the partial region (visual mode)
----@return number
+---@return integer _ Returns a calculated comment mode
 function Op.blockwise(param, partial)
     local is_x = #param.lines == 1 -- current-line blockwise
     local lines = is_x and param.lines[1] or param.lines
@@ -198,11 +186,11 @@ function Op.blockwise(param, partial)
     return cmode
 end
 
----Toggle line comment with count i.e vim.v.count
----Example: `10gl` will comment 10 lines
----@param count number Number of lines
+---Line commenting with count i.e vim.v.count
+---Example: '10gl' will comment 10 lines
+---@param count integer Number of lines
 ---@param cfg CommentConfig
----@param ctype number CommentType
+---@param ctype integer See |comment.utils.ctype|
 function Op.count(count, cfg, ctype)
     local lines, range = U.get_count_lines(count)
 

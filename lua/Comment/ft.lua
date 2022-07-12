@@ -19,7 +19,8 @@ local M = {
 }
 
 ---Lang table that contains commentstring (linewise/blockwise) for mutliple filetypes
----@type table { filetype = { linewise, blockwise } }
+---Structure = { filetype = { linewise, blockwise } }
+---@type table<string,string[]>
 local L = {
     arduino = { M.cxx_l, M.cxx_b },
     bash = { M.hash },
@@ -115,7 +116,7 @@ end
 
 ---Get a commentstring from the filtype list
 ---@param lang CommentLang
----@param ctype number See |CommentType|
+---@param ctype integer See |comment.utils.ctype|
 ---@return string
 function ft.get(lang, ctype)
     local l = ft.lang(lang)
@@ -124,16 +125,16 @@ end
 
 ---Get the commentstring(s) from the filtype list
 ---@param lang CommentLang
----@return string
+---@return string[]
 function ft.lang(lang)
     return L[lang]
 end
 
 ---Get the tree in range by walking the whole tree recursively
----NOTE: This ignores `comment` parser as this is useless
+---NOTE: This ignores `comment` parser as this is not needed
 ---@param tree userdata Tree to be walked
----@param range number[] Range to check for
----@return userdata
+---@param range integer[] Range to check - {start_line, s_col, end_line, end_col}
+---@return userdata _ Returns a 'treesitter-languagetree'
 function ft.contains(tree, range)
     for lang, child in pairs(tree:children()) do
         if lang ~= 'comment' and child:contains(range) then
@@ -166,6 +167,7 @@ function ft.calculate(ctx)
     return ft.get(lang, ctx.ctype) or default
 end
 
+---@export ft
 return setmetatable(ft, {
     __newindex = function(this, k, v)
         this.set(k, v)
