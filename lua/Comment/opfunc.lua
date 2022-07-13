@@ -34,11 +34,9 @@ local Op = {}
 ---@param cfg CommentConfig
 ---@param cmode integer See |comment.utils.cmode|
 ---@param ctype integer See |comment.utils.ctype|
----@param cmotion integer See |comment.utils.cmotion|
-function Op.opfunc(opmode, cfg, cmode, ctype, cmotion)
-    cmotion = cmotion == U.cmotion._ and U.cmotion[opmode] or cmotion
-
+function Op.opfunc(opmode, cfg, cmode, ctype)
     local range = U.get_region(opmode)
+    local cmotion = U.cmotion[opmode] or U.cmotion.line
     local partial = cmotion == U.cmotion.char or cmotion == U.cmotion.v
     local block_x = partial and range.srow == range.erow
 

@@ -37,7 +37,6 @@ U.ctype = {
 }
 
 ---@class CommentMotion Comment motion types
----@field private _ integer Compute from vim mode. See |OpMode|
 ---@field line integer Line motion (ie. 'gc2j')
 ---@field char integer Character/left-right motion (ie. 'gc2w')
 ---@field block integer Visual operator-pending motion
@@ -47,7 +46,6 @@ U.ctype = {
 ---An object containing comment motions
 ---@type CommentMotion
 U.cmotion = {
-    _ = 0,
     line = 1,
     char = 2,
     block = 3,
