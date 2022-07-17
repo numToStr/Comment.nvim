@@ -26,14 +26,14 @@ U.cmode = {
 }
 
 ---@class CommentType Comment types
----@field line integer Use linewise commentstring
----@field block integer Use blockwise commentstring
+---@field linewise integer Use linewise commentstring
+---@field blockwise integer Use blockwise commentstring
 
 ---An object containing comment types
 ---@type CommentType
 U.ctype = {
-    line = 1,
-    block = 2,
+    linewise = 1,
+    blockwise = 2,
 }
 
 ---@class CommentMotion Comment motion types

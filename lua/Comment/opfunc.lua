@@ -52,7 +52,7 @@ function Op.opfunc(opmode, cfg, cmode, ctype)
     local ctx = {
         cmode = cmode,
         cmotion = cmotion,
-        ctype = block_x and U.ctype.block or ctype,
+        ctype = block_x and U.ctype.blockwise or ctype,
         range = range,
     }
 
@@ -68,7 +68,7 @@ function Op.opfunc(opmode, cfg, cmode, ctype)
         range = range,
     }
 
-    if block_x or ctype == U.ctype.block then
+    if block_x or ctype == U.ctype.blockwise then
         ctx.cmode = Op.blockwise(params, partial)
     else
         ctx.cmode = Op.linewise(params)
@@ -211,7 +211,7 @@ function Op.count(count, cfg, ctype)
         range = range,
     }
 
-    if ctype == U.ctype.block then
+    if ctype == U.ctype.blockwise then
         ctx.cmode = Op.blockwise(params)
     else
         ctx.cmode = Op.linewise(params)
