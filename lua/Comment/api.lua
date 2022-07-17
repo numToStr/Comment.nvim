@@ -197,7 +197,7 @@ end
 ---@param opmode OpMode
 ---@param cfg? CommentConfig
 function api.uncomment_current_blockwise_op(opmode, cfg)
-    Op.opfunc(opmode, cfg, U.cmode.uncomment, U.ctype.block, U.cmotion.line)
+    Op.opfunc(opmode, cfg or Config:get(), U.cmode.uncomment, U.ctype.block, U.cmotion.line)
 end
 
 --==========================================
