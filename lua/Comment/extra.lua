@@ -14,10 +14,10 @@ local function move_n_insert(row, col)
     A.nvim_feedkeys('a', 'ni', true)
 end
 
----@param count integer Line index
+---@param lnum integer Line index
 ---@param ctype integer
 ---@param cfg CommentConfig
-local function ins_on_line(count, ctype, cfg)
+local function ins_on_line(lnum, ctype, cfg)
     local row, col = unpack(A.nvim_win_get_cursor(0))
 
     ---@type CommentCtx
@@ -28,19 +28,18 @@ local function ins_on_line(count, ctype, cfg)
         range = { srow = row, scol = col, erow = row, ecol = col },
     }
 
-    local srow = row + count
+    local srow = row + lnum
     local lcs, rcs = U.parse_cstr(cfg, ctx)
-    local line = A.nvim_get_current_line()
-    local indent = U.indent_len(line)
     local padding = U.get_pad(cfg.padding)
 
     -- We need RHS of cstr, if we are doing block comments or if RHS exists
     -- because even in line comment RHS do exists for some filetypes like jsx_element, ocaml
     local if_rcs = U.is_empty(rcs) and rcs or padding .. rcs
 
-    A.nvim_buf_set_lines(0, srow, srow, false, { table.concat({ string.rep(' ', indent), lcs, padding, if_rcs }) })
-
-    move_n_insert(srow + 1, indent + #lcs + #padding - 1)
+    A.nvim_buf_set_lines(0, srow, srow, false, { lcs .. padding .. if_rcs })
+    A.nvim_win_set_cursor(0, { srow + 1, 0 })
+    A.nvim_command('normal! ==')
+    move_n_insert(srow + 1, #A.nvim_get_current_line() - #if_rcs - 1)
     U.is_fn(cfg.post_hook, ctx)
 end
 
