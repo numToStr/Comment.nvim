@@ -8,7 +8,7 @@ local Op = {}
 
 ---Vim operator-mode motions.
 ---Read `:h :map-operator`
----@alias OpMode
+---@alias OpMotion
 ---| 'line' # Vertical motion
 ---| 'char' # Horizontal motion
 ---| 'v' # Visual Block motion
@@ -30,15 +30,18 @@ local Op = {}
 
 ---Common operatorfunc callback
 ---This function contains the core logic for comment/uncomment
----@param opmode OpMode
+---@param motion? OpMotion If nil is given, it'll work on the current line
 ---@param cfg CommentConfig
 ---@param cmode integer See |comment.utils.cmode|
 ---@param ctype integer See |comment.utils.ctype|
-function Op.opfunc(opmode, cfg, cmode, ctype)
-    local range = U.get_region(opmode)
-    local cmotion = U.cmotion[opmode] or U.cmotion.line
-    local partial = cmotion == U.cmotion.char or cmotion == U.cmotion.v
-    local block_x = partial and range.srow == range.erow
+function Op.opfunc(motion, cfg, cmode, ctype)
+    local range = U.get_region(motion)
+    local cmotion = motion == nil and U.cmotion.line or U.cmotion[motion]
+
+    -- If we are doing char or visual motion on the same line
+    -- then we would probably want block comment instead of line comment
+    local is_partial = cmotion == U.cmotion.char or cmotion == U.cmotion.v
+    local is_blockx = is_partial and range.srow == range.erow
 
     local lines = U.get_lines(range)
 
@@ -52,7 +55,7 @@ function Op.opfunc(opmode, cfg, cmode, ctype)
     local ctx = {
         cmode = cmode,
         cmotion = cmotion,
-        ctype = block_x and U.ctype.blockwise or ctype,
+        ctype = is_blockx and U.ctype.blockwise or ctype,
         range = range,
     }
 
@@ -68,8 +71,8 @@ function Op.opfunc(opmode, cfg, cmode, ctype)
         range = range,
     }
 
-    if block_x or ctype == U.ctype.blockwise then
-        ctx.cmode = Op.blockwise(params, partial)
+    if motion ~= nil and (is_blockx or ctype == U.ctype.blockwise) then
+        ctx.cmode = Op.blockwise(params, is_partial)
     else
         ctx.cmode = Op.linewise(params)
     end
@@ -185,7 +188,6 @@ function Op.blockwise(param, partial)
 end
 
 ---Line commenting with count i.e vim.v.count
----Example: '10gl' will comment 10 lines
 ---@param count integer Number of lines
 ---@param cfg CommentConfig
 ---@param ctype integer See |comment.utils.ctype|

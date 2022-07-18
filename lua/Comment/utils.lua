@@ -108,7 +108,7 @@ end
 
 ---Get region for line movement or visual selection
 ---NOTE: Returns the current line region, if `opmode` is not given.
----@param opmode? OpMode
+---@param opmode? OpMotion
 ---@return CommentRange
 function U.get_region(opmode)
     if not opmode then
