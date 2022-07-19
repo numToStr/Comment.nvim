@@ -2,12 +2,12 @@
 
 Following are the `<Plug>` mappings which you can use to quickly setup your custom keybindings
 
-- `<Plug>(comment_toggle_linewise_count)` - Toggles line comment with count
-- `<Plug>(comment_toggle_blockwise_count)` - Toggles block comment with count
-- `<Plug>(comment_toggle_current_linewise)` - Toggles line comment on the current line
-- `<Plug>(comment_toggle_current_blockwise)` - Toggles block comment on the current line
 - `<Plug>(comment_toggle_linewise)` - Toggles line comment via Operator pending mode
 - `<Plug>(comment_toggle_blockwise)` - Toggles block comment via Operator pending mode
+- `<Plug>(comment_toggle_linewise_current)` - Toggles line comment on the current line
+- `<Plug>(comment_toggle_blockwise_current)` - Toggles block comment on the current line
+- `<Plug>(comment_toggle_linewise_count)` - Toggles line comment with count
+- `<Plug>(comment_toggle_blockwise_count)` - Toggles block comment with count
 - `<Plug>(comment_toggle_linewise_visual)` - Toggles line comment in VISUAL mode
 - `<Plug>(comment_toggle_blockwise_visual)` - Toggles block comment in VISUAL mode
 
@@ -21,8 +21,8 @@ Following snippets is same as the default mappings set by the plugin.
 local opt = { expr = true, remap = true, replace_keycodes = false }
 
 -- Toggle using count
-vim.keymap.set('n', 'gcc', "v:count == 0 ? '<Plug>(comment_toggle_current_linewise)' : '<Plug>(comment_toggle_linewise_count)'", opt)
-vim.keymap.set('n', 'gbc', "v:count == 0 ? '<Plug>(comment_toggle_current_blockwise)' : '<Plug>(comment_toggle_blockwise_count)'", opt)
+vim.keymap.set('n', 'gcc', "v:count == 0 ? '<Plug>(comment_toggle_linewise_current)' : '<Plug>(comment_toggle_linewise_count)'", opt)
+vim.keymap.set('n', 'gbc', "v:count == 0 ? '<Plug>(comment_toggle_blockwise_current)' : '<Plug>(comment_toggle_blockwise_count)'", opt)
 
 -- Toggle in Op-pending mode
 vim.keymap.set('n', 'gc', '<Plug>(comment_toggle_linewise)')

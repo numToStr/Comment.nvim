@@ -429,21 +429,21 @@ function api.setup(config)
         -- Basic Mappings
         if cfg.mappings.basic then
             -- NORMAL mode mappings
+            K('n', cfg.opleader.line, '<Plug>(comment_toggle_linewise)')
+            K('n', cfg.opleader.block, '<Plug>(comment_toggle_blockwise)')
+
             K(
                 'n',
                 cfg.toggler.line,
-                "v:count == 0 ? '<Plug>(comment_toggle_current_linewise)' : '<Plug>(comment_toggle_linewise_count)'",
+                "v:count == 0 ? '<Plug>(comment_toggle_linewise_current)' : '<Plug>(comment_toggle_linewise_count)'",
                 { expr = true, remap = true, replace_keycodes = false }
             )
             K(
                 'n',
                 cfg.toggler.block,
-                "v:count == 0 ? '<Plug>(comment_toggle_current_blockwise)' : '<Plug>(comment_toggle_blockwise_count)'",
+                "v:count == 0 ? '<Plug>(comment_toggle_blockwise_current)' : '<Plug>(comment_toggle_blockwise_count)'",
                 { expr = true, remap = true, replace_keycodes = false }
             )
-
-            K('n', cfg.opleader.line, '<Plug>(comment_toggle_linewise)')
-            K('n', cfg.opleader.block, '<Plug>(comment_toggle_blockwise)')
 
             -- VISUAL mode mappings
             K('x', cfg.opleader.line, '<Plug>(comment_toggle_linewise_visual)')
