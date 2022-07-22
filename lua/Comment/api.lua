@@ -266,16 +266,6 @@ end
 
 ------------ OLD END ------------
 
--- TODO:
--- [x] add extra API as `insert.{above,below,eol}`
--- [x] add `count_repeat` but make it private
--- [x] play nice w/ `locked`
--- [x] replace all <Plug>
--- [x] depreact old APIs
--- [x] rename U.ctype.{line => linewise, block => blockwise}
--- [x] move this to api.lua
--- [ ] do something about the API.md
-
 local core = {}
 local extra = {}
 
@@ -412,7 +402,7 @@ api.locked = setmetatable({}, {
 ---@usage `require('Comment.api').call('toggle.linewise')`
 function api.call(cb)
     A.nvim_set_option('operatorfunc', ("v:lua.require'Comment.api'.locked'%s'"):format(cb))
-    Config.position = Config:get().sticky and A.nvim_win_get_cursor(0)
+    Config.position = Config:get().sticky and A.nvim_win_get_cursor(0) or nil
     Config.count = vim.v.count
 end
 

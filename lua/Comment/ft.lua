@@ -7,7 +7,7 @@ local M = {
     cxx_l = '//%s',
     cxx_b = '/*%s*/',
     hash = '#%s',
-    double_hash = '##%s',
+    dbl_hash = '##%s',
     dash = '--%s',
     dash_bracket = '--[[%s]]',
     haskell_b = '{-%s-}',
@@ -68,7 +68,7 @@ local L = {
     lua = { M.dash, M.dash_bracket },
     markdown = { M.html, M.html },
     make = { M.hash },
-    mbsyncrc = { M.double_hash },
+    mbsyncrc = { M.dbl_hash },
     meson = { M.hash },
     nix = { M.hash, M.cxx_b },
     ocaml = { M.fsharp_b, M.fsharp_b },
@@ -93,7 +93,7 @@ local L = {
     teal = { M.dash, M.dash_bracket },
     terraform = { M.hash, M.cxx_b },
     tex = { M.latex },
-    template = { M.double_hash },
+    template = { M.dbl_hash },
     tmux = { M.hash },
     toml = { M.hash },
     typescript = { M.cxx_l, M.cxx_b },
@@ -114,7 +114,7 @@ local ft = {}
 ---@param lang CommentLang
 ---@param val string|string[]
 function ft.set(lang, val)
-    L[lang] = type(val) == 'string' and { val } or val
+    L[lang] = type(val) == 'string' and { val } or val --[[ @as string[] ]]
     return ft
 end
 

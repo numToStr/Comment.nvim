@@ -260,7 +260,7 @@ function U.uncommenter(left, right, padding, scol, ecol)
     local ll = U.is_empty(left) and left or vim.pesc(left) .. pp
     local rr = U.is_empty(right) and right or pp .. vim.pesc(right)
     local is_lw = not (scol and scol)
-    local pattern = is_lw and '^(%s*)' .. ll .. '(.-)' .. rr .. '$'
+    local pattern = is_lw and '^(%s*)' .. ll .. '(.-)' .. rr .. '$' or ''
 
     return function(line)
         -------------------
