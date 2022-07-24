@@ -45,6 +45,7 @@ local L = {
     gdb = { M.hash },
     gdscript = { M.hash },
     gleam = { M.cxx_l },
+    glsl = { M.cxx_l, M.cxx_b },
     go = { M.cxx_l, M.cxx_b },
     graphql = { M.hash },
     groovy = { M.cxx_l, M.cxx_b },
