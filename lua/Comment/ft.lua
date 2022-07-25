@@ -39,6 +39,7 @@ local L = {
     eelixir = { M.html, M.html },
     elixir = { M.hash },
     elm = { M.dash, M.haskell_b },
+    elvish = { M.hash },
     fennel = { M.lisp_l },
     fish = { M.hash },
     fsharp = { M.cxx_l, M.fsharp_b },
