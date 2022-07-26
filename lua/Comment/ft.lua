@@ -60,6 +60,7 @@ local L = {
     javascript = { M.cxx_l, M.cxx_b },
     javascriptreact = { M.cxx_l, M.cxx_b },
     jsonc = { M.cxx_l },
+    jsonnet = { M.cxx_l, M.cxx_b },
     julia = { M.hash, '#=%s=#' },
     kotlin = { M.cxx_l, M.cxx_b },
     lidris = { M.dash, M.haskell_b },
