@@ -99,7 +99,7 @@ function Op.linewise(param)
 
     -- While commenting a region, there could be lines being both commented and non-commented
     -- So, if any line is uncommented then we should comment the whole block or vise-versa
-    local cmode = U.cmode.comment
+    local cmode = U.cmode.uncomment
 
     ---When commenting multiple line, it is to be expected that indentation should be preserved
     ---So, When looping over multiple lines we need to store the indentation of the mininum length (except empty line)
@@ -112,8 +112,8 @@ function Op.linewise(param)
         for _, line in ipairs(param.lines) do
             -- I wish lua had `continue` statement [sad noises]
             if not U.ignore(line, pattern) then
-                if cmode == U.cmode.comment and check_comment(line) then
-                    cmode = U.cmode.uncomment
+                if cmode == U.cmode.uncomment and (not check_comment(line)) then
+                    cmode = U.cmode.comment
                 end
 
                 -- If local `cmode` == comment or the given cmode ~= uncomment, then only calculate min_indent
