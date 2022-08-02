@@ -18,7 +18,7 @@ Following are the `<Plug>` mappings which you can use to quickly setup your cust
 Following snippets is same as the default mappings set by the plugin.
 
 ```lua
-local opt = { expr = true, remap = true }
+local opt = { expr = true, remap = true, replace_keycodes = false }
 
 -- Toggle using count
 vim.keymap.set('n', 'gcc', "v:count == 0 ? '<Plug>(comment_toggle_current_linewise)' : '<Plug>(comment_toggle_linewise_count)'", opt)
