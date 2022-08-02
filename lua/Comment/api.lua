@@ -248,13 +248,13 @@ function api.setup(config)
                 'n',
                 cfg.toggler.line,
                 "v:count == 0 ? '<Plug>(comment_toggle_current_linewise)' : '<Plug>(comment_toggle_linewise_count)'",
-                { expr = true, remap = true }
+                { expr = true, remap = true, replace_keycodes = false }
             )
             K(
                 'n',
                 cfg.toggler.block,
                 "v:count == 0 ? '<Plug>(comment_toggle_current_blockwise)' : '<Plug>(comment_toggle_blockwise_count)'",
-                { expr = true, remap = true }
+                { expr = true, remap = true, replace_keycodes = false }
             )
 
             K('n', cfg.opleader.line, '<Plug>(comment_toggle_linewise)')
