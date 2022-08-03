@@ -230,7 +230,7 @@ function U.commenter(left, right, padding, scol, ecol)
                 line[1] = sfirst .. ll .. slast
                 line[#line] = efirst .. rr .. elast
             else
-                line[1] = U.is_empty(first) and left or string.gsub(first, '^(%s*)', '%1' .. ll)
+                line[1] = U.is_empty(first) and left or string.gsub(first, '^(%s*)', '%1' .. vim.pesc(ll))
                 line[#line] = U.is_empty(last) and right or (last .. rr)
             end
             return line
