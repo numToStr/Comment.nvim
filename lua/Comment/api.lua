@@ -349,7 +349,7 @@ function api.setup(config)
                 'x',
                 'g<',
                 '<ESC><CMD>lua require("Comment.api").locked.uncomment_linewise_op(vim.fn.visualmode())<CR>',
-                { desc = 'Uncomment region using single line (visual)' }
+                { desc = 'Uncomment region linewise (visual)' }
             )
         end
     end
