@@ -343,7 +343,7 @@ function api.setup(config)
                 'x',
                 'g>',
                 '<ESC><CMD>lua require("Comment.api").locked.comment_linewise_op(vim.fn.visualmode())<CR>',
-                { desc = 'Comment region using single line (visual)' }
+                { desc = 'Comment region linewise (visual)' }
             )
             K(
                 'x',
