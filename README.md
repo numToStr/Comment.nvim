@@ -82,7 +82,7 @@ Following are the **default** config for the [`setup()`](#setup). If you want to
     ---@type string|fun():string
     ignore = nil,
 
-    ---LHS of toggle mappings in NORMAL + VISUAL mode
+    ---LHS of toggle mappings in NORMAL mode
     ---@type table
     toggler = {
         ---Line-comment toggle keymap
@@ -91,7 +91,7 @@ Following are the **default** config for the [`setup()`](#setup). If you want to
         block = 'gbc',
     },
 
-    ---LHS of operator-pending mappings in NORMAL + VISUAL mode
+    ---LHS of operator-pending mappings in NORMAL mode
     ---@type table
     opleader = {
         ---Line-comment keymap
@@ -111,7 +111,7 @@ Following are the **default** config for the [`setup()`](#setup). If you want to
         eol = 'gcA',
     },
 
-    ---Create basic (operator-pending) and extended mappings for NORMAL + VISUAL mode
+    ---Create basic (operator-pending) and extended mappings for NORMAL mode
     ---NOTE: If `mappings = false` then the plugin won't create any mappings
     ---@type boolean|table
     mappings = {
