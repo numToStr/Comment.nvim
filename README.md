@@ -82,7 +82,7 @@ Following are the **default** config for the [`setup()`](#setup). If you want to
     ---@type string|fun():string
     ignore = nil,
 
-    ---LHS of toggle mappings in NORMAL + VISUAL mode
+    ---LHS of toggle mappings in NORMAL mode
     ---@type table
     toggler = {
         ---Line-comment toggle keymap
