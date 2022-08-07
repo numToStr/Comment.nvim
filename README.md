@@ -91,7 +91,7 @@ Following are the **default** config for the [`setup()`](#setup). If you want to
         block = 'gbc',
     },
 
-    ---LHS of operator-pending mappings in NORMAL mode
+    ---LHS of operator-pending mappings in NORMAL + VISUAL mode
     ---@type table
     opleader = {
         ---Line-comment keymap
@@ -111,7 +111,7 @@ Following are the **default** config for the [`setup()`](#setup). If you want to
         eol = 'gcA',
     },
 
-    ---Create basic (operator-pending) and extended mappings for NORMAL mode
+    ---Create basic (operator-pending) and extended mappings for NORMAL + VISUAL mode
     ---NOTE: If `mappings = false` then the plugin won't create any mappings
     ---@type boolean|table
     mappings = {
