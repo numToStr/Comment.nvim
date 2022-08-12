@@ -44,7 +44,7 @@
 ---@private
 ---@class RootConfig
 ---@field config CommentConfig
----@field position integer[] To be used to restore cursor position
+---@field position? integer[] To be used to restore cursor position
 ---@field count integer Helps with dot-repeat support for count prefix
 local Config = {
     state = {},

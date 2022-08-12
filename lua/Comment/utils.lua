@@ -26,18 +26,17 @@ U.cmode = {
 }
 
 ---@class CommentType Comment types
----@field line integer Use linewise commentstring
----@field block integer Use blockwise commentstring
+---@field linewise integer Use linewise commentstring
+---@field blockwise integer Use blockwise commentstring
 
 ---An object containing comment types
 ---@type CommentType
 U.ctype = {
-    line = 1,
-    block = 2,
+    linewise = 1,
+    blockwise = 2,
 }
 
 ---@class CommentMotion Comment motion types
----@field private _ integer Compute from vim mode. See |OpMode|
 ---@field line integer Line motion (ie. 'gc2j')
 ---@field char integer Character/left-right motion (ie. 'gc2w')
 ---@field block integer Visual operator-pending motion
@@ -47,7 +46,6 @@ U.ctype = {
 ---An object containing comment motions
 ---@type CommentMotion
 U.cmotion = {
-    _ = 0,
     line = 1,
     char = 2,
     block = 3,
@@ -110,7 +108,7 @@ end
 
 ---Get region for line movement or visual selection
 ---NOTE: Returns the current line region, if `opmode` is not given.
----@param opmode? OpMode
+---@param opmode? OpMotion
 ---@return CommentRange
 function U.get_region(opmode)
     if not opmode then
@@ -262,7 +260,7 @@ function U.uncommenter(left, right, padding, scol, ecol)
     local ll = U.is_empty(left) and left or vim.pesc(left) .. pp
     local rr = U.is_empty(right) and right or pp .. vim.pesc(right)
     local is_lw = not (scol and scol)
-    local pattern = is_lw and '^(%s*)' .. ll .. '(.-)' .. rr .. '$'
+    local pattern = is_lw and '^(%s*)' .. ll .. '(.-)' .. rr .. '$' or ''
 
     return function(line)
         -------------------
