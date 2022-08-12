@@ -375,7 +375,7 @@ api.insert = setmetatable({}, extra)
 ---@usage `require('Comment.api').locked('toggle.linewise.current')()`
 api.locked = setmetatable({}, {
     __index = function(_, cb)
-        D('locker.{fn}(args...)', 'locked({fn})(args...)')
+        D(string.format('locker.%s(args...)', cb), string.format('locked(%q)(args...)', cb))
         ---Actual function which will be attached to operatorfunc
         ---@param opmode OpMotion
         return function(opmode)
@@ -419,48 +419,116 @@ function api.setup(config)
         -- Basic Mappings
         if cfg.mappings.basic then
             -- NORMAL mode mappings
-            K('n', cfg.opleader.line, '<Plug>(comment_toggle_linewise)')
-            K('n', cfg.opleader.block, '<Plug>(comment_toggle_blockwise)')
+            K('n', cfg.opleader.line, '<Plug>(comment_toggle_linewise)', { desc = 'Comment toggle linewise' })
+            K('n', cfg.opleader.block, '<Plug>(comment_toggle_blockwise)', { desc = 'Comment toggle blockwise' })
 
             K(
                 'n',
                 cfg.toggler.line,
                 "v:count == 0 ? '<Plug>(comment_toggle_linewise_current)' : '<Plug>(comment_toggle_linewise_count)'",
-                { expr = true, remap = true, replace_keycodes = false }
+                { expr = true, remap = true, replace_keycodes = false, desc = 'Comment toggle current line' }
             )
             K(
                 'n',
                 cfg.toggler.block,
                 "v:count == 0 ? '<Plug>(comment_toggle_blockwise_current)' : '<Plug>(comment_toggle_blockwise_count)'",
-                { expr = true, remap = true, replace_keycodes = false }
+                { expr = true, remap = true, replace_keycodes = false, desc = 'Comment toggle current block' }
             )
 
+            K('n', cfg.opleader.line, '<Plug>(comment_toggle_linewise)', { desc = 'Comment toggle linewise' })
+            K('n', cfg.opleader.block, '<Plug>(comment_toggle_blockwise)', { desc = 'Comment toggle blockwise' })
+
             -- VISUAL mode mappings
-            K('x', cfg.opleader.line, '<Plug>(comment_toggle_linewise_visual)')
-            K('x', cfg.opleader.block, '<Plug>(comment_toggle_blockwise_visual)')
+            K(
+                'x',
+                cfg.opleader.line,
+                '<Plug>(comment_toggle_linewise_visual)',
+                { desc = 'Comment toggle linewise (visual)' }
+            )
+            K(
+                'x',
+                cfg.opleader.block,
+                '<Plug>(comment_toggle_blockwise_visual)',
+                { desc = 'Comment toggle blockwise (visual)' }
+            )
         end
 
         -- Extra Mappings
         if cfg.mappings.extra then
-            K('n', cfg.extra.below, '<CMD>lua require("Comment.api").locked("insert.linewise.below")()<CR>')
-            K('n', cfg.extra.above, '<CMD>lua require("Comment.api").locked("insert.linewise.above")()<CR>')
-            K('n', cfg.extra.eol, '<CMD>lua require("Comment.api").locked("insert.linewise.eol")()<CR>')
+            K(
+                'n',
+                cfg.extra.below,
+                '<CMD>lua require("Comment.api").locked("insert.linewise.below")()<CR>',
+                { desc = 'Comment insert below' }
+            )
+            K(
+                'n',
+                cfg.extra.above,
+                '<CMD>lua require("Comment.api").locked("insert.linewise.above")()<CR>',
+                { desc = 'Comment insert above' }
+            )
+            K(
+                'n',
+                cfg.extra.eol,
+                '<CMD>lua require("Comment.api").locked("insert.linewise.eol")()<CR>',
+                { desc = 'Comment insert end of line' }
+            )
         end
 
         -- Extended Mappings
         if cfg.mappings.extended then
             -- NORMAL mode extended
-            K('n', 'g>', '<CMD>lua require("Comment.api").call("comment.linewise")<CR>g@')
-            K('n', 'g>c', '<CMD>lua require("Comment.api").call("comment.linewise.current")<CR>g@$')
-            K('n', 'g>b', '<CMD>lua require("Comment.api").call("comment.blockwise.current")<CR>g@$')
+            K(
+                'n',
+                'g>',
+                '<CMD>lua require("Comment.api").call("comment.linewise")<CR>g@',
+                { desc = 'Comment region linewise' }
+            )
+            K(
+                'n',
+                'g>c',
+                '<CMD>lua require("Comment.api").call("comment.linewise.current")<CR>g@$',
+                { desc = 'Comment current line' }
+            )
+            K(
+                'n',
+                'g>b',
+                '<CMD>lua require("Comment.api").call("comment.blockwise.current")<CR>g@$',
+                { desc = 'Comment current block' }
+            )
 
-            K('n', 'g<', '<CMD>lua require("Comment.api").call("uncomment.linewise")<CR>g@')
-            K('n', 'g<c', '<CMD>lua require("Comment.api").call("uncomment.linewise.current")<CR>g@$')
-            K('n', 'g<b', '<CMD>lua require("Comment.api").call("uncomment.blockwise.current")<CR>g@$')
+            K(
+                'n',
+                'g<',
+                '<CMD>lua require("Comment.api").call("uncomment.linewise")<CR>g@',
+                { desc = 'Uncomment region linewise' }
+            )
+            K(
+                'n',
+                'g<c',
+                '<CMD>lua require("Comment.api").call("uncomment.linewise.current")<CR>g@$',
+                { desc = 'Uncomment current line' }
+            )
+            K(
+                'n',
+                'g<b',
+                '<CMD>lua require("Comment.api").call("uncomment.blockwise.current")<CR>g@$',
+                { desc = 'Uncomment current block' }
+            )
 
             -- VISUAL mode extended
-            K('x', 'g>', '<ESC><CMD>lua require("Comment.api").locked("comment.linewise")(vim.fn.visualmode())<CR>')
-            K('x', 'g<', '<ESC><CMD>lua require("Comment.api").locked("uncomment.linewise")(vim.fn.visualmode())<CR>')
+            K(
+                'x',
+                'g>',
+                '<ESC><CMD>lua require("Comment.api").locked("comment.linewise")(vim.fn.visualmode())<CR>',
+                { desc = 'Comment region linewise (visual)' }
+            )
+            K(
+                'x',
+                'g<',
+                '<ESC><CMD>lua require("Comment.api").locked("uncomment.linewise")(vim.fn.visualmode())<CR>',
+                { desc = 'Uncomment region linewise (visual)' }
+            )
         end
     end
 
