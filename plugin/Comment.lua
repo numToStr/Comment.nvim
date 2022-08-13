@@ -1,45 +1,46 @@
 local K = vim.keymap.set
+local call = require('Comment.api').call
 
 -- Operator-Pending mappings
 K(
     'n',
     '<Plug>(comment_toggle_linewise)',
-    '<CMD>lua require("Comment.api").call("toggle.linewise")<CR>g@',
-    { desc = 'Comment toggle linewise' }
+    call('toggle.linewise', 'g@'),
+    { expr = true, desc = 'Comment toggle linewise' }
 )
 K(
     'n',
     '<Plug>(comment_toggle_blockwise)',
-    '<CMD>lua require("Comment.api").call("toggle.blockwise")<CR>g@',
-    { desc = 'Comment toggle blockwise' }
+    call('toggle.blockwise', 'g@'),
+    { expr = true, desc = 'Comment toggle blockwise' }
 )
 
 -- Toggle mappings
 K(
     'n',
     '<Plug>(comment_toggle_linewise_current)',
-    '<CMD>lua require("Comment.api").call("toggle.linewise.current")<CR>g@$',
-    { desc = 'Comment toggle current line' }
+    call('toggle.linewise.current', 'g@$'),
+    { expr = true, desc = 'Comment toggle current line' }
 )
 K(
     'n',
     '<Plug>(comment_toggle_blockwise_current)',
-    '<CMD>lua require("Comment.api").call("toggle.blockwise.current")<CR>g@$',
-    { desc = 'Comment toggle current block' }
+    call('toggle.blockwise.current', 'g@$'),
+    { expr = true, desc = 'Comment toggle current block' }
 )
 
 -- Count mappings
 K(
     'n',
     '<Plug>(comment_toggle_linewise_count)',
-    '<CMD>lua require("Comment.api").call("toggle.linewise.count_repeat")<CR>g@$',
-    { desc = 'Comment toggle linewise with count' }
+    call('toggle.linewise.count_repeat', 'g@$'),
+    { expr = true, desc = 'Comment toggle linewise with count' }
 )
 K(
     'n',
     '<Plug>(comment_toggle_blockwise_count)',
-    '<CMD>lua require("Comment.api").call("toggle.blockwise.count_repeat")<CR>g@$',
-    { desc = 'Comment toggle blockwise with count' }
+    call('toggle.blockwise.count_repeat', 'g@$'),
+    { expr = true, desc = 'Comment toggle blockwise with count' }
 )
 
 -- Visual-Mode mappings
