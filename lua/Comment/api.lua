@@ -435,9 +435,6 @@ function api.setup(config)
                 { expr = true, remap = true, replace_keycodes = false, desc = 'Comment toggle current block' }
             )
 
-            K('n', cfg.opleader.line, '<Plug>(comment_toggle_linewise)', { desc = 'Comment toggle linewise' })
-            K('n', cfg.opleader.block, '<Plug>(comment_toggle_blockwise)', { desc = 'Comment toggle blockwise' })
-
             -- VISUAL mode mappings
             K(
                 'x',
