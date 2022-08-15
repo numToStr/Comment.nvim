@@ -267,7 +267,6 @@ end
 ------------ OLD END ------------
 
 local core = {}
-local extra = {}
 
 function core.__index(that, ctype)
     local idxd = {}
@@ -298,20 +297,6 @@ function core.__index(that, ctype)
             Op.opfunc(motion, cfg or Config:get(), this.cmode, U.ctype[this.ctype])
         end,
     })
-end
-
-function extra.__index(_, ctype)
-    return {
-        above = function(cfg)
-            Ex.insert_above(U.ctype[ctype], cfg or Config:get())
-        end,
-        below = function(cfg)
-            Ex.insert_below(U.ctype[ctype], cfg or Config:get())
-        end,
-        eol = function(cfg)
-            Ex.insert_eol(U.ctype[ctype], cfg or Config:get())
-        end,
-    }
 end
 
 ---API to toggle comments using line or block comment string
@@ -368,27 +353,37 @@ api.uncomment = setmetatable({ cmode = U.cmode.comment }, core)
 ---require('Comment.api').insert.blockwise.below({cfg?})
 ---require('Comment.api').insert.blockwise.eol({cfg?})
 ---@type table A metatable containing API functions
-api.insert = setmetatable({}, extra)
+api.insert = setmetatable({}, {
+    __index = function(_, ctype)
+        return {
+            above = function(cfg)
+                Ex.insert_above(U.ctype[ctype], cfg or Config:get())
+            end,
+            below = function(cfg)
+                Ex.insert_below(U.ctype[ctype], cfg or Config:get())
+            end,
+            eol = function(cfg)
+                Ex.insert_eol(U.ctype[ctype], cfg or Config:get())
+            end,
+        }
+    end,
+})
 
 ---Wraps a given function with `lockmarks` to preserve marks/jumps when commenting
----@type fun(cb:string):fun(opmotion:OpMotion)
+---@type fun(cb:string):fun(motion:OpMotion)
 ---@usage `require('Comment.api').locked('toggle.linewise.current')()`
 api.locked = setmetatable({}, {
-    __index = function(_, cb)
+    __index = function(this, cb)
         D(string.format('locker.%s(args...)', cb), string.format('locked(%q)(args...)', cb))
-        ---Actual function which will be attached to operatorfunc
-        ---@param opmode OpMotion
-        return function(opmode)
-            return A.nvim_command(
-                ('lockmarks lua require("Comment.api").%s(%s)'):format(cb, opmode and ('%q'):format(opmode))
-            )
-        end
+        return this(cb)
     end,
     -- TODO: After removal of the old api functions, make `api.locked` a simple function call
     __call = function(_, cb)
-        return function(opmode)
+        ---Actual function which will be attached to operatorfunc
+        ---@param motion OpMotion
+        return function(motion)
             return A.nvim_command(
-                ('lockmarks lua require("Comment.api").%s(%s)'):format(cb, opmode and ('%q'):format(opmode))
+                ('lockmarks lua require("Comment.api").%s(%s)'):format(cb, motion and ('%q'):format(motion))
             )
         end
     end,
@@ -399,11 +394,16 @@ api.locked = setmetatable({}, {
 ---  2. Preserves jumps and marks
 ---  3. Stores last cursor position
 ---@param cb string Name of the API function to call
----@usage `require('Comment.api').call('toggle.linewise')`
-function api.call(cb)
-    A.nvim_set_option('operatorfunc', ("v:lua.require'Comment.api'.locked'%s'"):format(cb))
-    Config.position = Config:get().sticky and A.nvim_win_get_cursor(0) or nil
-    Config.count = vim.v.count
+---@param op 'g@'|'g@$' Operator string to execute
+---@return fun():string _ Keymap RHS callback
+---@usage `vim.keymap.set('n', 'gc', api.call('toggle.linewise', 'g@'), { expr = true })`
+function api.call(cb, op)
+    return function()
+        A.nvim_set_option('operatorfunc', ("v:lua.require'Comment.api'.locked'%s'"):format(cb))
+        Config.position = Config:get().sticky and A.nvim_win_get_cursor(0) or nil
+        Config.count = vim.v.count
+        return op
+    end
 end
 
 ---@private
@@ -422,18 +422,14 @@ function api.setup(config)
             K('n', cfg.opleader.line, '<Plug>(comment_toggle_linewise)', { desc = 'Comment toggle linewise' })
             K('n', cfg.opleader.block, '<Plug>(comment_toggle_blockwise)', { desc = 'Comment toggle blockwise' })
 
-            K(
-                'n',
-                cfg.toggler.line,
-                "v:count == 0 ? '<Plug>(comment_toggle_linewise_current)' : '<Plug>(comment_toggle_linewise_count)'",
-                { expr = true, remap = true, replace_keycodes = false, desc = 'Comment toggle current line' }
-            )
-            K(
-                'n',
-                cfg.toggler.block,
-                "v:count == 0 ? '<Plug>(comment_toggle_blockwise_current)' : '<Plug>(comment_toggle_blockwise_count)'",
-                { expr = true, remap = true, replace_keycodes = false, desc = 'Comment toggle current block' }
-            )
+            K('n', cfg.toggler.line, function()
+                return vim.v.count == 0 and '<Plug>(comment_toggle_linewise_current)'
+                    or '<Plug>(comment_toggle_linewise_count)'
+            end, { expr = true, desc = 'Comment toggle current line' })
+            K('n', cfg.toggler.block, function()
+                return vim.v.count == 0 and '<Plug>(comment_toggle_blockwise_current)'
+                    or '<Plug>(comment_toggle_blockwise_count)'
+            end, { expr = true, desc = 'Comment toggle current block' })
 
             -- VISUAL mode mappings
             K(
@@ -452,65 +448,30 @@ function api.setup(config)
 
         -- Extra Mappings
         if cfg.mappings.extra then
-            K(
-                'n',
-                cfg.extra.below,
-                '<CMD>lua require("Comment.api").locked("insert.linewise.below")()<CR>',
-                { desc = 'Comment insert below' }
-            )
-            K(
-                'n',
-                cfg.extra.above,
-                '<CMD>lua require("Comment.api").locked("insert.linewise.above")()<CR>',
-                { desc = 'Comment insert above' }
-            )
-            K(
-                'n',
-                cfg.extra.eol,
-                '<CMD>lua require("Comment.api").locked("insert.linewise.eol")()<CR>',
-                { desc = 'Comment insert end of line' }
-            )
+            K('n', cfg.extra.below, api.locked('insert.linewise.below'), { desc = 'Comment insert below' })
+            K('n', cfg.extra.above, api.locked('insert.linewise.above'), { desc = 'Comment insert above' })
+            K('n', cfg.extra.eol, api.locked('insert.linewise.eol'), { desc = 'Comment insert end of line' })
         end
 
         -- Extended Mappings
         if cfg.mappings.extended then
             -- NORMAL mode extended
-            K(
-                'n',
-                'g>',
-                '<CMD>lua require("Comment.api").call("comment.linewise")<CR>g@',
-                { desc = 'Comment region linewise' }
-            )
-            K(
-                'n',
-                'g>c',
-                '<CMD>lua require("Comment.api").call("comment.linewise.current")<CR>g@$',
-                { desc = 'Comment current line' }
-            )
-            K(
-                'n',
-                'g>b',
-                '<CMD>lua require("Comment.api").call("comment.blockwise.current")<CR>g@$',
-                { desc = 'Comment current block' }
-            )
+            K('n', 'g>', api.call('comment.linewise', 'g@'), { expr = true, desc = 'Comment region linewise' })
+            K('n', 'g>c', api.call('comment.linewise.current', 'g@$'), { expr = true, desc = 'Comment current line' })
+            K('n', 'g>b', api.call('comment.blockwise.current', 'g@$'), { expr = true, desc = 'Comment current block' })
 
-            K(
-                'n',
-                'g<',
-                '<CMD>lua require("Comment.api").call("uncomment.linewise")<CR>g@',
-                { desc = 'Uncomment region linewise' }
-            )
+            K('n', 'g<', api.call('uncomment.linewise', 'g@'), { expr = true, desc = 'Uncomment region linewise' })
             K(
                 'n',
                 'g<c',
-                '<CMD>lua require("Comment.api").call("uncomment.linewise.current")<CR>g@$',
-                { desc = 'Uncomment current line' }
+                api.call('uncomment.linewise.current', 'g@$'),
+                { expr = true, desc = 'Uncomment current line' }
             )
             K(
                 'n',
                 'g<b',
-                '<CMD>lua require("Comment.api").call("uncomment.blockwise.current")<CR>g@$',
-                { desc = 'Uncomment current block' }
+                api.call('uncomment.blockwise.current', 'g@$'),
+                { expr = true, desc = 'Uncomment current block' }
             )
 
             -- VISUAL mode extended
