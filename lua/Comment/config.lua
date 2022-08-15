@@ -1,45 +1,51 @@
 ---@mod comment.config Configuration
 
----@class Toggler LHS of toggle mappings in NORMAL + VISUAL mode
----@field line string Linewise comment keymap
----@field block string Blockwise comment keymap
-
----@class Opleader LHS of operator-mode mappings in NORMAL + VISUAL mode
----@field line string Linewise comment keymap
----@field block string Blockwise comment keymap
-
----@class ExtraMapping LHS of extra mappings
----@field above string Mapping to add comment on the line above
----@field below string Mapping to add comment on the line below
----@field eol string Mapping to add comment at the end of line
-
----@class Mappings Create default mappings
----Enable operator-pending mapping
----Includes `gcc`, `gbc`, `gc[count]{motion}` and `gb[count]{motion}`
----NOTE: These mappings can be changed individually by `opleader` and `toggler` config
----@field basic boolean
----Enable extra mapping
----Includes `gco`, `gcO`, `gcA`
----@field extra boolean
----Enable extended mapping
----Includes `g>`, `g<`, `g>[count]{motion}` and `g<[count]{motion}`
----@field extended boolean
-
 ---@class CommentConfig Plugin's configuration
----@field padding boolean Add a space b/w comment and the line
----Whether the cursor should stay at its position
----NOTE: This only affects NORMAL mode mappings and doesn't work with dot-repeat
+---Controls space between the comment
+---and the line (default: 'true')
+---@field padding boolean
+---Whether cursor should stay at the
+---same position. Only works with NORMAL
+---mode mappings (default: 'true')
 ---@field sticky boolean
----Lines to be ignored while comment/uncomment.
----Could be a regex string or a function that returns a regex string.
----Example: Use '^$' to ignore empty lines
+---Lua pattern used to ignore lines
+---during (un)comment (default: 'nil')
 ---@field ignore string|fun():string
----@field mappings boolean|Mappings
+---@field mappings Mappings|boolean
 ---@field toggler Toggler
 ---@field opleader Opleader
 ---@field extra ExtraMapping
----@field pre_hook fun(ctx:CommentCtx):string Function to be called before comment/uncomment
----@field post_hook fun(ctx:CommentCtx) Function to be called after comment/uncomment
+---Function to call before (un)comment
+---(default: 'nil')
+---@field pre_hook fun(ctx):string
+---Function to call after (un)comment
+---(default: 'nil')
+---@field post_hook fun(ctx)
+
+---@class Mappings Create default mappings
+---Enables operator-pending mapping; `gcc`, `gbc`,
+---`gc{motion}` and `gb{motion}` (default: 'true')
+---@field basic boolean
+---Enable extra mapping; `gco`, `gcO` and `gcA`
+---(default: 'true')
+---@field extra boolean
+---Enable extended mapping; `g>`, `g<c`, 'g<b',
+---'g<', 'g<c', 'g<b', `g>{motion}` and `g<{motion}`
+---(default: 'false')
+---@field extended boolean
+
+---@class Toggler LHS of toggle mappings in NORMAL
+---@field line string Linewise comment (default: 'gcc')
+---@field block string Blockwise comment (default: 'gbc')
+
+---@class Opleader LHS of operator-mode mappings in NORMAL and VISUAL mode
+---@field line string Linewise comment (default: 'gc')
+---@field block string Blockwise comment (default: 'gb')
+
+---@class ExtraMapping LHS of extra mappings
+---@field below string Inserts comment below (default: 'gco')
+---@field above string Inserts comment above (default: 'gcO')
+---@field eol string Inserts comment at the end of line (default: 'gcA')
 
 ---@private
 ---@class RootConfig
@@ -72,9 +78,12 @@ local Config = {
     },
 }
 
----Update the config
+---@private
+---Updates the default config
 ---@param cfg? CommentConfig
 ---@return RootConfig
+---@see comment.usage.setup
+---@usage `require('Comment.config'):set({config})`
 function Config:set(cfg)
     if cfg then
         self.config = vim.tbl_deep_extend('force', self.config, cfg)
@@ -84,11 +93,12 @@ end
 
 ---Get the config
 ---@return CommentConfig
+---@usage `require('Comment.config'):get()`
 function Config:get()
     return self.config
 end
 
----@export ft
+---@export Config
 return setmetatable(Config, {
     __index = function(this, k)
         return this.state[k]

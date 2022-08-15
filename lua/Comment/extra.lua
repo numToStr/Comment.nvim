@@ -1,4 +1,7 @@
----@mod comment.extra Extra functions
+---@mod comment.extra Insert API
+---@brief [[
+---Underlying functions that powers the |comment.api.insert| lua API.
+---@brief ]]
 
 local U = require('Comment.utils')
 local A = vim.api
