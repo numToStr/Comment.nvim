@@ -488,7 +488,6 @@ api.locked = setmetatable({}, {
     end,
 })
 
----@tag comment.api.dotrepeat
 ---Callback function which does the following
 ---  1. Sets 'operatorfunc' for dot-repeat
 ---  2. Preserves jumps and marks

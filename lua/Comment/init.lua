@@ -20,51 +20,13 @@
 ---dot-repeat, counts, line ('//') and block ('/* */') comments, and can be used
 ---with motion and text-objects. It has native integration with tressitter to
 ---support embedded filetypes like html, vue, markdown with codeblocks etc.
----
----Comment.nvim uses |g@| and |Operator-pending-mode| to be able to easily comment
----and to support dot-repeat. Following is the brief architecture of the plugin
----
---->
---- - START (keybinding or API)
----
---- - Determine the region using marks, changed text |'[| |']| or visual |'>| |'<|
----
---- - Pick commentstring either linewise/blockwise from one of the following places
----     1. pre_hook (if string is returned)
----     2. stored inside the plugin (with the help of treesitter)
----     3. vim.bo.commentstring
----
---- - Parse commentstring, returns LHS and RHS of commentstring
----
---- >> Every is_comment check is made using the commentstring from the above step
----
---- >> If `gc` is used on the current line i.e., `gc3w` then use blockwise
----
---- - If linewise
----     1. if every line is commented
----         1.1 uncomment
----
----     2. else
----         2.1 find the column no. to start the comment from (indentation)
----         2.2 comment
----
---- - If blockwise
----     1. if the first line or start of the block is commented with LHS
----        and the last line or end of the block is commented with RHS
----        1.1 uncomment
----
----     2. else
----         2.1 Prepend the LHS into the first line
----         2.2 Append the RHS into the last line
----
----     >> In visual block, we can't preprend or append, so in this case we need
----     >> to slice and concat the line, putting RHS and LHS of commentstring into
----     >> right place when doing comment and removing LHS and RHS when uncomment
----
---- - END
----<
 ---@brief ]]
-
+---@tag comment.dotrepeat
+---@brief [[
+---Comment.nvim uses |operatorfunc| combined with |g@| to support dot-repeat, and
+---various marks i.e., |'[| |']| |'<| |'>| to deduce the region with the {motion}
+---argument provided by 'operatorfunc'. See |comment.api.call|
+---@brief ]]
 ---@tag comment.commentstring
 ---@brief [[
 ---Comment.nvim picks commentstring, either linewise/blockwise, from one of the
