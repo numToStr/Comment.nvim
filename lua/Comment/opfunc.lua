@@ -70,11 +70,22 @@ function Op.opfunc(motion, cfg, cmode, ctype)
         cmode = cmode,
         range = range,
     }
+    local is_visual = type(motion) == 'string' and string.match(motion, '[vV]')
+    local srow, scol, erow, ecol
+    if is_visual then
+        srow, scol = unpack(A.nvim_buf_get_mark(0, '<'))
+        erow, ecol = unpack(A.nvim_buf_get_mark(0, '>'))
+    end
 
     if motion ~= nil and (is_blockx or ctype == U.ctype.blockwise) then
         ctx.cmode = Op.blockwise(params, is_partial)
     else
         ctx.cmode = Op.linewise(params)
+    end
+
+    if is_visual then
+        A.nvim_buf_set_mark(0, '<', srow, scol, {})
+        A.nvim_buf_set_mark(0, '>', erow, ecol, {})
     end
 
     -- We only need to restore cursor if both sticky and position are available
