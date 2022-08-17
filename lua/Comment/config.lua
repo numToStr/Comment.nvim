@@ -1,24 +1,65 @@
 ---@mod comment.config Configuration
+---@tag comment.config.defaults
+---@brief [[
+---Following is the default config for the |comment.usage.setup|. If you want to
+---override, just modify the option that you want, then it will be merged with the
+---default config.
+---
+--->
+---    {
+---        padding = true,
+---        sticky = true,
+---        ignore = nil,
+---        toggler = {
+---            line = 'gcc',
+---            block = 'gbc',
+---        },
+---        opleader = {
+---            line = 'gc',
+---            block = 'gb',
+---        },
+---        extra = {
+---            above = 'gcO',
+---            below = 'gco',
+---            eol = 'gcA',
+---        },
+---        mappings = {
+---            basic = true,
+---            extra = true,
+---            extended = false,
+---        },
+---        pre_hook = nil,
+---        post_hook = nil,
+---    }
+---<
+---@brief ]]
 
 ---@class CommentConfig Plugin's configuration
 ---Controls space between the comment
 ---and the line (default: 'true')
----@field padding boolean
+---@field padding boolean|fun():boolean
 ---Whether cursor should stay at the
----same position. Only works with NORMAL
+---same position. Only works in NORMAL
 ---mode mappings (default: 'true')
 ---@field sticky boolean
 ---Lua pattern used to ignore lines
 ---during (un)comment (default: 'nil')
 ---@field ignore string|fun():string
----@field mappings Mappings|boolean
+---Enables |comment.keybindings|
+---NOTE: If given 'false', then the
+---plugin won't create any mappings
+---@field mappings Mappings|false
 ---@field toggler Toggler
 ---@field opleader Opleader
 ---@field extra ExtraMapping
----Function to call before (un)comment
+---Function to call before (un)comment.
+---It is called with a {ctx} argument
+---of type |comment.utils.CommentCtx|
 ---(default: 'nil')
 ---@field pre_hook fun(ctx):string
----Function to call after (un)comment
+---Function to call after (un)comment.
+---It is called with a {ctx} argument
+---of type |comment.utils.CommentCtx|
 ---(default: 'nil')
 ---@field post_hook fun(ctx)
 

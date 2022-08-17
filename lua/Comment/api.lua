@@ -325,8 +325,6 @@ end
 ---api.toggle.blockwise.current(motion?, config?)
 ---api.toggle.blockwise.count(count, config?)
 ---
------ NORMAL mode
----
 ----- Toggle current line (linewise) using C-/
 ---vim.keymap.set('n', '<C-_>', api.toggle.linewise.current)
 ---
@@ -347,19 +345,17 @@ end
 ---    { expr = true }
 ---)
 ---
------ VISUAL mode
----
 ---local esc = vim.api.nvim_replace_termcodes(
 ---    '<ESC>', true, false, true
 ---)
 ---
------ Linewise toggle (linewise)
+----- Toggle selection (linewise)
 ---vim.keymap.set('x', '<leader>c', function()
 ---    vim.api.nvim_feedkeys(esc, 'nx', false)
 ---    api.toggle.linewise(vim.fn.visualmode())
 ---end)
 ---
------ Blockwise toggle (blockwise)
+----- Toggle selection (blockwise)
 ---vim.keymap.set('x', '<leader>b', function()
 ---    vim.api.nvim_feedkeys(esc, 'nx', false)
 ---    api.toggle.blockwise(vim.fn.visualmode())

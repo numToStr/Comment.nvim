@@ -18,7 +18,7 @@
 ---@brief [[
 ---Comment.nvim is a smart and powerful comment plugin for neovim. It supports
 ---dot-repeat, counts, line ('//') and block ('/* */') comments, and can be used
----with motion and text-objects. It has native integration with tressitter to
+---with motion and text-objects. It has native integration with |tressitter| to
 ---support embedded filetypes like html, vue, markdown with codeblocks etc.
 ---@brief ]]
 ---@tag comment.dotrepeat
@@ -49,6 +49,11 @@
 ---the string in |comment.ft| instead of using 'commentstring'. To override this
 ---behavior, you have to manually return the 'commentstring' from 'pre_hook'.
 ---@brief ]]
+---@tag comment.sourcecode
+---@brief [[
+---Comment.nvim is FOSS provided under MIT license. All the source code is avaiable
+---at https://github.com/numToStr/Comment.nvim
+---@brief ]]
 
 ---@mod comment.usage Usage
 ---@brief [[
@@ -65,6 +70,10 @@ local C = {}
 ---@return CommentConfig _ Returns the mutated config
 ---@see comment.config
 ---@usage [[
+----- Use default configuration
+---require('Comment').setup()
+---
+----- or with custom configuration
 ---require('Comment').setup({
 ---    ignore = '^$',
 ---    toggler = {

@@ -128,7 +128,7 @@ end
 
 ---Get lines from the current position to the given count
 ---@param count integer Probably 'vim.v.count'
----@return string[] List of lines
+---@return string[] _ List of lines
 ---@return CommentRange
 function U.get_count_lines(count)
     local srow = unpack(A.nvim_win_get_cursor(0))
@@ -140,7 +140,7 @@ end
 
 ---Get lines from a NORMAL/VISUAL mode
 ---@param range CommentRange
----@return string[] List of lines
+---@return string[] _ List of lines
 function U.get_lines(range)
     -- If start and end is same, then just return the current line
     if range.srow == range.erow then
