@@ -1,0 +1,33 @@
+name: ci
+
+on:
+  push:
+    paths:
+      - "**.lua"
+    branches:
+      - master
+      - docs
+
+env:
+  PLUGIN_NAME: Comment
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+    name: emmylua to help doc
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Generating help
+        run: |
+          curl -Lq https://github.com/numToStr/lemmy-help/releases/latest/download/lemmy-help-x86_64-unknown-linux-gnu.tar.gz | tar xz
+          ./lemmy-help -fact \
+            lua/Comment/{init.lua,config.lua} plugin/Comment.lua \
+            lua/Comment/{api.lua,ft.lua,utils.lua,opfunc.lua,extra.lua} > doc/${{env.PLUGIN_NAME}}.txt
+
+      - name: Commit
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          branch: ${{ github.head_ref }}
+          commit_message: "chore(docs): auto-generate `:help` doc"
+          file_pattern: doc/*.txt
