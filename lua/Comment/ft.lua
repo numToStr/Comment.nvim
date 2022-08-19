@@ -1,7 +1,7 @@
 ---@mod comment.ft Language/Filetype detection
 ---@brief [[
 ---This module is the core of filetype and commentstring detection and uses the
----|lua-treesitter| APIs to accurately detect filetype and gives the corresponding
+--- |lua-treesitter| APIs to accurately detect filetype and gives the corresponding
 ---commentstring, stored inside the plugin, for the filetype/langauge.
 ---@brief ]]
 

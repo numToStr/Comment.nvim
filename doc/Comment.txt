@@ -523,6 +523,10 @@ api.call({cb}, {op})                                          *comment.api.call*
 ================================================================================
 Language/Filetype detection                                         *comment.ft*
 
+This module is the core of filetype and commentstring detection and uses the
+ |lua-treesitter| APIs to accurately detect filetype and gives the corresponding
+commentstring, stored inside the plugin, for the filetype/langauge.
+
 ft.set({lang}, {val})                                           *comment.ft.set*
     Sets a commentstring(s) for a filetype/language
 
