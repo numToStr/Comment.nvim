@@ -1,4 +1,7 @@
----@mod comment.extra Extra functions
+---@mod comment.extra Extra API
+---@brief [[
+---Underlying functions that powers the |comment.api.insert| lua API.
+---@brief ]]
 
 local U = require('Comment.utils')
 local A = vim.api
@@ -30,7 +33,7 @@ local function ins_on_line(lnum, ctype, cfg)
 
     local srow = row + lnum
     local lcs, rcs = U.parse_cstr(cfg, ctx)
-    local padding = U.get_pad(cfg.padding)
+    local padding = U.get_pad(U.is_fn(cfg.padding))
 
     -- We need RHS of cstr, if we are doing block comments or if RHS exists
     -- because even in line comment RHS do exists for some filetypes like jsx_element, ocaml
@@ -73,7 +76,7 @@ function extra.insert_eol(ctype, cfg)
     local lcs, rcs = U.parse_cstr(cfg, ctx)
 
     local line = A.nvim_get_current_line()
-    local padding = U.get_pad(cfg.padding)
+    local padding = U.get_pad(U.is_fn(cfg.padding))
 
     -- We need RHS of cstr, if we are doing block comments or if RHS exists
     -- because even in line comment RHS do exists for some filetypes like jsx_element, ocaml

@@ -1,0 +1,874 @@
+*comment-nvim.txt*    For Neovim version 0.7           Last change: 2021 July 11
+
+     _____                                     _                _
+    / ____/                                   / /              (_)
+   / /     ___  _ __ ___  _ __ ___   ___ _ __ / /_   _ ____   ___ _ __ ___
+   / /    / _ \/ '_ ` _ \/ '_ ` _ \ / _ \ '_ \/ __/ / '_ \ \ / / / '_ ` _ \
+   / /___/ (_) / / / / / / / / / / /  __/ / / / /_ _/ / / \ V // / / / / / /
+    \_____\___//_/ /_/ /_/_/ /_/ /_/\___/_/ /_/\__(_)_/ /_/\_/ /_/_/ /_/ /_/
+
+                    · Smart and Powerful comment plugin ·
+
+
+================================================================================
+Table of Contents                                             *comment.contents*
+
+Introduction······················································|comment-nvim|
+Usage····························································|comment.usage|
+Configuration···················································|comment.config|
+Keybindings················································|comment.keybindings|
+Plug Mappings··················································|comment.plugmap|
+Core Lua API·······················································|comment.api|
+Language/Filetype detection·········································|comment.ft|
+Utilities························································|comment.utils|
+Operator-mode API···············································|comment.opfunc|
+Insert API·······················································|comment.extra|
+
+================================================================================
+Introduction                                                      *comment-nvim*
+
+Comment.nvim is a smart and powerful comment plugin for neovim. It supports
+dot-repeat, counts, line ('//') and block ('/* */') comments, and can be used
+with motion and text-objects. It has native integration with tressitter to
+support embedded filetypes like html, vue, markdown with codeblocks etc.
+
+                                                             *comment.dotrepeat*
+Comment.nvim uses |operatorfunc| combined with |g@| to support dot-repeat, and
+various marks i.e., |'[| |']| |'<| |'>| to deduce the region with the {motion}
+argument provided by 'operatorfunc'. See |comment.api.call|
+
+                                                         *comment.commentstring*
+Comment.nvim picks commentstring, either linewise/blockwise, from one of the
+following places
+
+ 1. 'pre_hook'
+       If a string is returned from this function then it will be used for
+       (un)commenting. See |comment.config|
+
+ 2. |comment.ft|
+       Using the commentstring table inside the plugin (using treesitter).
+       Fallback to |commentstring|, if not found.
+
+ 3. |commentstring| - Neovim's native commentstring for the filetype
+
+Although Comment.nvim supports native 'commentstring' but unfortunately it has
+the least priority. The caveat with this approach is that if someone sets the
+`commentstring`, without returning it, from the 'pre_hook' and the current
+filetype also exists in the |comment.ft| then the commenting will be done using
+the string in |comment.ft| instead of using 'commentstring'. To override this
+behavior, you have to manually return the 'commentstring' from 'pre_hook'.
+
+================================================================================
+Usage                                                            *comment.usage*
+
+Before using the plugin, you need to call the `setup()` function to create the
+default mappings. If you want, you can also override the default configuration
+by giving it a partial 'comment.config.Config' object, it will then be merged
+with the default config.
+
+C.setup({config?})                                         *comment.usage.setup*
+    Configures the plugin
+
+    Parameters: ~
+        {config?}  (CommentConfig)  User configuration
+
+    Returns: ~
+        {CommentConfig}  Returns the mutated config
+
+    See: ~
+        |comment.config|
+
+    Usage: ~
+        >
+            require('Comment').setup({
+                ignore = '^$',
+                toggler = {
+                    line = '<leader>cc',
+                    block = '<leader>bc',
+                },
+                opleader = {
+                    line = '<leader>c',
+                    block = '<leader>b',
+                },
+            })
+        <
+
+
+================================================================================
+Configuration                                                   *comment.config*
+
+CommentConfig                                     *comment.config.CommentConfig*
+    Plugin's configuration
+
+    Fields: ~
+        {padding}    (boolean)              Controls space between the comment
+                                            and the line (default: 'true')
+        {sticky}     (boolean)              Whether cursor should stay at the
+                                            same position. Only works with NORMAL
+                                            mode mappings (default: 'true')
+        {ignore}     (string|fun():string)  Lua pattern used to ignore lines
+                                            during (un)comment (default: 'nil')
+        {mappings}   (Mappings|boolean)
+        {toggler}    (Toggler)
+        {opleader}   (Opleader)
+        {extra}      (ExtraMapping)
+        {pre_hook}   (fun(ctx):string)      Function to call before (un)comment
+                                            (default: 'nil')
+        {post_hook}  (fun(ctx))             Function to call after (un)comment
+                                            (default: 'nil')
+
+
+Mappings                                               *comment.config.Mappings*
+    Create default mappings
+
+    Fields: ~
+        {basic}     (boolean)  Enables operator-pending mapping; `gcc`, `gbc`,
+                               `gc{motion}` and `gb{motion}` (default: 'true')
+        {extra}     (boolean)  Enable extra mapping; `gco`, `gcO` and `gcA`
+                               (default: 'true')
+        {extended}  (boolean)  Enable extended mapping; `g>`, `g<c`, 'g<b',
+                               'g<', 'g<c', 'g<b', `g>{motion}` and `g<{motion}`
+                               (default: 'false')
+
+
+Toggler                                                 *comment.config.Toggler*
+    LHS of toggle mappings in NORMAL
+
+    Fields: ~
+        {line}   (string)  Linewise comment (default: 'gcc')
+        {block}  (string)  Blockwise comment (default: 'gbc')
+
+
+Opleader                                               *comment.config.Opleader*
+    LHS of operator-mode mappings in NORMAL and VISUAL mode
+
+    Fields: ~
+        {line}   (string)  Linewise comment (default: 'gc')
+        {block}  (string)  Blockwise comment (default: 'gb')
+
+
+ExtraMapping                                       *comment.config.ExtraMapping*
+    LHS of extra mappings
+
+    Fields: ~
+        {below}  (string)  Inserts comment below (default: 'gco')
+        {above}  (string)  Inserts comment above (default: 'gcO')
+        {eol}    (string)  Inserts comment at the end of line (default: 'gcA')
+
+
+Config:get()                                                *comment.config:get*
+    Get the config
+
+    Returns: ~
+        {CommentConfig}
+
+    Usage: ~
+        >
+            require('Comment.config'):get()
+        <
+
+
+================================================================================
+Keybindings                                                *comment.keybindings*
+
+Comment.nvim provides default keybinds which is used for (un)comment your code.
+These keybinds are enabled upon calling |commen.usage.setup| and can be
+configured or disabled, if desired.
+
+Basic: ~
+
+  *gc*
+  *gb*
+  *gc[count]{motion}*
+  *gb[count]{motion}*
+
+      Toggle comment on a region using linewise/blockwise comment. In 'NORMAL'
+      mode, it uses 'Operator-Pending' mode to listen for an operator/motion.
+      In 'VISUAL' mode it simply comment the selected region.
+
+  *gcc*
+  *gbc*
+  *[count]gcc*
+  *[count]gbc*
+
+      Toggle comment on the current line using linewise/blockwise comment. If
+      prefixed with a 'v:count' then it will comment over the number of lines
+      corresponding to the {count}. These are only available in 'NORMAL' mode.
+
+
+Extra: ~
+
+  *gco* - Inserts comment below and enters INSERT mode
+  *gcO* - Inserts comment above and enters INSERT mode
+  *gcA* - Inserts comment at the end of line and enters INSERT mode
+
+================================================================================
+Plug Mappings                                                  *comment.plugmap*
+
+Comment.nvim provides <Plug> mappings for most commonly used actions. These
+can be used to make custom keybindings and are enabled by default. All plug
+mappings has support for dot-repeat except VISUAL mode keybindings. To create
+custom comment function, check out 'comment.api' section.
+
+  *<Plug>(comment_toggle_linewise)*
+  *<Plug>(comment_toggle_blockwise)*
+
+     Toggle comment on a region with linewise/blockwise comment in NORMAL mode.
+     using |Operator-Pending| mode (or |g@|) to get the region to comment.
+     These powers the |gc| and |gb| keybindings.
+
+  *<Plug>(comment_toggle_linewise_current)*
+  *<Plug>(comment_toggle_blockwise_current)*
+
+     Toggle comment on the current line with linewise/blockwise comment in
+     NORMAL mode. These powers the |gcc| and 'gbc' keybindings.
+
+  *<Plug>(comment_toggle_linewise_count)*
+  *<Plug>(comment_toggle_blockwise_count)*
+
+     Toggle comment on a region using 'v:count' with linewise/blockwise comment
+     in NORMAL mode. These powers the |[count]gcc| and |[count]gbc| keybindings.
+
+  *<Plug>(comment_toggle_linewise_visual)*
+  *<Plug>(comment_toggle_blockwise_visual)*
+
+     Toggle comment on the selected region with linewise/blockwise comment in
+     NORMAL mode. These powers the |{visual}gc| and |{visual}gb| keybindings.
+
+Usage: ~
+
+>
+    -- Toggle current line or with count
+    vim.keymap.set('n', 'gcc', function()
+        return vim.v.count == 0
+            and '<Plug>(comment_toggle_linewise_current)'
+            or '<Plug>(comment_toggle_linewise_count)'
+    end, { expr = true })
+
+    -- Toggle in Op-pending mode
+    vim.keymap.set('n', 'gc', '<Plug>(comment_toggle_linewise)')
+
+    -- Toggle in VISUAL mode
+    vim.keymap.set('x', 'gc', '<Plug>(comment_toggle_linewise_visual)')
+<
+
+================================================================================
+Core Lua API                                                       *comment.api*
+
+This module provides the core lua APIs which is used by the default keybindings
+and <Plug> (Read |comment.plugmap|) mappings. These API can be used to setup your
+own custom keybindings or to even make your (un)comment function.
+
+                                                   *comment.api.toggle.linewise*
+                                                  *comment.api.toggle.blockwise*
+api.toggle                                                  *comment.api.toggle*
+    Provides API to toggle comments over a region, on current-line, or with a
+    count using line or block comment string.
+
+    All functions takes a {motion} argument, except '*.count()' function which
+    takes an {count} argument, and an optional {config} parameter.
+
+    Type: ~
+        (table)  A metatable containing API functions
+
+    See: ~
+        |comment.opfunc.OpMotion|
+        |comment.config|
+
+    Usage: ~
+        >
+            local api = require('Comment.api')
+
+            api.toggle.linewise(motion, config)
+            api.toggle.linewise.current(motion?, config?)
+            api.toggle.linewise.count(count, config?)
+
+            api.toggle.blockwise(motion, config?)
+            api.toggle.blockwise.current(motion?, config?)
+            api.toggle.blockwise.count(count, config?)
+
+            -- NORMAL mode
+
+            -- Toggle current line (linewise) using C-/
+            vim.keymap.set('n', '<C-_>', api.toggle.linewise.current)
+
+            -- Toggle current line (blockwise) using C-\
+            vim.keymap.set('n', '<C-\\>', api.toggle.blockwise.current)
+
+            -- Toggle lines (linewise) with dot-repeat support
+            -- Example: <leader>gc3j will comment 4 lines
+            vim.keymap.set(
+                'n', '<leader>gc', api.call('toggle.linewise', 'g@'),
+                { expr = true }
+            )
+
+            -- Toggle lines (blockwise) with dot-repeat support
+            -- Example: <leader>gb3j will comment 4 lines
+            vim.keymap.set(
+                'n', '<leader>gb', api.call('toggle.blockwise', 'g@'),
+                { expr = true }
+            )
+
+            -- VISUAL mode
+
+            local esc = vim.api.nvim_replace_termcodes(
+                '<ESC>', true, false, true
+            )
+
+            -- Linewise toggle (linewise)
+            vim.keymap.set('x', '<leader>c', function()
+                vim.api.nvim_feedkeys(esc, 'nx', false)
+                api.toggle.linewise(vim.fn.visualmode())
+            end)
+
+            -- Blockwise toggle (blockwise)
+            vim.keymap.set('x', '<leader>b', function()
+                vim.api.nvim_feedkeys(esc, 'nx', false)
+                api.toggle.blockwise(vim.fn.visualmode())
+            end)
+        <
+
+
+                                                  *comment.api.comment.linewise*
+                                                 *comment.api.comment.blockwise*
+api.comment                                                *comment.api.comment*
+    Provides API to (only) comment a region, on current-line, or with a
+    count using line or block comment string.
+
+    All functions takes a {motion} argument, except '*.count()' function which
+    takes an {count} argument, and an optional {config} parameter.
+
+    Type: ~
+        (table)  A metatable containing API functions
+
+    See: ~
+        |comment.opfunc.OpMotion|
+        |comment.config|
+
+    Usage: ~
+        >
+            local api = require('Comment.api')
+
+            api.comment.linewise(motion, config)
+            api.comment.linewise.current(motion?, config?)
+            api.comment.linewise.count(count, config?)
+
+            api.comment.blockwise(motion, config?)
+            api.comment.blockwise.current(motion?, config?)
+            api.comment.blockwise.count(count, config?)
+        <
+
+
+                                                *comment.api.uncomment.linewise*
+                                               *comment.api.uncomment.blockwise*
+api.uncomment                                            *comment.api.uncomment*
+    Provides API to (only) uncomment a region, on current-line, or with a
+    count using line or block comment string.
+
+    All functions takes a {motion} argument, except '*.count()' function which
+    takes an {count} argument, and an optional {config} parameter.
+
+    Type: ~
+        (table)  A metatable containing API functions
+
+    See: ~
+        |comment.opfunc.OpMotion|
+        |comment.config|
+
+    Usage: ~
+        >
+            local api = require('Comment.api')
+
+            api.uncomment.linewise(motion, config)
+            api.uncomment.linewise.current(motion?, config?)
+            api.uncomment.linewise.count(count, config?)
+
+            api.uncomment.blockwise(motion, config?)
+            api.uncomment.blockwise.current(motion?, config?)
+            api.uncomment.blockwise.count(count, config?)
+        <
+
+
+api.insert                                                  *comment.api.insert*
+    Provides API to to insert comment on previous, next or at the end-of-line.
+    All functions takes an optional {config} parameter.
+
+    Type: ~
+        (table)  A metatable containing API functions
+
+    See: ~
+        |comment.config|
+
+    Usage: ~
+        >
+            local api = require('Comment.api')
+
+            api.insert.linewise.above(cfg?)
+            api.insert.linewise.below(cfg?)
+            api.insert.linewise.eol(cfg?)
+
+            api.insert.blockwise.above(cfg?)
+            api.insert.blockwise.below(cfg?)
+            api.insert.blockwise.eol(cfg?)
+        <
+
+
+api.locked                                                  *comment.api.locked*
+    Wraps the given API function with 'lockmarks' to preserve marks/jumps
+
+    Type: ~
+        (fun(cb:string):fun(motion:OpMotion))
+
+    See: ~
+        |lockmarks|
+        |comment.opfunc.OpMotion|
+
+    Usage: ~
+        >
+            local api = require('Comment.api')
+
+            vim.keymap.set(
+                'n', '<leader>c', api.locked('toggle.linewise.current')
+            )
+
+            local esc = vim.api.nvim_replace_termcodes(
+                '<ESC>', true, false, true
+            )
+            vim.keymap.set('x', '<leader>c', function()
+                vim.api.nvim_feedkeys(esc, 'nx', false)
+                api.locked('toggle.linewise')(vim.fn.visualmode())
+            end)
+
+            -- NOTE: `locked` method is just a wrapper around `lockmarks`
+            vim.api.nvim_command([[
+                lockmarks lua require('Comment.api').toggle.linewise.current()
+            ]])
+        <
+
+
+api.call({cb}, {op})                                          *comment.api.call*
+    Callback function which does the following
+      1. Sets 'operatorfunc' for dot-repeat
+      2. Preserves jumps and marks
+      3. Stores last cursor position
+
+    Parameters: ~
+        {cb}  (string)      Name of the API function to call
+        {op}  ('g@'|'g@$')  Operator string to execute
+
+    Returns: ~
+        {fun():string}  Keymap RHS callback
+
+    See: ~
+        |g@|
+        |operatorfunc|
+
+    Usage: ~
+        >
+            local api = require('Comment.api')
+            vim.keymap.set(
+                'n', 'gc', api.call('toggle.linewise', 'g@'),
+                { expr = true }
+            )
+            vim.keymap.set(
+                'n', 'gcc', api.call('toggle.linewise.current', 'g@$'),
+                { expr = true }
+            )
+        <
+
+
+================================================================================
+Language/Filetype detection                                         *comment.ft*
+
+ft.set({lang}, {val})                                           *comment.ft.set*
+    Sets a commentstring(s) for a filetype/language
+
+    Parameters: ~
+        {lang}  (string)           Filetype/Language of the buffer
+        {val}   (string|string[])
+
+    Returns: ~
+        {table}  Returns itself
+
+    Usage: ~
+        >
+            local ft = require('Comment.ft')
+
+            --1. Using method signature
+            -- Set only line comment or both
+            -- You can also chain the set calls
+            ft.set('yaml', '#%s').set('javascript', {'//%s', '/*%s*/'})
+
+            -- 2. Metatable magic
+            ft.javascript = {'//%s', '/*%s*/'}
+            ft.yaml = '#%s'
+
+            -- 3. Multiple filetypes
+            ft({'go', 'rust'}, {'//%s', '/*%s*/'})
+            ft({'toml', 'graphql'}, '#%s')
+        <
+
+
+ft.get({lang}, {ctype})                                         *comment.ft.get*
+    Get line/block commentstring for a given filetype
+
+    Parameters: ~
+        {lang}   (string)   Filetype/Language of the buffer
+        {ctype}  (integer)  See |comment.utils.ctype|
+
+    Returns: ~
+        {string}  Commentstring
+
+    Usage: ~
+        >
+            local ft = require('Comment.ft')
+            local U = require('Comment.utils')
+            print(ft.get(vim.bo.filetype, U.ctype.linewise))
+        <
+
+
+ft.lang({lang})                                                *comment.ft.lang*
+    Get a copy of commentstring(s) for a given filetype
+
+    Parameters: ~
+        {lang}  (string)  Filetype/Language of the buffer
+
+    Returns: ~
+        {string[]}  Tuple of { line, block } commentstring
+
+    Usage: ~
+        >
+            require('Comment.ft').lang(vim.bo.filetype)
+        <
+
+
+ft.contains({tree}, {range})                               *comment.ft.contains*
+    Get a language tree for a given range by walking the parse tree recursively.
+    This uses 'lua-treesitter' API under the hood. This can be used to calculate
+    language of a particular region which embedded multiple filetypes like html,
+    vue, markdown etc.
+
+    NOTE: This ignores `tree-sitter-comment` parser, if installed.
+
+    Parameters: ~
+        {tree}   (userdata)   Parse tree to be walked
+        {range}  (integer[])  Range to check for
+                              {start_row, start_col, end_row, end_col}
+
+    Returns: ~
+        {userdata}  Returns a |treesitter-languagetree|
+
+    See: ~
+        |treesitter-languagetree|
+        |lua-treesitter-core|
+
+    Usage: ~
+        >
+            local ok, parser = pcall(vim.treesitter.get_parser, 0)
+            assert(ok, "No parser found!")
+            local tree = require('Comment.ft').contains(parser, {0, 0, -1, 0})
+            print('Lang:', tree:lang())
+        <
+
+
+ft.calculate({ctx})                                       *comment.ft.calculate*
+    Calculate commentstring with the power of treesitter
+
+    Parameters: ~
+        {ctx}  (CommentCtx)
+
+    Returns: ~
+        {string}  Commentstring
+
+    See: ~
+        |comment.utils.CommentCtx|
+
+
+================================================================================
+Utilities                                                        *comment.utils*
+
+CommentCtx                                            *comment.utils.CommentCtx*
+    Comment context
+
+    Fields: ~
+        {ctype}    (integer)       See |comment.utils.ctype|
+        {cmode}    (integer)       See |comment.utils.cmode|
+        {cmotion}  (integer)       See |comment.utils.cmotion|
+        {range}    (CommentRange)
+
+
+CommentRange                                        *comment.utils.CommentRange*
+    Range of the selection that needs to be commented
+
+    Fields: ~
+        {srow}  (integer)  Starting row
+        {scol}  (integer)  Starting column
+        {erow}  (integer)  Ending row
+        {ecol}  (integer)  Ending column
+
+
+CommentMode                                          *comment.utils.CommentMode*
+    Comment modes - Can be manual or computed via operator-mode
+
+    Fields: ~
+        {toggle}     (integer)  Toggle action
+        {comment}    (integer)  Comment action
+        {uncomment}  (integer)  Uncomment action
+
+
+U.cmode                                                    *comment.utils.cmode*
+    An object containing comment modes
+
+    Type: ~
+        (CommentMode)
+
+
+CommentType                                          *comment.utils.CommentType*
+    Comment types
+
+    Fields: ~
+        {linewise}   (integer)  Use linewise commentstring
+        {blockwise}  (integer)  Use blockwise commentstring
+
+
+U.ctype                                                    *comment.utils.ctype*
+    An object containing comment types
+
+    Type: ~
+        (CommentType)
+
+
+CommentMotion                                      *comment.utils.CommentMotion*
+    Comment motion types
+
+    Fields: ~
+        {line}   (integer)  Line motion (ie. 'gc2j')
+        {char}   (integer)  Character/left-right motion (ie. 'gc2w')
+        {block}  (integer)  Visual operator-pending motion
+        {v}      (integer)  Visual motion (ie. 'v3jgc')
+        {V}      (integer)  Visual-line motion (ie. 'V10kgc')
+
+
+U.cmotion                                                *comment.utils.cmotion*
+    An object containing comment motions
+
+    Type: ~
+        (CommentMotion)
+
+
+U.get_region({opmode?})                               *comment.utils.get_region*
+    Get region for line movement or visual selection
+    NOTE: Returns the current line region, if `opmode` is not given.
+
+    Parameters: ~
+        {opmode?}  (OpMotion)
+
+    Returns: ~
+        {CommentRange}
+
+
+U.get_count_lines({count})                       *comment.utils.get_count_lines*
+    Get lines from the current position to the given count
+
+    Parameters: ~
+        {count}  (integer)  Probably 'vim.v.count'
+
+    Returns: ~
+        {string[]}      of lines
+        {CommentRange}
+
+
+U.get_lines({range})                                   *comment.utils.get_lines*
+    Get lines from a NORMAL/VISUAL mode
+
+    Parameters: ~
+        {range}  (CommentRange)
+
+    Returns: ~
+        {string[]}  of lines
+
+
+U.unwrap_cstr({cstr})                                *comment.utils.unwrap_cstr*
+    Validates and unwraps the given commentstring
+
+    Parameters: ~
+        {cstr}  (string)  See 'commentstring'
+
+    Returns: ~
+        {string}  Left side of the commentstring
+        {string}  Right side of the commentstring
+
+
+U.parse_cstr({cfg}, {ctx})                            *comment.utils.parse_cstr*
+    Parses commentstring from the following places in the respective order
+      1. pre_hook - commentstring returned from the function
+      2. ft.lua - commentstring table bundled with the plugin
+      3. commentstring - Neovim's native. See 'commentstring'
+
+    Parameters: ~
+        {cfg}  (CommentConfig)
+        {ctx}  (CommentCtx)
+
+    Returns: ~
+        {string}  Left side of the commentstring
+        {string}  Right side of the commentstring
+
+
+                                                       *comment.utils.commenter*
+U.commenter({left}, {right}, {padding}, {scol?}, {ecol?})
+    Returns a closure which is used to do comments
+
+    If given {string[]} to the closure then it will do blockwise comment
+    else linewise comment will be done with the given {string}
+
+    Parameters: ~
+        {left}     (string)   Left side of the commentstring
+        {right}    (string)   Right side of the commentstring
+        {padding}  (boolean)  Is padding enabled?
+        {scol?}    (integer)  Starting column
+        {ecol?}    (integer)  Ending column
+
+    Returns: ~
+        {fun(line:string|string[]):string}
+
+
+                                                     *comment.utils.uncommenter*
+U.uncommenter({left}, {right}, {padding}, {scol?}, {ecol?})
+    Returns a closure which is used to uncomment a line
+
+    If given {string[]} to the closure then it will block uncomment
+    else linewise uncomment will be done with the given {string}
+
+    Parameters: ~
+        {left}     (string)   Left side of the commentstring
+        {right}    (string)   Right side of the commentstring
+        {padding}  (boolean)  Is padding enabled?
+        {scol?}    (integer)  Starting column
+        {ecol?}    (integer)  Ending column
+
+    Returns: ~
+        {fun(line:string|string[]):string}
+
+
+                                                    *comment.utils.is_commented*
+U.is_commented({left}, {right}, {padding}, {scol?}, {ecol?})
+    Check if the given string is commented or not
+
+    If given {string[]} to the closure, it will check the first and last line
+    with LHS and RHS of commentstring respectively else it will check the given
+    line with LHS and RHS (if given) of the commenstring
+
+    Parameters: ~
+        {left}     (string)   Left side of the commentstring
+        {right}    (string)   Right side of the commentstring
+        {padding}  (boolean)  Is padding enabled?
+        {scol?}    (integer)  Starting column
+        {ecol?}    (integer)  Ending column
+
+    Returns: ~
+        {fun(line:string|string[]):boolean}
+
+
+================================================================================
+Operator-mode API                                               *comment.opfunc*
+
+Underlying functions that powers the |comment.api.toggle|, |comment.api.comment|,
+and |comment.api.uncomment| lua API.
+
+OpMotion                                               *comment.opfunc.OpMotion*
+    Vim operator-mode motion enum. Read |:map-operator|
+
+    Variants: ~
+        ('line')  Vertical motion
+        ('char')  Horizontal motion
+        ('v')     Visual Block motion
+        ('V')     Visual Line motion
+
+
+                                                         *comment.opfunc.opfunc*
+Op.opfunc({motion?}, {cfg}, {cmode}, {ctype})
+    Common operatorfunc callback
+    This function contains the core logic for comment/uncomment
+
+    Parameters: ~
+        {motion?}  (OpMotion)       If given 'nil', it'll only (un)comment
+                                    the current line
+        {cfg}      (CommentConfig)
+        {cmode}    (integer)        See |comment.utils.cmode|
+        {ctype}    (integer)        See |comment.utils.ctype|
+
+
+                                                          *comment.opfunc.count*
+Op.count({count}, {cfg}, {cmode}, {ctype})
+    Line commenting with count
+
+    Parameters: ~
+        {count}  (integer)        Value of |v:count|
+        {cfg}    (CommentConfig)
+        {cmode}  (integer)        See |comment.utils.cmode|
+        {ctype}  (integer)        See |comment.utils.ctype|
+
+
+OpFnParams                                           *comment.opfunc.OpFnParams*
+    Operator-mode function parameters
+
+    Fields: ~
+        {cfg}    (CommentConfig)
+        {cmode}  (integer)        See |comment.utils.cmode|
+        {lines}  (string[])       List of lines
+        {rcs}    (string)         RHS of commentstring
+        {lcs}    (string)         LHS of commentstring
+        {range}  (CommentRange)
+
+
+Op.linewise({param})                                   *comment.opfunc.linewise*
+    Line commenting
+
+    Parameters: ~
+        {param}  (OpFnParams)
+
+    Returns: ~
+        {integer}  Returns a calculated comment mode
+
+
+Op.blockwise({param}, {partial?})                     *comment.opfunc.blockwise*
+    Full/Partial/Current-Line Block commenting
+
+    Parameters: ~
+        {param}     (OpFnParams)
+        {partial?}  (boolean)     Comment the partial region (visual mode)
+
+    Returns: ~
+        {integer}  Returns a calculated comment mode
+
+
+================================================================================
+Insert API                                                       *comment.extra*
+
+Underlying functions that powers the |comment.api.insert| lua API.
+
+extra.insert_below({ctype}, {cfg})                  *comment.extra.insert_below*
+    Add a comment below the current line and goes to INSERT mode
+
+    Parameters: ~
+        {ctype}  (integer)        See |comment.utils.ctype|
+        {cfg}    (CommentConfig)
+
+
+extra.insert_above({ctype}, {cfg})                  *comment.extra.insert_above*
+    Add a comment above the current line and goes to INSERT mode
+
+    Parameters: ~
+        {ctype}  (integer)        See |comment.utils.ctype|
+        {cfg}    (CommentConfig)
+
+
+extra.insert_eol({ctype}, {cfg})                      *comment.extra.insert_eol*
+    Add a comment at the end of current line and goes to INSERT mode
+
+    Parameters: ~
+        {ctype}  (integer)        See |comment.utils.ctype|
+        {cfg}    (CommentConfig)
+
+
+vim:tw=78:ts=8:noet:ft=help:norl:

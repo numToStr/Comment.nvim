@@ -4,7 +4,11 @@ local A = vim.api
 
 local U = {}
 
----@alias CommentLines string[] List of lines inside the start and end index
+---@class CommentCtx Comment context
+---@field ctype integer See |comment.utils.ctype|
+---@field cmode integer See |comment.utils.cmode|
+---@field cmotion integer See |comment.utils.cmotion|
+---@field range CommentRange
 
 ---@class CommentRange Range of the selection that needs to be commented
 ---@field srow integer Starting row
@@ -124,7 +128,7 @@ end
 
 ---Get lines from the current position to the given count
 ---@param count integer Probably 'vim.v.count'
----@return CommentLines
+---@return string[] _ List of lines
 ---@return CommentRange
 function U.get_count_lines(count)
     local srow = unpack(A.nvim_win_get_cursor(0))
@@ -136,7 +140,7 @@ end
 
 ---Get lines from a NORMAL/VISUAL mode
 ---@param range CommentRange
----@return CommentLines
+---@return string[] _ List of lines
 function U.get_lines(range)
     -- If start and end is same, then just return the current line
     if range.srow == range.erow then

@@ -1,4 +1,8 @@
----@mod comment.opfunc Operator-mode
+---@mod comment.opfunc Operator-mode API
+---@brief [[
+---Underlying functions that powers the |comment.api.toggle|, |comment.api.comment|,
+---and |comment.api.uncomment| lua API.
+---@brief ]]
 
 local U = require('Comment.utils')
 local Config = require('Comment.config')
@@ -6,31 +10,18 @@ local A = vim.api
 
 local Op = {}
 
----Vim operator-mode motions.
----Read `:h :map-operator`
+---Vim operator-mode motion enum. Read |:map-operator|
 ---@alias OpMotion
 ---| 'line' # Vertical motion
 ---| 'char' # Horizontal motion
 ---| 'v' # Visual Block motion
 ---| 'V' # Visual Line motion
 
----@class CommentCtx Comment context
----@field ctype integer See |comment.utils.ctype|
----@field cmode integer See |comment.utils.cmode|
----@field cmotion integer See |comment.utils.cmotion|
----@field range CommentRange
-
----@class OpFnParams Operator-mode function parameters
----@field cfg CommentConfig
----@field cmode integer See |comment.utils.cmode|
----@field lines string[] List of lines
----@field rcs string RHS of commentstring
----@field lcs string LHS of commentstring
----@field range CommentRange
-
 ---Common operatorfunc callback
 ---This function contains the core logic for comment/uncomment
----@param motion? OpMotion If nil is given, it'll work on the current line
+---@param motion? OpMotion
+---If given 'nil', it'll only (un)comment
+---the current line
 ---@param cfg CommentConfig
 ---@param cmode integer See |comment.utils.cmode|
 ---@param ctype integer See |comment.utils.ctype|
@@ -90,6 +81,50 @@ function Op.opfunc(motion, cfg, cmode, ctype)
     U.is_fn(cfg.post_hook, ctx)
 end
 
+---Line commenting with count
+---@param count integer Value of |v:count|
+---@param cfg CommentConfig
+---@param cmode integer See |comment.utils.cmode|
+---@param ctype integer See |comment.utils.ctype|
+function Op.count(count, cfg, cmode, ctype)
+    local lines, range = U.get_count_lines(count)
+
+    ---@type CommentCtx
+    local ctx = {
+        cmode = cmode,
+        cmotion = U.cmotion.line,
+        ctype = ctype,
+        range = range,
+    }
+    local lcs, rcs = U.parse_cstr(cfg, ctx)
+
+    ---@type OpFnParams
+    local params = {
+        cfg = cfg,
+        cmode = ctx.cmode,
+        lines = lines,
+        lcs = lcs,
+        rcs = rcs,
+        range = range,
+    }
+
+    if ctype == U.ctype.blockwise then
+        ctx.cmode = Op.blockwise(params)
+    else
+        ctx.cmode = Op.linewise(params)
+    end
+
+    U.is_fn(cfg.post_hook, ctx)
+end
+
+---@class OpFnParams Operator-mode function parameters
+---@field cfg CommentConfig
+---@field cmode integer See |comment.utils.cmode|
+---@field lines string[] List of lines
+---@field rcs string RHS of commentstring
+---@field lcs string LHS of commentstring
+---@field range CommentRange
+
 ---Line commenting
 ---@param param OpFnParams
 ---@return integer _ Returns a calculated comment mode
@@ -113,7 +148,7 @@ function Op.linewise(param)
         for _, line in ipairs(param.lines) do
             -- I wish lua had `continue` statement [sad noises]
             if not U.ignore(line, pattern) then
-                if cmode == U.cmode.uncomment and (not check_comment(line)) then
+                if cmode == U.cmode.uncomment and param.cmode == U.cmode.toggle and (not check_comment(line)) then
                     cmode = U.cmode.comment
                 end
 
@@ -127,6 +162,11 @@ function Op.linewise(param)
                 end
             end
         end
+    end
+
+    -- If the comment mode given is not toggle than force that mode
+    if param.cmode ~= U.cmode.toggle then
+        cmode = param.cmode
     end
 
     if cmode == U.cmode.uncomment then
@@ -185,41 +225,6 @@ function Op.blockwise(param, partial)
     end
 
     return cmode
-end
-
----Line commenting with count i.e vim.v.count
----@param count integer Number of lines
----@param cfg CommentConfig
----@param ctype integer See |comment.utils.ctype|
-function Op.count(count, cfg, ctype)
-    local lines, range = U.get_count_lines(count)
-
-    ---@type CommentCtx
-    local ctx = {
-        cmode = U.cmode.toggle,
-        cmotion = U.cmotion.line,
-        ctype = ctype,
-        range = range,
-    }
-    local lcs, rcs = U.parse_cstr(cfg, ctx)
-
-    ---@type OpFnParams
-    local params = {
-        cfg = cfg,
-        cmode = ctx.cmode,
-        lines = lines,
-        lcs = lcs,
-        rcs = rcs,
-        range = range,
-    }
-
-    if ctype == U.ctype.blockwise then
-        ctx.cmode = Op.blockwise(params)
-    else
-        ctx.cmode = Op.linewise(params)
-    end
-
-    U.is_fn(cfg.post_hook, ctx)
 end
 
 return Op

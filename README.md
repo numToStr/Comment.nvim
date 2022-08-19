@@ -6,7 +6,7 @@
 ### ✨ Features
 
 - Supports treesitter. [Read more](#treesitter)
-- Supports `commentstring`. [Read more](#commentstring)
+- Supports `commentstring`. Read `:h comment.commentstring`
 - Supports line (`//`) and block (`/* */`) comments
 - Dot (`.`) repeat support for `gcc`, `gbc` and friends
 - Count support for `[count]gcc` and `[count]gbc`
@@ -37,6 +37,10 @@ Plug 'numToStr/Comment.nvim'
 lua require('Comment').setup()
 ```
 
+### 📖 Getting Help
+
+`Comment.nvim` provides help docs which can be accessed by running `:help comment-nvim`
+
 <a id="setup"></a>
 
 ### ⚒️ Setup
@@ -63,46 +67,31 @@ EOF
 
 #### Configuration (optional)
 
-Following are the **default** config for the [`setup()`](#setup). If you want to override, just modify the option that you want then it will be merged with the default config.
+Following are the **default** config for the [`setup()`](#setup). If you want to override, just modify the option that you want then it will be merged with the default config. Read `:h comment.config` for more info.
 
 ```lua
 {
     ---Add a space b/w comment and the line
-    ---@type boolean|fun():boolean
     padding = true,
-
     ---Whether the cursor should stay at its position
-    ---NOTE: This only affects NORMAL mode mappings and doesn't work with dot-repeat
-    ---@type boolean
     sticky = true,
-
-    ---Lines to be ignored while comment/uncomment.
-    ---Could be a regex string or a function that returns a regex string.
-    ---Example: Use '^$' to ignore empty lines
-    ---@type string|fun():string
+    ---Lines to be ignored while (un)comment
     ignore = nil,
-
     ---LHS of toggle mappings in NORMAL mode
-    ---@type table
     toggler = {
         ---Line-comment toggle keymap
         line = 'gcc',
         ---Block-comment toggle keymap
         block = 'gbc',
     },
-
-    ---LHS of operator-pending mappings in NORMAL mode
-    ---LHS of mapping in VISUAL mode
-    ---@type table
+    ---LHS of operator-pending mappings in NORMAL and VISUAL mode
     opleader = {
         ---Line-comment keymap
         line = 'gc',
         ---Block-comment keymap
         block = 'gb',
     },
-
     ---LHS of extra mappings
-    ---@type table
     extra = {
         ---Add comment on the line above
         above = 'gcO',
@@ -111,29 +100,19 @@ Following are the **default** config for the [`setup()`](#setup). If you want to
         ---Add comment at the end of line
         eol = 'gcA',
     },
-
-    ---Create basic (operator-pending) and extended mappings for NORMAL + VISUAL mode
-    ---NOTE: If `mappings = false` then the plugin won't create any mappings
-    ---@type boolean|table
+    ---Enable keybindings
+    ---NOTE: If given `false` then the plugin won't create any mappings
     mappings = {
-        ---Operator-pending mapping
-        ---Includes `gcc`, `gbc`, `gc[count]{motion}` and `gb[count]{motion}`
-        ---NOTE: These mappings can be changed individually by `opleader` and `toggler` config
+        ---Operator-pending mapping; `gcc` `gbc` `gc[count]{motion}` `gb[count]{motion}`
         basic = true,
-        ---Extra mapping
-        ---Includes `gco`, `gcO`, `gcA`
+        ---Extra mapping; `gco`, `gcO`, `gcA`
         extra = true,
-        ---Extended mapping
-        ---Includes `g>`, `g<`, `g>[count]{motion}` and `g<[count]{motion}`
+        ---Extended mapping; `g>` `g<` `g>[count]{motion}` `g<[count]{motion}`
         extended = false,
     },
-
-    ---Pre-hook, called before commenting the line
-    ---@type fun(ctx: CommentCtx):string
+    ---Function to call before (un)comment
     pre_hook = nil,
-
-    ---Post-hook, called after commenting is done
-    ---@type fun(ctx: CommentCtx)
+    ---Function to call after (un)comment
     post_hook = nil,
 }
 ```
@@ -224,14 +203,6 @@ These mappings are disabled by default. (config: `mappings.extended`)
 `gbac` - Toggle comment around a class (w/ LSP/treesitter support)
 ```
 
-<a id="api"></a>
-
-### ⚙️ API
-
-- [Plug Mappings](./doc/plugs.md) - Excellent for creating custom keybindings
-
-- [Lua API](./doc/API.md) - Details the Lua API. Great for making custom comment function.
-
 <a id="treesitter"></a>
 
 ### 🌳 Treesitter
@@ -254,12 +225,10 @@ There are two hook methods i.e `pre_hook` and `post_hook` which are called befor
 
 <a id="pre-hook"></a>
 
-- `pre_hook` - This method is called with a [`ctx`](#comment-context) argument before comment/uncomment is started. It can be used to return a custom `commentstring` which will be used for comment/uncomment the lines. You can use something like [nvim-ts-context-commentstring](https://github.com/JoosepAlviste/nvim-ts-context-commentstring) to compute the commentstring using treesitter.
+- `pre_hook` - Called with a `ctx` argument (Read `:h comment.utils.CommentCtx`) before (un)comment. Can optionally return a `commentstring` to be used for (un)commenting. You can use [nvim-ts-context-commentstring](https://github.com/JoosepAlviste/nvim-ts-context-commentstring) to easily comment `tsx/jsx` files.
 
 ```lua
--- NOTE: The example below is a proper integration and it is RECOMMENDED.
 {
-    ---@param ctx CommentCtx
     pre_hook = function(ctx)
         -- Only calculate commentstring for tsx filetypes
         if vim.bo.filetype == 'typescriptreact' then
@@ -285,13 +254,14 @@ There are two hook methods i.e `pre_hook` and `post_hook` which are called befor
 }
 ```
 
+> **Note** - `Comment.nvim` already supports [`treesitter`](#treesitter) out-of-the-box except for `tsx/jsx`.
+
 <a id="post-hook"></a>
 
-- `post_hook` - This method is called after commenting is done. It receives the same [`ctx`](#comment-context) argument as [`pre_hook`](#pre_hook).
+- `post_hook` - This method is called after (un)commenting. It receives the same `ctx` (Read `:h comment.utils.CommentCtx`) argument as [`pre_hook`](#pre_hook).
 
 ```lua
 {
-    ---@param ctx CommentCtx
     post_hook = function(ctx)
         if ctx.range.srow == ctx.range.erow then
             -- do something with the current line
@@ -347,7 +317,7 @@ ignore = '^const(.*)=(%s?)%((.*)%)(%s?)=>'
 
 Most languages/filetypes have native support for comments via `commentstring` but there might be a filetype that is not supported. There are two ways to enable commenting for unsupported filetypes:
 
-1.  You can set `commentstring` for that particular filetype like the following
+1.  You can set `commentstring` for that particular filetype like the following. Read `:h commentstring` for more info.
 
 ```lua
 vim.bo.commentstring = '//%s'
@@ -356,27 +326,23 @@ vim.bo.commentstring = '//%s'
 vim.api.nvim_command('set commentstring=//%s')
 ```
 
-> Run `:h commentstring` for more help
-
 <a id="ft-lua"></a>
 
-2. You can also use this plugin interface to store both line and block commentstring for the filetype. You can treat this as a more powerful version of the `commentstring`
+2. You can also use this plugin interface to store both line and block commentstring for the filetype. You can treat this as a more powerful version of the `commentstring`. Read `:h comment.ft` for more info.
 
 ```lua
 local ft = require('Comment.ft')
 
 -- 1. Using set function
 
--- Just set only line comment
-ft.set('yaml', '#%s')
-
--- Or set both line and block commentstring
--- You can also chain the set calls
-ft.set('javascript', {'//%s', '/*%s*/'}).set('conf', '#%s')
+ft
+ -- Set only line comment
+ .set('yaml', '#%s')
+ -- Or set both line and block commentstring
+ .set('javascript', {'//%s', '/*%s*/'})
 
 -- 2. Metatable magic
 
--- One filetype at a time
 ft.javascript = {'//%s', '/*%s*/'}
 ft.yaml = '#%s'
 
@@ -390,56 +356,6 @@ ft.lang('javascript') -- { '//%s', '/*%s*/' }
 ```
 
 > PR(s) are welcome to add more commentstring inside the plugin
-
-<a id="commentstring"></a>
-
-### 🧵 Comment String
-
-Although, `Comment.nvim` supports neovim's `commentstring` but unfortunately it has the least priority. The commentstring is taken from the following place in the respective order.
-
-- [`pre_hook`](#hooks) - If a string is returned from this method then it will be used for commenting.
-
-- [`ft.lua`](#ft-lua) - If the current filetype is found in the table, then the string there will be used.
-
-- `commentstring` - Neovim's native commentstring for the filetype
-
-<a id="commentstring-caveat"></a>
-
-> There is one caveat with this approach. If someone sets the `commentstring` (w/o returning a string) from the `pre_hook` method and if the current filetype also exists in the `ft_table` then the commenting will be done using the string in `ft_table` instead of using `commentstring`
-
-<a id="comment-context"></a>
-
-### 🧠 Comment Context
-
-The following object is provided as an argument to `pre_hook` and `post_hook` functions.
-
-> I am just placing it here just for documentation purpose
-
-```lua
----Comment context
----@class CommentCtx
----@field ctype CommentType
----@field cmode CommentMode
----@field cmotion CommentMotion
----@field range CommentRange
-
----Range of the selection that needs to be commented
----@class CommentRange
----@field srow integer Starting row
----@field scol integer Starting column
----@field erow integer Ending row
----@field ecol integer Ending column
-```
-
-`CommentType`, `CommentMode` and `CommentMotion` all of them are exported from the plugin's utils for reuse
-
-```lua
-require('Comment.utils').ctype.{linewise,blockwise}
-
-require('Comment.utils').cmode.{toggle,comment,uncomment}
-
-require('Comment.utils').cmotion.{line,char,v,V}
-```
 
 ### 🤝 Contributing
 

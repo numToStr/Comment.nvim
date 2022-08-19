@@ -41,3 +41,6 @@ luac.out
 
 tmp
 scratch
+
+# ignore generated doc tags
+doc/tags

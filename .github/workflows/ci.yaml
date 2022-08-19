@@ -6,7 +6,6 @@ on:
       - "**.lua"
     branches:
       - master
-      - docs
 
 env:
   PLUGIN_NAME: Comment
