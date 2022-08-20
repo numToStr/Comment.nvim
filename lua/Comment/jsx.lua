@@ -1,8 +1,15 @@
-local J = {
-    comment = '{/*%s*/}',
-}
+---@mod comment.jsx JSX Integration
+---@brief [[
+---This module provides the jsx/tsx comment integration via `pre_hook`. The default
+---treesitter integration doesn't provides tsx/jsx support as the syntax is weird
+---enough to deserve its own module. Besides that not everyone is using jsx/tsx
+---so it's better make it an ad-hoc integration.
+---@brief ]]
+
+local jsx = {}
 
 local query = [[
+    ;; query
     (jsx_opening_element [(jsx_attribute) (comment)] @nojsx)
 
     (jsx_self_closing_element [(jsx_attribute) (comment)] @nojsx)
@@ -38,7 +45,7 @@ end
 ---@param q table
 ---@param tree table
 ---@param parser table
----@param range CRange
+---@param range CommentRange
 ---@return table
 local function normalize(q, tree, parser, range)
     local prev, section, sections = nil, 0, {}
@@ -71,13 +78,13 @@ end
 
 ---Runs the query and returns the commentstring by checking the cursor range
 ---@param parser table
----@param range CRange
+---@param range CommentRange
 ---@return boolean
 local function capture(parser, range)
     local lang = parser:lang()
 
     if not is_jsx(lang) then
-        return
+        return false
     end
 
     local Q = vim.treesitter.query.parse_query(lang, query)
@@ -105,10 +112,20 @@ local function capture(parser, range)
     return Q.captures[id] == 'jsx'
 end
 
----Calculates the `jsx` commentstring
----@param ctx Ctx
----@return string?
-function J.calculate(ctx)
+---Static |commentstring| for jsx/tsx
+---@type string
+jsx.commentstring = '{/*%s*/}'
+
+---Calculates the `jsx/tsx` commentstring using |treesitter|
+---@param ctx CommentCtx
+---@return string? _ jsx/tsx commenstring
+---@see comment.utils.CommentCtx
+---@usage [[
+---require('Comment').setup({
+---    pre_hook = require('Comment.jsx').calculate
+---})
+---@usage ]]
+function jsx.calculate(ctx)
     local buf = vim.api.nvim_get_current_buf()
     local filetype = vim.api.nvim_buf_get_option(buf, 'filetype')
 
@@ -132,12 +149,12 @@ function J.calculate(ctx)
     -- This is for `markdown` which embeds multiple `tsx` blocks
     for _, child in pairs(tree:children()) do
         if child:contains(range) and capture(child, ctx.range) then
-            return J.comment
+            return jsx.commentstring
         end
     end
 
     -- This is for `tsx` itself
-    return (tree:contains(range) and capture(tree, ctx.range)) and J.comment
+    return (tree:contains(range) and capture(tree, ctx.range)) and jsx.commentstring or nil
 end
 
-return J
+return jsx
