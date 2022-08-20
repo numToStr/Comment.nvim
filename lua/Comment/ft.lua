@@ -78,6 +78,7 @@ local L = {
     mbsyncrc = { M.dbl_hash },
     meson = { M.hash },
     nix = { M.hash, M.cxx_b },
+    nu = { M.hash },
     ocaml = { M.fsharp_b, M.fsharp_b },
     plantuml = { "'%s", "/'%s'/" },
     purescript = { M.dash, M.haskell_b },
