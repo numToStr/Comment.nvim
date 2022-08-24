@@ -51,6 +51,7 @@ local L = {
     fsharp = { M.cxx_l, M.fsharp_b },
     gdb = { M.hash },
     gdscript = { M.hash },
+    gitignore = { M.hash },
     gleam = { M.cxx_l },
     glsl = { M.cxx_l, M.cxx_b },
     gnuplot = { M.hash, M.hash_bracket },
