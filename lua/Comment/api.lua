@@ -478,7 +478,7 @@ api.locked = setmetatable({}, {
         ---@param motion OpMotion
         return function(motion)
             return A.nvim_command(
-                ('lua require("Comment.api").%s(%s)'):format(cb, motion and ('%q'):format(motion))
+                ('lockmarks lua require("Comment.api").%s(%s)'):format(cb, motion and ('%q'):format(motion))
             )
         end
     end,
