@@ -555,8 +555,8 @@ function api.setup(config)
 
         -- Extra Mappings
         if cfg.mappings.extra then
-            K('n', cfg.extra.below, api.locked('insert.linewise.below'), { desc = 'Comment insert below' })
-            K('n', cfg.extra.above, api.locked('insert.linewise.above'), { desc = 'Comment insert above' })
+            K('n', cfg.extra.below, api.insert.linewise.below, { desc = 'Comment insert below' })
+            K('n', cfg.extra.above, api.insert.linewise.above, { desc = 'Comment insert above' })
             K('n', cfg.extra.eol, api.locked('insert.linewise.eol'), { desc = 'Comment insert end of line' })
         end
 
