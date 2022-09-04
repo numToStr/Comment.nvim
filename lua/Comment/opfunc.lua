@@ -140,8 +140,7 @@ function Op.linewise(param)
     ---When commenting multiple line, it is to be expected that indentation should be preserved
     ---So, When looping over multiple lines we need to store the indentation of the mininum length (except empty line)
     ---Which will be used to semantically comment rest of the lines
-    ---@type integer
-    local min_indent = -1
+    local min_indent, tabbed = -1, false
 
     -- If the given cmode is uncomment then we actually don't want to compute the cmode or min_indent
     if param.cmode ~= U.cmode.uncomment then
@@ -155,9 +154,9 @@ function Op.linewise(param)
                 -- If local `cmode` == comment or the given cmode ~= uncomment, then only calculate min_indent
                 -- As calculating min_indent only makes sense when we actually want to comment the lines
                 if not U.is_empty(line) and (cmode == U.cmode.comment or param.cmode == U.cmode.comment) then
-                    local len = U.indent_len(line)
+                    local _, len = string.find(line, '^%s*')
                     if min_indent == -1 or min_indent > len then
-                        min_indent = len
+                        min_indent, tabbed = len, string.find(line, '^\t') ~= nil
                     end
                 end
             end
@@ -177,7 +176,7 @@ function Op.linewise(param)
             end
         end
     else
-        local comment = U.commenter(param.lcs, param.rcs, padding, min_indent)
+        local comment = U.commenter(param.lcs, param.rcs, padding, min_indent, nil, tabbed)
         for i, line in ipairs(param.lines) do
             if not U.ignore(line, pattern) then
                 param.lines[i] = comment(line)

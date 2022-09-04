@@ -66,15 +66,6 @@ function U.is_empty(iter)
 end
 
 ---@private
----Get the length of the indentation
----@param str string
----@return integer integer Length of indent chars
-function U.indent_len(str)
-    local _, len = string.find(str, '^%s*')
-    return len
-end
-
----@private
 ---Helper to get padding character
 ---@param flag boolean
 ---@return string string
@@ -193,12 +184,13 @@ end
 ---@param padding boolean Is padding enabled?
 ---@param scol? integer Starting column
 ---@param ecol? integer Ending column
+---@param tabbed? boolean Using tab indentation
 ---@return fun(line:string|string[]):string
-function U.commenter(left, right, padding, scol, ecol)
+function U.commenter(left, right, padding, scol, ecol, tabbed)
     local pad = U.get_pad(padding)
     local ll = U.is_empty(left) and left or (left .. pad)
     local rr = U.is_empty(right) and right or (pad .. right)
-    local empty = string.rep(' ', scol or 0) .. left .. right
+    local empty = string.rep(tabbed and '\t' or ' ', scol or 0) .. left .. right
     local is_lw = scol and not ecol
 
     return function(line)
