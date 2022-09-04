@@ -762,7 +762,7 @@ U.parse_cstr({cfg}, {ctx})                            *comment.utils.parse_cstr*
 
 
                                                        *comment.utils.commenter*
-U.commenter({left}, {right}, {padding}, {scol?}, {ecol?})
+U.commenter({left}, {right}, {padding}, {scol?}, {ecol?}, {tabbed?})
     Returns a closure which is used to do comments
 
     If given {string[]} to the closure then it will do blockwise comment
@@ -774,6 +774,7 @@ U.commenter({left}, {right}, {padding}, {scol?}, {ecol?})
         {padding}  (boolean)  Is padding enabled?
         {scol?}    (integer)  Starting column
         {ecol?}    (integer)  Ending column
+        {tabbed?}  (boolean)  Using tab indentation
 
     Returns: ~
         {fun(line:string|string[]):string}
