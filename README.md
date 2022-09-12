@@ -225,36 +225,29 @@ There are two hook methods i.e `pre_hook` and `post_hook` which are called befor
 
 <a id="pre-hook"></a>
 
-- `pre_hook` - Called with a `ctx` argument (Read `:h comment.utils.CommentCtx`) before (un)comment. Can optionally return a `commentstring` to be used for (un)commenting. You can use [nvim-ts-context-commentstring](https://github.com/JoosepAlviste/nvim-ts-context-commentstring) to easily comment `tsx/jsx` files.
+- `pre_hook` - Called with a `ctx` argument (Read `:h comment.utils.CommentCtx`) before (un)comment. Can optionally return a `commentstring` to be used for (un)commenting.
 
 ```lua
 {
     pre_hook = function(ctx)
-        -- Only calculate commentstring for tsx filetypes
-        if vim.bo.filetype == 'typescriptreact' then
-            local U = require('Comment.utils')
-
-            -- Determine whether to use linewise or blockwise commentstring
-            local type = ctx.ctype == U.ctype.linewise and '__default' or '__multiline'
-
-            -- Determine the location where to calculate commentstring from
-            local location = nil
-            if ctx.ctype == U.ctype.blockwise then
-                location = require('ts_context_commentstring.utils').get_cursor_location()
-            elseif ctx.cmotion == U.cmotion.v or ctx.cmotion == U.cmotion.V then
-                location = require('ts_context_commentstring.utils').get_visual_start_location()
-            end
-
-            return require('ts_context_commentstring.internal').calculate_commentstring({
-                key = type,
-                location = location,
-            })
+        if ctx.range.srow == ctx.range.erow then
+            -- do something with the current line
+        else
+            -- do something with lines range
         end
     end,
 }
 ```
 
-> **Note** - `Comment.nvim` already supports [`treesitter`](#treesitter) out-of-the-box except for `tsx/jsx`.
+You can also integrate [nvim-ts-context-commentstring](https://github.com/JoosepAlviste/nvim-ts-context-commentstring#commentnvim) using `pre_hook` to easily comment `tsx/jsx` files.
+
+> **Note** - `Comment.nvim` already supports [`treesitter`](#treesitter) out-of-the-box for all the languages except `tsx/jsx`.
+
+```lua
+{
+    pre_hook = require('ts_context_commentstring.integrations.comment_nvim').create_pre_hook(),
+}
+```
 
 <a id="post-hook"></a>
 

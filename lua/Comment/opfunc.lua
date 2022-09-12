@@ -12,10 +12,10 @@ local Op = {}
 
 ---Vim operator-mode motion enum. Read |:map-operator|
 ---@alias OpMotion
----| 'line' # Vertical motion
----| 'char' # Horizontal motion
----| 'v' # Visual Block motion
----| 'V' # Visual Line motion
+---| '"line"' # Vertical motion
+---| '"char"' # Horizontal motion
+---| '"v"' # Visual Block motion
+---| '"V"' # Visual Line motion
 
 ---Common operatorfunc callback
 ---This function contains the core logic for comment/uncomment
@@ -117,7 +117,8 @@ function Op.count(count, cfg, cmode, ctype)
     U.is_fn(cfg.post_hook, ctx)
 end
 
----@class OpFnParams Operator-mode function parameters
+---Operator-mode function parameters
+---@class OpFnParams
 ---@field cfg CommentConfig
 ---@field cmode integer See |comment.utils.cmode|
 ---@field lines string[] List of lines

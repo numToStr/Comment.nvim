@@ -51,8 +51,8 @@
 ---@brief ]]
 ---@tag comment.sourcecode
 ---@brief [[
----Comment.nvim is FOSS provided under MIT license. All the source code is avaiable
----at https://github.com/numToStr/Comment.nvim
+---Comment.nvim is FOSS and distributed under MIT license. All the source code is
+---available at https://github.com/numToStr/Comment.nvim
 ---@brief ]]
 
 ---@mod comment.usage Usage
@@ -60,14 +60,14 @@
 ---Before using the plugin, you need to call the `setup()` function to create the
 ---default mappings. If you want, you can also override the default configuration
 ---by giving it a partial 'comment.config.Config' object, it will then be merged
----with the default config.
+---with the default configuration.
 ---@brief ]]
 
 local C = {}
 
 ---Configures the plugin
 ---@param config? CommentConfig User configuration
----@return CommentConfig _ Returns the mutated config
+---@return CommentConfig #Returns the mutated config
 ---@see comment.config
 ---@usage [[
 ----- Use default configuration

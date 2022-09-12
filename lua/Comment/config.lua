@@ -34,7 +34,8 @@
 ---<
 ---@brief ]]
 
----@class CommentConfig Plugin's configuration
+---Plugin's configuration
+---@class CommentConfig
 ---Controls space between the comment
 ---and the line (default: 'true')
 ---@field padding boolean|fun():boolean
@@ -63,7 +64,8 @@
 ---(default: 'nil')
 ---@field post_hook fun(ctx)
 
----@class Mappings Create default mappings
+---Create default mappings
+---@class Mappings
 ---Enables operator-pending mapping; `gcc`, `gbc`,
 ---`gc{motion}` and `gb{motion}` (default: 'true')
 ---@field basic boolean
@@ -75,15 +77,18 @@
 ---(default: 'false')
 ---@field extended boolean
 
----@class Toggler LHS of toggle mappings in NORMAL
+---LHS of toggle mappings in NORMAL
+---@class Toggler
 ---@field line string Linewise comment (default: 'gcc')
 ---@field block string Blockwise comment (default: 'gbc')
 
----@class Opleader LHS of operator-mode mappings in NORMAL and VISUAL mode
+---LHS of operator-mode mappings in NORMAL and VISUAL mode
+---@class Opleader
 ---@field line string Linewise comment (default: 'gc')
 ---@field block string Blockwise comment (default: 'gb')
 
----@class ExtraMapping LHS of extra mappings
+---LHS of extra mappings
+---@class ExtraMapping
 ---@field below string Inserts comment below (default: 'gco')
 ---@field above string Inserts comment above (default: 'gcO')
 ---@field eol string Inserts comment at the end of line (default: 'gcA')

@@ -4,19 +4,22 @@ local A = vim.api
 
 local U = {}
 
----@class CommentCtx Comment context
+---Comment context
+---@class CommentCtx
 ---@field ctype integer See |comment.utils.ctype|
 ---@field cmode integer See |comment.utils.cmode|
 ---@field cmotion integer See |comment.utils.cmotion|
 ---@field range CommentRange
 
----@class CommentRange Range of the selection that needs to be commented
+---Range of the selection that needs to be commented
+---@class CommentRange
 ---@field srow integer Starting row
 ---@field scol integer Starting column
 ---@field erow integer Ending row
 ---@field ecol integer Ending column
 
----@class CommentMode Comment modes - Can be manual or computed via operator-mode
+---Comment modes - Can be manual or computed via operator-mode
+---@class CommentMode
 ---@field toggle integer Toggle action
 ---@field comment integer Comment action
 ---@field uncomment integer Uncomment action
@@ -29,7 +32,8 @@ U.cmode = {
     uncomment = 2,
 }
 
----@class CommentType Comment types
+---Comment types
+---@class CommentType
 ---@field linewise integer Use linewise commentstring
 ---@field blockwise integer Use blockwise commentstring
 
@@ -40,7 +44,8 @@ U.ctype = {
     blockwise = 2,
 }
 
----@class CommentMotion Comment motion types
+---Comment motion types
+---@class CommentMotion
 ---@field line integer Line motion (ie. 'gc2j')
 ---@field char integer Character/left-right motion (ie. 'gc2w')
 ---@field block integer Visual operator-pending motion
@@ -119,7 +124,7 @@ end
 
 ---Get lines from the current position to the given count
 ---@param count integer Probably 'vim.v.count'
----@return string[] _ List of lines
+---@return string[] #List of lines
 ---@return CommentRange
 function U.get_count_lines(count)
     local srow = unpack(A.nvim_win_get_cursor(0))
@@ -131,7 +136,7 @@ end
 
 ---Get lines from a NORMAL/VISUAL mode
 ---@param range CommentRange
----@return string[] _ List of lines
+---@return string[] #List of lines
 function U.get_lines(range)
     -- If start and end is same, then just return the current line
     if range.srow == range.erow then
