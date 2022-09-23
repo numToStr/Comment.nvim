@@ -207,7 +207,7 @@ function U.commenter(left, right, padding, scol, ecol, tabbed)
             end
             local first = string.sub(line, 0, scol)
             local last = string.sub(line, scol + 1, -1)
-            return table.concat({ first, ll, last, rr })
+            return first .. ll .. last .. rr
         end
 
         -------------------
@@ -233,10 +233,14 @@ function U.commenter(left, right, padding, scol, ecol, tabbed)
         --------------------------------
         -- for current-line blockwise --
         --------------------------------
+        -- SOURCE: https://github.com/numToStr/Comment.nvim/issues/224
+        if ecol > #line then
+            return ll .. line .. rr
+        end
         local first = string.sub(line, 0, scol)
         local mid = string.sub(line, scol + 1, ecol + 1)
         local last = string.sub(line, ecol + 2, -1)
-        return table.concat({ first, ll, mid, rr, last })
+        return first .. ll .. mid .. rr .. last
     end
 end
 
@@ -292,6 +296,10 @@ function U.uncommenter(left, right, padding, scol, ecol)
         --------------------------------
         -- for current-line blockwise --
         --------------------------------
+        -- SOURCE: https://github.com/numToStr/Comment.nvim/issues/224
+        if ecol > #line then
+            return string.sub(line, scol + left_len + 1, #line - right_len)
+        end
         local first = string.sub(line, 0, scol)
         local mid = string.sub(line, scol + left_len + 1, ecol - right_len + 1)
         local last = string.sub(line, ecol + 2, -1)
@@ -339,7 +347,8 @@ function U.is_commented(left, right, padding, scol, ecol)
         --------------------------------
         -- for current-line blockwise --
         --------------------------------
-        return string.find(string.sub(line, scol + 1, ecol + 1), pattern)
+        -- SOURCE: https://github.com/numToStr/Comment.nvim/issues/224
+        return string.find(string.sub(line, scol + 1, (ecol > #line and #line or ecol + 1)), pattern)
     end
 end
 
