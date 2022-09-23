@@ -151,9 +151,7 @@ function Op.linewise(param)
                     cmode = U.cmode.comment
                 end
 
-                -- If local `cmode` == comment or the given cmode ~= uncomment, then only calculate min_indent
-                -- As calculating min_indent only makes sense when we actually want to comment the lines
-                if not U.is_empty(line) and (cmode == U.cmode.comment or param.cmode == U.cmode.comment) then
+                if not U.is_empty(line) and param.cmode ~= U.cmode.uncomment then
                     local _, len = string.find(line, '^%s*')
                     if min_indent == -1 or min_indent > len then
                         min_indent, tabbed = len, string.find(line, '^\t') ~= nil
