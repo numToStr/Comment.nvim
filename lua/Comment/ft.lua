@@ -143,26 +143,25 @@ function ft.set(lang, val)
     return ft
 end
 
----Get line/block commentstring for a given filetype
+---Get line/block/both commentstring(s) for a given filetype
 ---@param lang string Filetype/Language of the buffer
----@param ctype integer See |comment.utils.ctype|
----@return string _ Commentstring
+---@param ctype? integer See |comment.utils.ctype|. If given `nil`, it'll
+---return a copy of { line, block } commentstring.
+---@return nil|string|string[] _ Commentstring
 ---@usage [[
 ---local ft = require('Comment.ft')
 ---local U = require('Comment.utils')
 ---print(ft.get(vim.bo.filetype, U.ctype.linewise))
 ---@usage ]]
 function ft.get(lang, ctype)
-    local l = L[lang]
-    return l and l[ctype]
-end
-
----Get a copy of commentstring(s) for a given filetype
----@param lang string Filetype/Language of the buffer
----@return string[] _ Tuple of { line, block } commentstring
----@usage `require('Comment.ft').lang(vim.bo.filetype)`
-function ft.lang(lang)
-    return vim.deepcopy(L[lang])
+    local tuple = L[lang]
+    if not tuple then
+        return nil
+    end
+    if not ctype then
+        return vim.deepcopy(tuple)
+    end
+    return tuple[ctype]
 end
 
 ---Get a language tree for a given range by walking the parse tree recursively.
@@ -195,7 +194,7 @@ end
 
 ---Calculate commentstring with the power of treesitter
 ---@param ctx CommentCtx
----@return string _ Commentstring
+---@return nil|string _ Commentstring
 ---@see comment.utils.CommentCtx
 function ft.calculate(ctx)
     local buf = A.nvim_get_current_buf()
@@ -203,7 +202,7 @@ function ft.calculate(ctx)
     local default = ft.get(A.nvim_buf_get_option(buf, 'filetype'), ctx.ctype)
 
     if not ok then
-        return default
+        return default --[[@as string]]
     end
 
     local lang = ft.contains(parser, {
@@ -213,7 +212,7 @@ function ft.calculate(ctx)
         ctx.range.ecol,
     }):lang()
 
-    return ft.get(lang, ctx.ctype) or default
+    return ft.get(lang, ctx.ctype) or default --[[@as string]]
 end
 
 ---@export ft
