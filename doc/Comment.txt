@@ -556,36 +556,22 @@ ft.set({lang}, {val})                                           *comment.ft.set*
         <
 
 
-ft.get({lang}, {ctype})                                         *comment.ft.get*
-    Get line/block commentstring for a given filetype
+ft.get({lang}, {ctype?})                                        *comment.ft.get*
+    Get line/block/both commentstring(s) for a given filetype
 
     Parameters: ~
-        {lang}   (string)   Filetype/Language of the buffer
-        {ctype}  (integer)  See |comment.utils.ctype|
+        {lang}    (string)   Filetype/Language of the buffer
+        {ctype?}  (integer)  See |comment.utils.ctype|. If given `nil`, it'll
+                             return a copy of { line, block } commentstring.
 
     Returns: ~
-        {string}  Commentstring
+        {nil|string|string[]}  Commentstring
 
     Usage: ~
         >
             local ft = require('Comment.ft')
             local U = require('Comment.utils')
             print(ft.get(vim.bo.filetype, U.ctype.linewise))
-        <
-
-
-ft.lang({lang})                                                *comment.ft.lang*
-    Get a copy of commentstring(s) for a given filetype
-
-    Parameters: ~
-        {lang}  (string)  Filetype/Language of the buffer
-
-    Returns: ~
-        {string[]}  Tuple of { line, block } commentstring
-
-    Usage: ~
-        >
-            require('Comment.ft').lang(vim.bo.filetype)
         <
 
 
@@ -625,7 +611,7 @@ ft.calculate({ctx})                                       *comment.ft.calculate*
         {ctx}  (CommentCtx)
 
     Returns: ~
-        {string}  Commentstring
+        {nil|string}  Commentstring
 
     See: ~
         |comment.utils.CommentCtx|
