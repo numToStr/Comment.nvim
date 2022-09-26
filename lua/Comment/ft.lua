@@ -88,6 +88,7 @@ local L = {
     prisma = { M.cxx_l },
     r = { M.hash }, -- R doesn't have block comments
     readline = { M.hash },
+    rego = { M.hash },
     ruby = { M.hash },
     rust = { M.cxx_l, M.cxx_b },
     scala = { M.cxx_l, M.cxx_b },
