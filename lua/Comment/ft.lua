@@ -1,8 +1,13 @@
 ---@mod comment.ft Language/Filetype detection
 ---@brief [[
 ---This module is the core of filetype and commentstring detection and uses the
---- |lua-treesitter| APIs to accurately detect filetype and gives the corresponding
+---|lua-treesitter| APIs to accurately detect filetype and gives the corresponding
 ---commentstring, stored inside the plugin, for the filetype/langauge.
+---
+---Compound (dot-separated) filetypes are also supported i.e. 'ansible.yaml',
+---'ios.swift' etc. The commentstring resolution will be done from left to right.
+---For example, If the filetype is 'ansible.yaml' then 'ansible' commenstring will
+---be used if found otherwise it'll fallback to 'yaml'. Read `:h 'filetype'`
 ---@brief ]]
 
 local A = vim.api
@@ -27,7 +32,7 @@ local M = {
 ---Lang table that contains commentstring (linewise/blockwise) for mutliple filetypes
 ---Structure = { filetype = { linewise, blockwise } }
 ---@type table<string,string[]>
-local L = {
+local L = setmetatable({
     arduino = { M.cxx_l, M.cxx_b },
     bash = { M.hash },
     bib = { M.latex },
@@ -114,7 +119,16 @@ local L = {
     xdefaults = { '!%s' },
     yaml = { M.hash },
     zig = { M.cxx_l }, -- Zig doesn't have block comments
-}
+}, {
+    -- Support for compound filetype i.e. 'ios.swift', 'ansible.yaml' etc.
+    __index = function(this, k)
+        local base, fallback = string.match(k, '^(.-)%.(.*)')
+        if not (base or fallback) then
+            return nil
+        end
+        return this[base] or this[fallback]
+    end,
+})
 
 local ft = {}
 
@@ -151,7 +165,16 @@ end
 ---@usage [[
 ---local ft = require('Comment.ft')
 ---local U = require('Comment.utils')
----print(ft.get(vim.bo.filetype, U.ctype.linewise))
+---
+----- 1. Primary filetype
+---ft.get('rust', U.ctype.linewise) -- `//%s`
+---ft.get('rust') -- `{ '//%s', '/*%s*/' }`
+---
+----- 2. Compound filetype
+----- NOTE: This will return `yaml` commenstring(s),
+-----       as `ansible` commentstring doesn't exists yet.
+---ft.get('ansible.yaml', U.ctype.linewise) -- `#%s`
+---ft.get('ansible.yaml') -- { '#%s' }
 ---@usage ]]
 function ft.get(lang, ctype)
     local tuple = L[lang]
@@ -171,7 +194,7 @@ end
 ---
 ---NOTE: This ignores `tree-sitter-comment` parser, if installed.
 ---@param tree userdata Parse tree to be walked
----@param range integer[] Range to check for
+---@param range integer[] Range to check
 ---{start_row, start_col, end_row, end_col}
 ---@return userdata _ Returns a |treesitter-languagetree|
 ---@see treesitter-languagetree
@@ -202,7 +225,7 @@ function ft.calculate(ctx)
     local default = ft.get(A.nvim_buf_get_option(buf, 'filetype'), ctx.ctype)
 
     if not ok then
-        return default --[[@as string]]
+        return default --[[ @as string ]]
     end
 
     local lang = ft.contains(parser, {
@@ -212,7 +235,7 @@ function ft.calculate(ctx)
         ctx.range.ecol,
     }):lang()
 
-    return ft.get(lang, ctx.ctype) or default --[[@as string]]
+    return ft.get(lang, ctx.ctype) or default --[[ @as string ]]
 end
 
 ---@export ft

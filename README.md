@@ -347,12 +347,8 @@ ft.javascript = {'//%s', '/*%s*/'}
 ft.yaml = '#%s'
 
 -- Multiple filetypes
-ft({'go', 'rust'}, {'//%s', '/*%s*/'})
+ft({'go', 'rust'}, ft.get('c'))
 ft({'toml', 'graphql'}, '#%s')
-
--- 3. Get the whole set of commentstring
-ft.lang('lua') -- { '--%s', '--[[%s]]' }
-ft.lang('javascript') -- { '//%s', '/*%s*/' }
 ```
 
 > PR(s) are welcome to add more commentstring inside the plugin
