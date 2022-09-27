@@ -523,10 +523,6 @@ api.call({cb}, {op})                                          *comment.api.call*
 ================================================================================
 Language/Filetype detection                                         *comment.ft*
 
-This module is the core of filetype and commentstring detection and uses the
- |lua-treesitter| APIs to accurately detect filetype and gives the corresponding
-commentstring, stored inside the plugin, for the filetype/langauge.
-
 ft.set({lang}, {val})                                           *comment.ft.set*
     Sets a commentstring(s) for a filetype/language
 
@@ -571,7 +567,16 @@ ft.get({lang}, {ctype?})                                        *comment.ft.get*
         >
             local ft = require('Comment.ft')
             local U = require('Comment.utils')
-            print(ft.get(vim.bo.filetype, U.ctype.linewise))
+
+            -- 1. Primary filetype
+            ft.get('rust', U.ctype.linewise) -- `//%s`
+            ft.get('rust') -- `{ '//%s', '/*%s*/' }`
+
+            -- 2. Compound filetype
+            -- NOTE: This will return `yaml` commenstring(s),
+            --       as `ansible` commentstring doesn't exists yet.
+            ft.get('ansible.yaml', U.ctype.linewise) -- `#%s`
+            ft.get('ansible.yaml') -- { '#%s' }
         <
 
 
@@ -585,7 +590,7 @@ ft.contains({tree}, {range})                               *comment.ft.contains*
 
     Parameters: ~
         {tree}   (userdata)   Parse tree to be walked
-        {range}  (integer[])  Range to check for
+        {range}  (integer[])  Range to check
                               {start_row, start_col, end_row, end_col}
 
     Returns: ~
