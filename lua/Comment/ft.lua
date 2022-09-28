@@ -83,6 +83,7 @@ local L = setmetatable({
     make = { M.hash },
     mbsyncrc = { M.dbl_hash },
     meson = { M.hash },
+    nim = { M.hash, "#[%s]#" },
     nix = { M.hash, M.cxx_b },
     nu = { M.hash },
     ocaml = { M.fsharp_b, M.fsharp_b },
