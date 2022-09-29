@@ -77,6 +77,7 @@ local L = setmetatable({
     julia = { M.hash, '#=%s=#' },
     kotlin = { M.cxx_l, M.cxx_b },
     lidris = { M.dash, M.haskell_b },
+    lilypond = { M.latex, '%{%s%}' },
     lisp = { M.lisp_l, M.lisp_b },
     lua = { M.dash, M.dash_bracket },
     markdown = { M.html, M.html },
