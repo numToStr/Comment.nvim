@@ -27,6 +27,7 @@ local M = {
     latex = '%%s',
     lisp_l = ';;%s',
     lisp_b = '#|%s|#',
+    twig = '{#%s#}'
 }
 
 ---Lang table that contains commentstring (linewise/blockwise) for mutliple filetypes
@@ -112,6 +113,7 @@ local L = setmetatable({
     template = { M.dbl_hash },
     tmux = { M.hash },
     toml = { M.hash },
+    twig = { M.twig,  M.twig },
     typescript = { M.cxx_l, M.cxx_b },
     typescriptreact = { M.cxx_l, M.cxx_b },
     vim = { '"%s' },
