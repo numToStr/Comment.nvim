@@ -332,23 +332,24 @@ function U.is_commented(left, right, padding, scol, ecol)
         if type(line) == 'table' then
             local first, last = line[1], line[#line]
             if is_full then
-                return string.find(first, ll) and string.find(last, rr)
+                return (string.find(first, ll) and string.find(last, rr)) ~= nil
             end
-            return string.find(string.sub(first, scol + 1, -1), ll) and string.find(string.sub(last, 0, ecol + 1), rr)
+            return (string.find(string.sub(first, scol + 1, -1), ll) and string.find(string.sub(last, 0, ecol + 1), rr))
+                ~= nil
         end
 
         ------------------
         -- for linewise --
         ------------------
         if is_full then
-            return string.find(line, pattern)
+            return string.find(line, pattern) ~= nil
         end
 
         --------------------------------
         -- for current-line blockwise --
         --------------------------------
         -- SOURCE: https://github.com/numToStr/Comment.nvim/issues/224
-        return string.find(string.sub(line, scol + 1, (ecol > #line and #line or ecol + 1)), pattern)
+        return string.find(string.sub(line, scol + 1, (ecol > #line and #line or ecol + 1)), pattern) ~= nil
     end
 end
 
