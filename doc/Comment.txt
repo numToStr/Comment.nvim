@@ -139,68 +139,18 @@ default config.
 <
 
 CommentConfig                                     *comment.config.CommentConfig*
-    Plugin's configuration
-
-    Fields: ~
-        {padding}    (boolean|fun():boolean)  Controls space between the comment
-                                              and the line (default: 'true')
-        {sticky}     (boolean)                Whether cursor should stay at the
-                                              same position. Only works in NORMAL
-                                              mode mappings (default: 'true')
-        {ignore}     (string|fun():string)    Lua pattern used to ignore lines
-                                              during (un)comment (default: 'nil')
-        {mappings}   (Mappings|false)         Enables |comment.keybindings|
-                                              NOTE: If given 'false', then the
-                                              plugin won't create any mappings
-        {toggler}    (Toggler)
-        {opleader}   (Opleader)
-        {extra}      (ExtraMapping)
-        {pre_hook}   (fun(ctx):string)        Function to call before (un)comment.
-                                              It is called with a {ctx} argument
-                                              of type |comment.utils.CommentCtx|
-                                              (default: 'nil')
-        {post_hook}  (fun(ctx))               Function to call after (un)comment.
-                                              It is called with a {ctx} argument
-                                              of type |comment.utils.CommentCtx|
-                                              (default: 'nil')
 
 
 Mappings                                               *comment.config.Mappings*
-    Create default mappings
-
-    Fields: ~
-        {basic}     (boolean)  Enables operator-pending mapping; `gcc`, `gbc`,
-                               `gc{motion}` and `gb{motion}` (default: 'true')
-        {extra}     (boolean)  Enable extra mapping; `gco`, `gcO` and `gcA`
-                               (default: 'true')
-        {extended}  (boolean)  Enable extended mapping; `g>`, `g<c`, 'g<b',
-                               'g<', 'g<c', 'g<b', `g>{motion}` and `g<{motion}`
-                               (default: 'false')
 
 
 Toggler                                                 *comment.config.Toggler*
-    LHS of toggle mappings in NORMAL
-
-    Fields: ~
-        {line}   (string)  Linewise comment (default: 'gcc')
-        {block}  (string)  Blockwise comment (default: 'gbc')
 
 
 Opleader                                               *comment.config.Opleader*
-    LHS of operator-mode mappings in NORMAL and VISUAL mode
-
-    Fields: ~
-        {line}   (string)  Linewise comment (default: 'gc')
-        {block}  (string)  Blockwise comment (default: 'gb')
 
 
 ExtraMapping                                       *comment.config.ExtraMapping*
-    LHS of extra mappings
-
-    Fields: ~
-        {below}  (string)  Inserts comment below (default: 'gco')
-        {above}  (string)  Inserts comment above (default: 'gcO')
-        {eol}    (string)  Inserts comment at the end of line (default: 'gcA')
 
 
 Config:get()                                                *comment.config:get*
@@ -523,6 +473,15 @@ api.call({cb}, {op})                                          *comment.api.call*
 ================================================================================
 Language/Filetype detection                                         *comment.ft*
 
+This module is the core of filetype and commentstring detection and uses the
+|lua-treesitter| APIs to accurately detect filetype and gives the corresponding
+commentstring, stored inside the plugin, for the filetype/langauge.
+
+Compound (dot-separated) filetypes are also supported i.e. 'ansible.yaml',
+'ios.swift' etc. The commentstring resolution will be done from left to right.
+For example, If the filetype is 'ansible.yaml' then 'ansible' commenstring will
+be used if found otherwise it'll fallback to 'yaml'. Read `:h 'filetype'`
+
 ft.set({lang}, {val})                                           *comment.ft.set*
     Sets a commentstring(s) for a filetype/language
 
@@ -626,32 +585,12 @@ ft.calculate({ctx})                                       *comment.ft.calculate*
 Utilities                                                        *comment.utils*
 
 CommentCtx                                            *comment.utils.CommentCtx*
-    Comment context
-
-    Fields: ~
-        {ctype}    (integer)       See |comment.utils.ctype|
-        {cmode}    (integer)       See |comment.utils.cmode|
-        {cmotion}  (integer)       See |comment.utils.cmotion|
-        {range}    (CommentRange)
 
 
 CommentRange                                        *comment.utils.CommentRange*
-    Range of the selection that needs to be commented
-
-    Fields: ~
-        {srow}  (integer)  Starting row
-        {scol}  (integer)  Starting column
-        {erow}  (integer)  Ending row
-        {ecol}  (integer)  Ending column
 
 
 CommentMode                                          *comment.utils.CommentMode*
-    Comment modes - Can be manual or computed via operator-mode
-
-    Fields: ~
-        {toggle}     (integer)  Toggle action
-        {comment}    (integer)  Comment action
-        {uncomment}  (integer)  Uncomment action
 
 
 U.cmode                                                    *comment.utils.cmode*
@@ -662,11 +601,6 @@ U.cmode                                                    *comment.utils.cmode*
 
 
 CommentType                                          *comment.utils.CommentType*
-    Comment types
-
-    Fields: ~
-        {linewise}   (integer)  Use linewise commentstring
-        {blockwise}  (integer)  Use blockwise commentstring
 
 
 U.ctype                                                    *comment.utils.ctype*
@@ -677,14 +611,6 @@ U.ctype                                                    *comment.utils.ctype*
 
 
 CommentMotion                                      *comment.utils.CommentMotion*
-    Comment motion types
-
-    Fields: ~
-        {line}   (integer)  Line motion (ie. 'gc2j')
-        {char}   (integer)  Character/left-right motion (ie. 'gc2w')
-        {block}  (integer)  Visual operator-pending motion
-        {v}      (integer)  Visual motion (ie. 'v3jgc')
-        {V}      (integer)  Visual-line motion (ie. 'V10kgc')
 
 
 U.cmotion                                                *comment.utils.cmotion*
@@ -818,10 +744,10 @@ OpMotion                                               *comment.opfunc.OpMotion*
     Vim operator-mode motion enum. Read |:map-operator|
 
     Variants: ~
-        ('line')  Vertical motion
-        ('char')  Horizontal motion
-        ('v')     Visual Block motion
-        ('V')     Visual Line motion
+        (line)  Vertical motion
+        (char)  Horizontal motion
+        (v)     Visual Block motion
+        (V)     Visual Line motion
 
 
                                                          *comment.opfunc.opfunc*
@@ -849,15 +775,6 @@ Op.count({count}, {cfg}, {cmode}, {ctype})
 
 
 OpFnParams                                           *comment.opfunc.OpFnParams*
-    Operator-mode function parameters
-
-    Fields: ~
-        {cfg}    (CommentConfig)
-        {cmode}  (integer)        See |comment.utils.cmode|
-        {lines}  (string[])       List of lines
-        {rcs}    (string)         RHS of commentstring
-        {lcs}    (string)         LHS of commentstring
-        {range}  (CommentRange)
 
 
 Op.linewise({param})                                   *comment.opfunc.linewise*
