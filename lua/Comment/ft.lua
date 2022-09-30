@@ -27,7 +27,7 @@ local M = {
     latex = '%%s',
     lisp_l = ';;%s',
     lisp_b = '#|%s|#',
-    twig = '{#%s#}'
+    twig = '{#%s#}',
 }
 
 ---Lang table that contains commentstring (linewise/blockwise) for mutliple filetypes
