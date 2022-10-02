@@ -103,6 +103,7 @@ local L = setmetatable({
     scheme = { M.lisp_l, M.lisp_b },
     sh = { M.hash },
     solidity = { M.cxx_l, M.cxx_b },
+    supercollider = { M.cxx_l, M.cxx_b },
     sql = { M.dash, M.cxx_b },
     stata = { M.cxx_l, M.cxx_b },
     svelte = { M.html, M.html },
