@@ -3,9 +3,9 @@ local call = require('Comment.api').call
 
 ---@mod comment.keybindings Keybindings
 ---@brief [[
----Comment.nvim provides default keybinds which is used for (un)comment your code.
----These keybinds are enabled upon calling |commen.usage.setup| and can be
----configured or disabled, if desired.
+---Comment.nvim provides default keybindings for (un)comment your code. These
+---keybinds are enabled upon calling |commen.usage.setup| and can be configured
+---or disabled, if desired.
 ---
 ---Basic: ~
 ---
@@ -38,8 +38,8 @@ local call = require('Comment.api').call
 ---@mod comment.plugmap Plug Mappings
 ---@brief [[
 ---Comment.nvim provides <Plug> mappings for most commonly used actions. These
----can be used to make custom keybindings and are enabled by default. All plug
----mappings has support for dot-repeat except VISUAL mode keybindings. To create
+---are enabled by default and can be used to make custom keybindings. All plug
+---mappings have support for dot-repeat except VISUAL mode keybindings. To create
 ---custom comment function, check out 'comment.api' section.
 ---
 ---  *<Plug>(comment_toggle_linewise)*
