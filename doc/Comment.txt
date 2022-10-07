@@ -131,7 +131,6 @@ default config.
         mappings = {
             basic = true,
             extra = true,
-            extended = false,
         },
         pre_hook = nil,
         post_hook = nil,
@@ -169,13 +168,10 @@ Mappings                                               *comment.config.Mappings*
     Create default mappings
 
     Fields: ~
-        {basic}     (boolean)  Enables operator-pending mapping; `gcc`, `gbc`,
-                               `gc{motion}` and `gb{motion}` (default: 'true')
-        {extra}     (boolean)  Enable extra mapping; `gco`, `gcO` and `gcA`
-                               (default: 'true')
-        {extended}  (boolean)  Enable extended mapping; `g>`, `g<c`, 'g<b',
-                               'g<', 'g<c', 'g<b', `g>{motion}` and `g<{motion}`
-                               (default: 'false')
+        {basic}  (boolean)  Enables operator-pending mapping; `gcc`, `gbc`,
+                            `gc{motion}` and `gb{motion}` (default: 'true')
+        {extra}  (boolean)  Enable extra mapping; `gco`, `gcO` and `gcA`
+                            (default: 'true')
 
 
 Toggler                                                 *comment.config.Toggler*
