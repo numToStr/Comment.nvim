@@ -107,8 +107,6 @@ Following are the **default** config for the [`setup()`](#setup). If you want to
         basic = true,
         ---Extra mapping; `gco`, `gcO`, `gcA`
         extra = true,
-        ---Extended mapping; `g>` `g<` `g>[count]{motion}` `g<[count]{motion}`
-        extended = false,
     },
     ---Function to call before (un)comment
     pre_hook = nil,
@@ -157,30 +155,6 @@ These mappings are enabled by default. (config: `mappings.extra`)
 `gco` - Insert comment to the next line and enters INSERT mode
 `gcO` - Insert comment to the previous line and enters INSERT mode
 `gcA` - Insert comment to end of the current line and enters INSERT mode
-```
-
-<a id="extended-mappings"></a>
-
-#### Extended mappings
-
-These mappings are disabled by default. (config: `mappings.extended`)
-
-- NORMAL mode
-
-```help
-`g>[count]{motion}` - (Op-pending) Comments the region using linewise comment
-`g>c` - Comments the current line using linewise comment
-`g>b` - Comments the current line using blockwise comment
-`g<[count]{motion}` - (Op-pending) Uncomments the region using linewise comment
-`g<c` - Uncomments the current line using linewise comment
-`g<b`- Uncomments the current line using blockwise comment
-```
-
-- VISUAL mode
-
-```help
-`g>` - Comments the region using single line
-`g<` - Unomments the region using single line
 ```
 
 ##### Examples
