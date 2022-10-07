@@ -289,9 +289,12 @@ function api.setup(config)
             K('n', cfg.extra.eol, api.locked('insert.linewise.eol'), { desc = 'Comment insert end of line' })
         end
 
-        -- Extended Mappings
         if cfg.mappings.extended then
-            -- NORMAL mode extended
+            vim.notify_once(
+                [=[[Comment] `extendend` mappings are deprecated and will be removed on 07 Nov 2022. Please refer to https://github.com/numToStr/Comment.nvim/wiki/Extended-Keybindings on how define them manually.]=],
+                vim.log.levels.WARN
+            )
+
             K('n', 'g>', api.call('comment.linewise', 'g@'), { expr = true, desc = 'Comment region linewise' })
             K('n', 'g>c', api.call('comment.linewise.current', 'g@$'), { expr = true, desc = 'Comment current line' })
             K('n', 'g>b', api.call('comment.blockwise.current', 'g@$'), { expr = true, desc = 'Comment current block' })
@@ -310,7 +313,6 @@ function api.setup(config)
                 { expr = true, desc = 'Uncomment current block' }
             )
 
-            -- VISUAL mode extended
             K(
                 'x',
                 'g>',

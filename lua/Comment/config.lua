@@ -26,7 +26,6 @@
 ---        mappings = {
 ---            basic = true,
 ---            extra = true,
----            extended = false,
 ---        },
 ---        pre_hook = nil,
 ---        post_hook = nil,
@@ -72,10 +71,6 @@
 ---Enable extra mapping; `gco`, `gcO` and `gcA`
 ---(default: 'true')
 ---@field extra boolean
----Enable extended mapping; `g>`, `g<c`, 'g<b',
----'g<', 'g<c', 'g<b', `g>{motion}` and `g<{motion}`
----(default: 'false')
----@field extended boolean
 
 ---LHS of toggle mappings in NORMAL
 ---@class Toggler
@@ -106,7 +101,6 @@ local Config = {
         mappings = {
             basic = true,
             extra = true,
-            extended = false,
         },
         toggler = {
             line = 'gcc',
