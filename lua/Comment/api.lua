@@ -26,7 +26,7 @@ function core.__index(that, ctype)
 
     ---To comment lines with a count
     function idxd.count(count, cfg)
-        Op.count(Config.count or count, cfg or Config:get(), that.cmode, U.ctype[ctype])
+        Op.count(count or A.nvim_get_vvar('count'), cfg or Config:get(), that.cmode, U.ctype[ctype])
     end
 
     ---@private
@@ -237,7 +237,6 @@ function api.call(cb, op)
     return function()
         A.nvim_set_option('operatorfunc', ("v:lua.require'Comment.api'.locked'%s'"):format(cb))
         Config.position = Config:get().sticky and A.nvim_win_get_cursor(0) or nil
-        Config.count = vim.v.count
         return op
     end
 end
@@ -259,11 +258,11 @@ function api.setup(config)
             K('n', cfg.opleader.block, '<Plug>(comment_toggle_blockwise)', { desc = 'Comment toggle blockwise' })
 
             K('n', cfg.toggler.line, function()
-                return vim.v.count == 0 and '<Plug>(comment_toggle_linewise_current)'
+                return A.nvim_get_vvar('count') == 0 and '<Plug>(comment_toggle_linewise_current)'
                     or '<Plug>(comment_toggle_linewise_count)'
             end, { expr = true, desc = 'Comment toggle current line' })
             K('n', cfg.toggler.block, function()
-                return vim.v.count == 0 and '<Plug>(comment_toggle_blockwise_current)'
+                return A.nvim_get_vvar('count') == 0 and '<Plug>(comment_toggle_blockwise_current)'
                     or '<Plug>(comment_toggle_blockwise_count)'
             end, { expr = true, desc = 'Comment toggle current block' })
 
