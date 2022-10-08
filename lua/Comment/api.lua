@@ -290,7 +290,7 @@ function api.setup(config)
 
         if cfg.mappings.extended then
             vim.notify_once(
-                [=[[Comment] `extendend` mappings are deprecated and will be removed on 07 Nov 2022. Please refer to https://github.com/numToStr/Comment.nvim/wiki/Extended-Keybindings on how define them manually.]=],
+                [=[[Comment] `extended` mappings are deprecated and will be removed on 07 Nov 2022. Please refer to https://github.com/numToStr/Comment.nvim/wiki/Extended-Keybindings on how to define them manually.]=],
                 vim.log.levels.WARN
             )
 

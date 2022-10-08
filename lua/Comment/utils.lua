@@ -1,5 +1,6 @@
 ---@mod comment.utils Utilities
 
+local F = require('Comment.ft')
 local A = vim.api
 
 local U = {}
@@ -173,7 +174,7 @@ function U.parse_cstr(cfg, ctx)
     -- 1. We ask `pre_hook` for a commentstring
     local cstr = U.is_fn(cfg.pre_hook, ctx)
         -- 2. Calculate w/ the help of treesitter
-        or require('Comment.ft').calculate(ctx)
+        or F.calculate(ctx)
         -- 3. Last resort to use native commentstring
         or vim.bo.commentstring
 
