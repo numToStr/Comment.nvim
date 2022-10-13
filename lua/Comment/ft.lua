@@ -36,7 +36,7 @@ local M = {
 ---@type table<string,string[]>
 local L = setmetatable({
     arduino = { M.cxx_l, M.cxx_b },
-    applescript = { '#%s' },
+    applescript = { M.hash },
     bash = { M.hash },
     bib = { M.latex },
     c = { M.cxx_l, M.cxx_b },
