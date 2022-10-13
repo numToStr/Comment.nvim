@@ -85,6 +85,7 @@ local L = setmetatable({
     lilypond = { M.latex, '%{%s%}' },
     lisp = { M.lisp_l, M.lisp_b },
     lua = { M.dash, M.dash_bracket },
+    luau = { M.dash, M.dash_bracket },
     markdown = { M.html, M.html },
     make = { M.hash },
     mbsyncrc = { M.dbl_hash },
