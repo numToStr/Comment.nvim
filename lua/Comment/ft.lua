@@ -48,6 +48,7 @@ local L = setmetatable({
     cs = { M.cxx_l, M.cxx_b },
     css = { M.cxx_b, M.cxx_b },
     cuda = { M.cxx_l, M.cxx_b },
+    dart = { M.cxx_l, M.cxx_b },
     dhall = { M.dash, M.haskell_b },
     dot = { M.cxx_l, M.cxx_b },
     eelixir = { M.html, M.html },
