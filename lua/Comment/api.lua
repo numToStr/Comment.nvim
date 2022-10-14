@@ -15,18 +15,19 @@ local api, core = {}, {}
 
 function core.__index(that, ctype)
     local idxd = {}
+    local mode, type = that.cmode, U.ctype[ctype]
 
     ---To comment the current-line
     ---NOTE:
     ---In current-line linewise method, 'opmode' is not useful which is always equals to `char`
     ---but we need 'nil' here which is used for current-line
     function idxd.current(_, cfg)
-        Op.opfunc(nil, cfg or Config:get(), that.cmode, U.ctype[ctype])
+        Op.opfunc(nil, cfg or Config:get(), mode, type)
     end
 
     ---To comment lines with a count
     function idxd.count(count, cfg)
-        Op.count(count or A.nvim_get_vvar('count'), cfg or Config:get(), that.cmode, U.ctype[ctype])
+        Op.count(count or A.nvim_get_vvar('count'), cfg or Config:get(), mode, type)
     end
 
     ---@private
@@ -36,10 +37,10 @@ function core.__index(that, ctype)
         idxd.count(count, cfg)
     end
 
-    return setmetatable({ cmode = that.cmode, ctype = ctype }, {
+    return setmetatable({}, {
         __index = idxd,
-        __call = function(this, motion, cfg)
-            Op.opfunc(motion, cfg or Config:get(), this.cmode, U.ctype[this.ctype])
+        __call = function(_, motion, cfg)
+            Op.opfunc(motion, cfg or Config:get(), mode, type)
         end,
     })
 end
@@ -56,8 +57,9 @@ end
 ---@see comment.config
 ---@usage [[
 ---local api = require('Comment.api')
+---local config = require('Comment.config'):get()
 ---
----api.toggle.linewise(motion, config)
+---api.toggle.linewise(motion, config?)
 ---api.toggle.linewise.current(motion?, config?)
 ---api.toggle.linewise.count(count, config?)
 ---
@@ -115,8 +117,9 @@ api.toggle = setmetatable({ cmode = U.cmode.toggle }, core)
 ---@see comment.config
 ---@usage [[
 ---local api = require('Comment.api')
+---local config = require('Comment.config'):get()
 ---
----api.comment.linewise(motion, config)
+---api.comment.linewise(motion, config?)
 ---api.comment.linewise.current(motion?, config?)
 ---api.comment.linewise.count(count, config?)
 ---
@@ -138,8 +141,9 @@ api.comment = setmetatable({ cmode = U.cmode.comment }, core)
 ---@see comment.config
 ---@usage [[
 ---local api = require('Comment.api')
+---local config = require('Comment.config'):get()
 ---
----api.uncomment.linewise(motion, config)
+---api.uncomment.linewise(motion, config?)
 ---api.uncomment.linewise.current(motion?, config?)
 ---api.uncomment.linewise.count(count, config?)
 ---
@@ -155,14 +159,15 @@ api.uncomment = setmetatable({ cmode = U.cmode.uncomment }, core)
 ---@see comment.config
 ---@usage [[
 ---local api = require('Comment.api')
+---local config = require('Comment.config'):get()
 ---
----api.insert.linewise.above(cfg?)
----api.insert.linewise.below(cfg?)
----api.insert.linewise.eol(cfg?)
+---api.insert.linewise.above(config?)
+---api.insert.linewise.below(config?)
+---api.insert.linewise.eol(config?)
 ---
----api.insert.blockwise.above(cfg?)
----api.insert.blockwise.below(cfg?)
----api.insert.blockwise.eol(cfg?)
+---api.insert.blockwise.above(config?)
+---api.insert.blockwise.below(config?)
+---api.insert.blockwise.eol(config?)
 ---@usage ]]
 api.insert = setmetatable({}, {
     __index = function(_, ctype)
@@ -218,7 +223,7 @@ end
 ---  2. Preserves jumps and marks
 ---  3. Stores last cursor position
 ---@param cb string Name of the API function to call
----@param op 'g@'|'g@$' Operator string to execute
+---@param op '"g@"'|'"g@$"' Operator-mode expression
 ---@return fun():string #Keymap RHS callback
 ---@see g@
 ---@see operatorfunc

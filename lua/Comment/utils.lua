@@ -191,7 +191,7 @@ end
 ---@param scol? integer Starting column
 ---@param ecol? integer Ending column
 ---@param tabbed? boolean Using tab indentation
----@return fun(line:string|string[]):string
+---@return fun(line: string|string[]):string|string[]
 function U.commenter(left, right, padding, scol, ecol, tabbed)
     local pad = U.get_pad(padding)
     local ll = U.is_empty(left) and left or (left .. pad)
@@ -259,7 +259,7 @@ end
 ---@param padding boolean Is padding enabled?
 ---@param scol? integer Starting column
 ---@param ecol? integer Ending column
----@return fun(line:string|string[]):string
+---@return fun(line: string|string[]):string|string[]
 function U.uncommenter(left, right, padding, scol, ecol)
     local pp, plen = U.get_padpat(padding), padding and 1 or 0
     local left_len, right_len = #left + plen, #right + plen
@@ -323,7 +323,7 @@ end
 ---@param padding boolean Is padding enabled?
 ---@param scol? integer Starting column
 ---@param ecol? integer Ending column
----@return fun(line:string|string[]):boolean
+---@return fun(line: string|string[]):boolean
 function U.is_commented(left, right, padding, scol, ecol)
     local pp = U.get_padpat(padding)
     local ll = U.is_empty(left) and left or '^%s*' .. vim.pesc(left) .. pp

@@ -49,19 +49,19 @@
 ---NOTE: If given 'false', then the
 ---plugin won't create any mappings
 ---@field mappings Mappings|false
----@field toggler Toggler
----@field opleader Opleader
----@field extra ExtraMapping
+---@field toggler Toggler See |comment.config.Toggler|
+---@field opleader Opleader See |comment.config.Opleader|
+---@field extra ExtraMapping See |comment.config.ExtraMapping|
 ---Function to call before (un)comment.
 ---It is called with a {ctx} argument
 ---of type |comment.utils.CommentCtx|
 ---(default: 'nil')
----@field pre_hook fun(ctx):string
+---@field pre_hook fun(c: CommentCtx): string
 ---Function to call after (un)comment.
 ---It is called with a {ctx} argument
 ---of type |comment.utils.CommentCtx|
 ---(default: 'nil')
----@field post_hook fun(ctx)
+---@field post_hook fun(c: CommentCtx)
 
 ---Create default mappings
 ---@class Mappings
