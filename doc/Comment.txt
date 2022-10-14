@@ -141,27 +141,27 @@ CommentConfig                                     *comment.config.CommentConfig*
     Plugin's configuration
 
     Fields: ~
-        {padding}    (boolean|fun():boolean)  Controls space between the comment
-                                              and the line (default: 'true')
-        {sticky}     (boolean)                Whether cursor should stay at the
-                                              same position. Only works in NORMAL
-                                              mode mappings (default: 'true')
-        {ignore}     (string|fun():string)    Lua pattern used to ignore lines
-                                              during (un)comment (default: 'nil')
-        {mappings}   (Mappings|false)         Enables |comment.keybindings|
-                                              NOTE: If given 'false', then the
-                                              plugin won't create any mappings
-        {toggler}    (Toggler)
-        {opleader}   (Opleader)
-        {extra}      (ExtraMapping)
-        {pre_hook}   (fun(ctx):string)        Function to call before (un)comment.
-                                              It is called with a {ctx} argument
-                                              of type |comment.utils.CommentCtx|
-                                              (default: 'nil')
-        {post_hook}  (fun(ctx))               Function to call after (un)comment.
-                                              It is called with a {ctx} argument
-                                              of type |comment.utils.CommentCtx|
-                                              (default: 'nil')
+        {padding}    (boolean|fun():boolean)     Controls space between the comment
+                                                 and the line (default: 'true')
+        {sticky}     (boolean)                   Whether cursor should stay at the
+                                                 same position. Only works in NORMAL
+                                                 mode mappings (default: 'true')
+        {ignore}     (string|fun():string)       Lua pattern used to ignore lines
+                                                 during (un)comment (default: 'nil')
+        {mappings}   (Mappings|false)            Enables |comment.keybindings|
+                                                 NOTE: If given 'false', then the
+                                                 plugin won't create any mappings
+        {toggler}    (Toggler)                   See |comment.config.Toggler|
+        {opleader}   (Opleader)                  See |comment.config.Opleader|
+        {extra}      (ExtraMapping)              See |comment.config.ExtraMapping|
+        {pre_hook}   (fun(c:CommentCtx):string)  Function to call before (un)comment.
+                                                 It is called with a {ctx} argument
+                                                 of type |comment.utils.CommentCtx|
+                                                 (default: 'nil')
+        {post_hook}  (fun(c:CommentCtx))         Function to call after (un)comment.
+                                                 It is called with a {ctx} argument
+                                                 of type |comment.utils.CommentCtx|
+                                                 (default: 'nil')
 
 
 Mappings                                               *comment.config.Mappings*
@@ -321,8 +321,9 @@ api.toggle                                                  *comment.api.toggle*
     Usage: ~
         >
             local api = require('Comment.api')
+            local config = require('Comment.config'):get()
 
-            api.toggle.linewise(motion, config)
+            api.toggle.linewise(motion, config?)
             api.toggle.linewise.current(motion?, config?)
             api.toggle.linewise.count(count, config?)
 
@@ -387,8 +388,9 @@ api.comment                                                *comment.api.comment*
     Usage: ~
         >
             local api = require('Comment.api')
+            local config = require('Comment.config'):get()
 
-            api.comment.linewise(motion, config)
+            api.comment.linewise(motion, config?)
             api.comment.linewise.current(motion?, config?)
             api.comment.linewise.count(count, config?)
 
@@ -417,8 +419,9 @@ api.uncomment                                            *comment.api.uncomment*
     Usage: ~
         >
             local api = require('Comment.api')
+            local config = require('Comment.config'):get()
 
-            api.uncomment.linewise(motion, config)
+            api.uncomment.linewise(motion, config?)
             api.uncomment.linewise.current(motion?, config?)
             api.uncomment.linewise.count(count, config?)
 
@@ -441,14 +444,15 @@ api.insert                                                  *comment.api.insert*
     Usage: ~
         >
             local api = require('Comment.api')
+            local config = require('Comment.config'):get()
 
-            api.insert.linewise.above(cfg?)
-            api.insert.linewise.below(cfg?)
-            api.insert.linewise.eol(cfg?)
+            api.insert.linewise.above(config?)
+            api.insert.linewise.below(config?)
+            api.insert.linewise.eol(config?)
 
-            api.insert.blockwise.above(cfg?)
-            api.insert.blockwise.below(cfg?)
-            api.insert.blockwise.eol(cfg?)
+            api.insert.blockwise.above(config?)
+            api.insert.blockwise.below(config?)
+            api.insert.blockwise.eol(config?)
         <
 
 
@@ -496,7 +500,7 @@ api.call({cb}, {op})                                          *comment.api.call*
 
     Parameters: ~
         {cb}  (string)      Name of the API function to call
-        {op}  ('g@'|'g@$')  Operator string to execute
+        {op}  ("g@"|"g@$")  Operator-mode expression
 
     Returns: ~
         {fun():string}  Keymap RHS callback
@@ -776,7 +780,7 @@ U.commenter({left}, {right}, {padding}, {scol?}, {ecol?}, {tabbed?})
         {tabbed?}  (boolean)  Using tab indentation
 
     Returns: ~
-        {fun(line:string|string[]):string}
+        {fun(line:string|string[]):string|string[]}
 
 
                                                      *comment.utils.uncommenter*
@@ -794,7 +798,7 @@ U.uncommenter({left}, {right}, {padding}, {scol?}, {ecol?})
         {ecol?}    (integer)  Ending column
 
     Returns: ~
-        {fun(line:string|string[]):string}
+        {fun(line:string|string[]):string|string[]}
 
 
                                                     *comment.utils.is_commented*
