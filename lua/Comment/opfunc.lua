@@ -42,6 +42,11 @@ function Op.opfunc(motion, cfg, cmode, ctype)
         return
     end
 
+    -- check if
+    if cfg.register.copy then
+        A.nvim_set_reg(cfg.register.register, lines)
+    end
+
     ---@type CommentCtx
     local ctx = {
         cmode = cmode,
@@ -88,7 +93,6 @@ end
 ---@param ctype integer See |comment.utils.ctype|
 function Op.count(count, cfg, cmode, ctype)
     local lines, range = U.get_count_lines(count)
-
     ---@type CommentCtx
     local ctx = {
         cmode = cmode,
