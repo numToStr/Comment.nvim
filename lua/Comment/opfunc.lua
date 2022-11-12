@@ -46,9 +46,11 @@ function Op.opfunc(motion, cfg, cmode, ctype)
     local register = cfg.register.register or '"'
     if cfg.register.copy then
         if type(lines) == 'table' then
+            -- clear register
             U.copy_to_register(register, '')
             for _, line in ipairs(lines) do
-                U.copy_to_register(register, line .. '\n', 'a')
+                -- append each line to register
+                U.copy_to_register(register, line, 'a')
             end
         else
             U.copy_to_register(register, lines)
