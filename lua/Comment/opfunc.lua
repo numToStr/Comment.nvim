@@ -42,9 +42,9 @@ function Op.opfunc(motion, cfg, cmode, ctype)
         return
     end
 
-    -- check if
-    local register = cfg.register.register or '"'
     if cfg.register.copy then
+        local register = cfg.register.register or '"'
+        vim.notify('Copying to ' .. register)
         local count = 0
         for _, line in ipairs(lines) do
             if count == 0 then
