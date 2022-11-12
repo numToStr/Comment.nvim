@@ -84,6 +84,9 @@ local C = {}
 ---        line = '<leader>c',
 ---        block = '<leader>b',
 ---    },
+---    register = {
+---     register = 'a',
+---    },
 ---})
 ---@usage ]]
 function C.setup(config)

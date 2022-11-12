@@ -29,6 +29,10 @@
 ---        },
 ---        pre_hook = nil,
 ---        post_hook = nil,
+---        register = {
+---            copy = true,
+---            register = "'",
+---        }
 ---    }
 ---<
 ---@brief ]]
@@ -49,6 +53,7 @@
 ---NOTE: If given 'false', then the
 ---plugin won't create any mappings
 ---@field mappings Mappings|false
+---@field register Register
 ---@field toggler Toggler See |comment.config.Toggler|
 ---@field opleader Opleader See |comment.config.Opleader|
 ---@field extra ExtraMapping See |comment.config.ExtraMapping|
@@ -72,6 +77,14 @@
 ---(default: 'true')
 ---@field extra boolean
 
+---Send commented lines to register
+---@class Register
+---Toggles automagic paste to register when using comment motions
+---@field copy boolean
+---(default: 'true')
+---Choose register to send result to
+---@field register string
+---(default: '"')
 ---LHS of toggle mappings in NORMAL
 ---@class Toggler
 ---@field line string Linewise comment (default: 'gcc')
@@ -95,6 +108,10 @@
 local Config = {
     state = {},
     config = {
+        register = {
+            copy = true,
+            register = '"',
+        },
         padding = true,
         sticky = true,
         mappings = {

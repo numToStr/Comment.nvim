@@ -42,6 +42,27 @@ function Op.opfunc(motion, cfg, cmode, ctype)
         return
     end
 
+    if cfg.register.copy then
+        local register = cfg.register.register or '"'
+        vim.notify('Copying to ' .. register)
+        local count = 0
+        -- save default register
+        local oldcontent = vim.fn.getreg('"')
+        for _, line in ipairs(lines) do
+            if count == 0 then
+                -- clear register
+                U.copy_to_register(register, line)
+                count = count + 1
+            else
+                U.copy_to_register(register, line .. '\n', 'a')
+            end
+        end
+        if register ~= '"' then
+            -- restore default register
+            U.copy_to_register('"', oldcontent)
+        end
+    end
+
     ---@type CommentCtx
     local ctx = {
         cmode = cmode,
@@ -88,7 +109,6 @@ end
 ---@param ctype integer See |comment.utils.ctype|
 function Op.count(count, cfg, cmode, ctype)
     local lines, range = U.get_count_lines(count)
-
     ---@type CommentCtx
     local ctx = {
         cmode = cmode,
