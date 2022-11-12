@@ -360,6 +360,7 @@ function U.is_commented(left, right, padding, scol, ecol)
 end
 
 function U.copy_to_register(register, lines)
+    vim.notify('copying ' .. 'to register ' .. register)
     vim.fn.setreg(register, lines, 'a')
 end
 
