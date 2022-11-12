@@ -46,12 +46,11 @@ function Op.opfunc(motion, cfg, cmode, ctype)
     local register = cfg.register.register or '"'
     if cfg.register.copy then
         if type(lines) == 'table' then
+            U.copy_to_register('', register)
             for _, line in ipairs(lines) do
-                vim.notify('line is ' .. line)
-                U.copy_to_register(register, line)
+                U.copy_to_register(register, line, 'a')
             end
         else
-            vim.notify('lines is ' .. lines)
             U.copy_to_register(register, lines)
         end
     end

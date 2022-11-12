@@ -359,9 +359,8 @@ function U.is_commented(left, right, padding, scol, ecol)
     end
 end
 
-function U.copy_to_register(register, lines)
-    vim.notify('copying ' .. 'to register ' .. register)
-    vim.fn.setreg(register, lines, 'a')
+function U.copy_to_register(register, lines, opts)
+    vim.fn.setreg(register, lines .. '\n', opts)
 end
 
 return U
