@@ -45,8 +45,9 @@ function Op.opfunc(motion, cfg, cmode, ctype)
     -- check if
     local register = cfg.register.register or '"'
     if cfg.register.copy then
-        U.copy_to_register(register, '\n')
+        U.copy_to_register(register, '')
         if type(lines) == 'table' then
+            vim.notify('table')
             -- clear register
             for _, line in ipairs(lines) do
                 -- append each line to register
