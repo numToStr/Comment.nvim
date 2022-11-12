@@ -360,6 +360,7 @@ function U.is_commented(left, right, padding, scol, ecol)
 end
 
 function U.copy_to_register(register, lines, opts)
+    vim.notify('adding ' .. lines .. ' to register')
     vim.fn.setreg(register, lines, opts)
 end
 
