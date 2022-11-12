@@ -51,7 +51,7 @@ function Op.opfunc(motion, cfg, cmode, ctype)
                 U.copy_to_register(register, line .. '\n', 'a')
             end
         else
-            U.copy_to_register(register, lines .. '\n')
+            U.copy_to_register(register, lines)
         end
     end
 
