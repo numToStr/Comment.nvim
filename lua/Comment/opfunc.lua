@@ -45,7 +45,7 @@ function Op.opfunc(motion, cfg, cmode, ctype)
     -- check if
     local register = cfg.register.register or '"'
     if cfg.register.copy then
-        U.copy_to_register(register, '')
+        U.copy_to_register(register, '\n')
         if type(lines) == 'table' then
             -- clear register
             for _, line in ipairs(lines) do
