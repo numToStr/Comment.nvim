@@ -359,4 +359,8 @@ function U.is_commented(left, right, padding, scol, ecol)
     end
 end
 
+function U.copy_to_register(register, lines)
+    vim.fn.setreg(register, lines, 'a')
+end
+
 return U

@@ -43,8 +43,15 @@ function Op.opfunc(motion, cfg, cmode, ctype)
     end
 
     -- check if
+    local register = cfg.register.register or '"'
     if cfg.register.copy then
-        A.nvim_set_reg(cfg.register.register, lines)
+        if type(lines) == 'table' then
+            for _, line in ipairs(lines) do
+                U.copy_to_register(register, line)
+            end
+        else
+            U.copy_to_register(register, lines)
+        end
     end
 
     ---@type CommentCtx
