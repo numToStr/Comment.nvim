@@ -48,10 +48,10 @@ function Op.opfunc(motion, cfg, cmode, ctype)
         if type(lines) == 'table' then
             U.copy_to_register(register, '')
             for _, line in ipairs(lines) do
-                U.copy_to_register(register, line, 'a')
+                U.copy_to_register(register, line .. '\n', 'a')
             end
         else
-            U.copy_to_register(register, lines)
+            U.copy_to_register(register, lines .. '\n')
         end
     end
 
