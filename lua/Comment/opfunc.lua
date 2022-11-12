@@ -46,6 +46,8 @@ function Op.opfunc(motion, cfg, cmode, ctype)
         local register = cfg.register.register or '"'
         vim.notify('Copying to ' .. register)
         local count = 0
+        -- save default register
+        local oldcontent = vim.fn.getreg('"')
         for _, line in ipairs(lines) do
             if count == 0 then
                 -- clear register
@@ -54,6 +56,10 @@ function Op.opfunc(motion, cfg, cmode, ctype)
             else
                 U.copy_to_register(register, line .. '\n', 'a')
             end
+        end
+        if register ~= '"' then
+            -- restore default register
+            U.copy_to_register('"', oldcontent)
         end
     end
 
