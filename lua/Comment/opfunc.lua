@@ -62,7 +62,7 @@ function Op.opfunc(motion, cfg, cmode, ctype)
         range = range,
     }
 
-    if motion ~= nil and (is_blockx or ctype == U.ctype.blockwise) then
+    if motion ~= nil and (is_blockx or ctype == U.ctype.blockwise) and rcs ~= '' then
         ctx.cmode = Op.blockwise(params, is_partial)
     else
         ctx.cmode = Op.linewise(params)
