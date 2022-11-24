@@ -193,6 +193,11 @@ end
 ---@param partial? boolean Comment the partial region (visual mode)
 ---@return integer _ Returns a calculated comment mode
 function Op.blockwise(param, partial)
+    if U.is_empty(param.rcs) then
+        print(string.format('Error: %s does not support block comments', vim.bo.filetype))
+        return -1
+    end
+
     local is_x = #param.lines == 1 -- current-line blockwise
     local lines = is_x and param.lines[1] or param.lines
 

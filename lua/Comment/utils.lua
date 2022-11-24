@@ -28,6 +28,7 @@ local U = {}
 ---An object containing comment modes
 ---@type CommentMode
 U.cmode = {
+    error = -1,
     toggle = 0,
     comment = 1,
     uncomment = 2,
