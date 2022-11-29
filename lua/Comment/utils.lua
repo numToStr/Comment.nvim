@@ -74,9 +74,9 @@ end
 
 ---@private
 ---Display a warning message
----@param msg string
-function U.warn(msg)
-    vim.notify(msg, vim.log.levels.WARN)
+---@param message string
+function U.warn(message)
+    vim.notify(message, vim.log.levels.WARN, { title = "Comment.nvim" })
 end
 
 ---@private
