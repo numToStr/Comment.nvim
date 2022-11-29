@@ -194,7 +194,7 @@ end
 ---@return integer _ Returns a calculated comment mode
 function Op.blockwise(param, partial)
     if U.is_empty(param.rcs) then
-        print(string.format('Error: %s does not support block comments', vim.bo.filetype))
+        U.warn(string.format('Error: %s does not support block comments', vim.bo.filetype))
         return -1
     end
 

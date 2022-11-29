@@ -73,6 +73,13 @@ function U.is_empty(iter)
 end
 
 ---@private
+---Display a warning message
+---@param msg string
+function U.warn(msg)
+    vim.notify(msg, vim.log.levels.WARN)
+end
+
+---@private
 ---Helper to get padding character
 ---@param flag boolean
 ---@return string string
