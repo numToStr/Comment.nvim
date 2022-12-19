@@ -83,7 +83,7 @@ C.setup({config?})                                         *comment.usage.setup*
         |comment.config|
 
     Usage: ~
-        >
+        >lua
             -- Use default configuration
             require('Comment').setup()
 
@@ -110,7 +110,7 @@ Following is the default config for the |comment.usage.setup|. If you want to
 override, just modify the option that you want, then it will be merged with the
 default config.
 
->
+>lua
     {
         padding = true,
         sticky = true,
@@ -206,7 +206,7 @@ Config:get()                                                *comment.config:get*
         (CommentConfig)
 
     Usage: ~
-        >
+        >lua
             require('Comment.config'):get()
         <
 
@@ -280,7 +280,7 @@ custom comment function, check out 'comment.api' section.
 
 Usage: ~
 
->
+>lua
     -- Toggle current line or with count
     vim.keymap.set('n', 'gcc', function()
         return vim.v.count == 0
@@ -319,7 +319,7 @@ api.toggle                                                  *comment.api.toggle*
         |comment.config|
 
     Usage: ~
-        >
+        >lua
             local api = require('Comment.api')
             local config = require('Comment.config'):get()
 
@@ -386,7 +386,7 @@ api.comment                                                *comment.api.comment*
         |comment.config|
 
     Usage: ~
-        >
+        >lua
             local api = require('Comment.api')
             local config = require('Comment.config'):get()
 
@@ -417,7 +417,7 @@ api.uncomment                                            *comment.api.uncomment*
         |comment.config|
 
     Usage: ~
-        >
+        >lua
             local api = require('Comment.api')
             local config = require('Comment.config'):get()
 
@@ -442,7 +442,7 @@ api.insert                                                  *comment.api.insert*
         |comment.config|
 
     Usage: ~
-        >
+        >lua
             local api = require('Comment.api')
             local config = require('Comment.config'):get()
 
@@ -470,7 +470,7 @@ api.locked({cb})                                            *comment.api.locked*
         |comment.opfunc.OpMotion|
 
     Usage: ~
-        >
+        >lua
             local api = require('Comment.api')
 
             vim.keymap.set(
@@ -510,7 +510,7 @@ api.call({cb}, {op})                                          *comment.api.call*
         |operatorfunc|
 
     Usage: ~
-        >
+        >lua
             local api = require('Comment.api')
             vim.keymap.set(
                 'n', 'gc', api.call('toggle.linewise', 'g@'),
@@ -546,7 +546,7 @@ ft.set({lang}, {val})                                           *comment.ft.set*
         (table)  Returns itself
 
     Usage: ~
-        >
+        >lua
             local ft = require('Comment.ft')
 
             --1. Using method signature
@@ -576,7 +576,7 @@ ft.get({lang}, {ctype?})                                        *comment.ft.get*
         (nil|string|string[])  Commentstring
 
     Usage: ~
-        >
+        >lua
             local ft = require('Comment.ft')
             local U = require('Comment.utils')
 
@@ -613,7 +613,7 @@ ft.contains({tree}, {range})                               *comment.ft.contains*
         |lua-treesitter-core|
 
     Usage: ~
-        >
+        >lua
             local ok, parser = pcall(vim.treesitter.get_parser, 0)
             assert(ok, "No parser found!")
             local tree = require('Comment.ft').contains(parser, {0, 0, -1, 0})
