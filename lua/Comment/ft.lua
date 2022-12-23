@@ -193,7 +193,12 @@ function ft.get(lang, ctype)
     if not ctype then
         return vim.deepcopy(tuple)
     end
-    return tuple[ctype]
+    local cmt_str = tuple[ctype]
+    assert(
+        cmt_str or (ctype ~= require('Comment.utils').ctype.blockwise),
+        { msg = lang .. " doesn't support block comments!" }
+    )
+    return cmt_str
 end
 
 ---Get a language tree for a given range by walking the parse tree recursively.

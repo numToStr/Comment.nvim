@@ -1,6 +1,5 @@
 ---@mod comment.utils Utilities
 
-local F = require('Comment.ft')
 local A = vim.api
 
 local U = {}
@@ -89,7 +88,7 @@ end
 
 ---@private
 ---Call a function if exists
----@param fn unknown|fun():unknown Wanna be function
+---@param fn unknown|fun(...):unknown Wanna be function
 ---@return unknown
 function U.is_fn(fn, ...)
     if type(fn) == 'function' then
@@ -156,7 +155,7 @@ function U.unwrap_cstr(cstr)
 
     assert(
         (left or right),
-        string.format("[Comment] Invalid commentstring - %q. Run ':h commentstring' for help.", cstr)
+        { msg = string.format('Invalid commentstring for %s! Read `:h commentstring` for help.', vim.bo.filetype) }
     )
 
     return vim.trim(left), vim.trim(right)
@@ -174,7 +173,7 @@ function U.parse_cstr(cfg, ctx)
     -- 1. We ask `pre_hook` for a commentstring
     local cstr = U.is_fn(cfg.pre_hook, ctx)
         -- 2. Calculate w/ the help of treesitter
-        or F.calculate(ctx)
+        or require('Comment.ft').calculate(ctx)
         -- 3. Last resort to use native commentstring
         or vim.bo.commentstring
 
@@ -211,8 +210,8 @@ function U.commenter(left, right, padding, scol, ecol, tabbed)
             if scol == 0 then
                 return (ll .. line .. rr)
             end
-            local first = string.sub(line, 0, scol)
-            local last = string.sub(line, scol + 1, -1)
+            local first = string.sub(line --[[@as string]], 0, scol)
+            local last = string.sub(line --[[@as string]], scol + 1, -1)
             return first .. ll .. last .. rr
         end
 
@@ -294,6 +293,8 @@ function U.uncommenter(left, right, padding, scol, ecol)
         ------------------
         if is_lw then
             local a, b, c = string.match(line, pattern)
+            -- When user tries to uncomment when there is nothing to uncomment. See #221
+            assert(a and b, { msg = 'Nothing to uncomment!' })
             -- If there is nothing after LHS then just return ''
             -- bcz the line previously (before comment) was empty
             return U.is_empty(b) and b or a .. b .. (c or '')
@@ -357,6 +358,15 @@ function U.is_commented(left, right, padding, scol, ecol)
         -- SOURCE: https://github.com/numToStr/Comment.nvim/issues/224
         return string.find(string.sub(line, scol + 1, (ecol > #line and #line or ecol + 1)), pattern) ~= nil
     end
+end
+
+---@private
+---Error handler
+---@param ... unknown
+function U.catch(fn, ...)
+    xpcall(fn, function(err)
+        vim.notify(string.format('[Comment.nvim] %s', err.msg), vim.log.levels.WARN)
+    end, ...)
 end
 
 return U
