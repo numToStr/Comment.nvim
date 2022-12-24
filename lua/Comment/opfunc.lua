@@ -171,14 +171,14 @@ function Op.linewise(param)
         local uncomment = U.uncommenter(param.lcs, param.rcs, padding)
         for i, line in ipairs(param.lines) do
             if not U.ignore(line, pattern) then
-                param.lines[i] = uncomment(line)
+                param.lines[i] = uncomment(line) --[[@as string]]
             end
         end
     else
         local comment = U.commenter(param.lcs, param.rcs, padding, min_indent, nil, tabbed)
         for i, line in ipairs(param.lines) do
             if not U.ignore(line, pattern) then
-                param.lines[i] = comment(line)
+                param.lines[i] = comment(line) --[[@as string]]
             end
         end
     end

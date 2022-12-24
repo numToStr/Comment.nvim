@@ -13,6 +13,10 @@ local A = vim.api
 
 local api, core = {}, {}
 
+---API metamethods
+---@param that table
+---@param ctype CommentType
+---@return table
 function core.__index(that, ctype)
     local idxd = {}
     local mode, type = that.cmode, U.ctype[ctype]
@@ -22,17 +26,17 @@ function core.__index(that, ctype)
     ---In current-line linewise method, 'opmode' is not useful which is always equals to `char`
     ---but we need 'nil' here which is used for current-line
     function idxd.current(_, cfg)
-        Op.opfunc(nil, cfg or Config:get(), mode, type)
+        U.catch(Op.opfunc, nil, cfg or Config:get(), mode, type)
     end
 
     ---To comment lines with a count
     function idxd.count(count, cfg)
-        Op.count(count or A.nvim_get_vvar('count'), cfg or Config:get(), mode, type)
+        U.catch(Op.count, count or A.nvim_get_vvar('count'), cfg or Config:get(), mode, type)
     end
 
     ---@private
     ---To comment lines with a count, also dot-repeatable
-    ---WARNING: This is not part of the API but anyone case use it, if they want
+    ---WARN: This is not part of the API but anyone case use it, if they want
     function idxd.count_repeat(_, count, cfg)
         idxd.count(count, cfg)
     end
@@ -40,7 +44,7 @@ function core.__index(that, ctype)
     return setmetatable({}, {
         __index = idxd,
         __call = function(_, motion, cfg)
-            Op.opfunc(motion, cfg or Config:get(), mode, type)
+            U.catch(Op.opfunc, motion, cfg or Config:get(), mode, type)
         end,
     })
 end
@@ -173,13 +177,13 @@ api.insert = setmetatable({}, {
     __index = function(_, ctype)
         return {
             above = function(cfg)
-                Ex.insert_above(U.ctype[ctype], cfg or Config:get())
+                U.catch(Ex.insert_above, U.ctype[ctype], cfg or Config:get())
             end,
             below = function(cfg)
-                Ex.insert_below(U.ctype[ctype], cfg or Config:get())
+                U.catch(Ex.insert_below, U.ctype[ctype], cfg or Config:get())
             end,
             eol = function(cfg)
-                Ex.insert_eol(U.ctype[ctype], cfg or Config:get())
+                U.catch(Ex.insert_eol, U.ctype[ctype], cfg or Config:get())
             end,
         }
     end,
