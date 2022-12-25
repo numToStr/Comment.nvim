@@ -1,5 +1,6 @@
 ---@mod comment.utils Utilities
 
+local F = require('Comment.ft')
 local A = vim.api
 
 local U = {}
@@ -171,13 +172,16 @@ end
 ---@return string string Right side of the commentstring
 function U.parse_cstr(cfg, ctx)
     -- 1. We ask `pre_hook` for a commentstring
-    local cstr = U.is_fn(cfg.pre_hook, ctx)
+    local inbuilt = U.is_fn(cfg.pre_hook, ctx)
         -- 2. Calculate w/ the help of treesitter
-        or require('Comment.ft').calculate(ctx)
-        -- 3. Last resort to use native commentstring
-        or vim.bo.commentstring
+        or F.calculate(ctx)
 
-    return U.unwrap_cstr(cstr)
+    assert(inbuilt or (ctx.ctype ~= U.ctype.blockwise), {
+        msg = vim.bo.filetype .. " doesn't support block comments!",
+    })
+
+    -- 3. Last resort to use native commentstring
+    return U.unwrap_cstr(inbuilt or vim.bo.commentstring)
 end
 
 ---Returns a closure which is used to do comments

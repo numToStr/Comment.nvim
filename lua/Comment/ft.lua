@@ -170,7 +170,8 @@ end
 ---@param lang string Filetype/Language of the buffer
 ---@param ctype? integer See |comment.utils.ctype|. If given `nil`, it'll
 ---return a copy of { line, block } commentstring.
----@return nil|string|string[] #Commentstring
+---@return nil|string|string[] #Returns stored commentstring, if {lang} is not
+---recognized then returns native |commentstring|
 ---@usage [[
 ---local ft = require('Comment.ft')
 ---local U = require('Comment.utils')
@@ -181,24 +182,19 @@ end
 ---
 ----- 2. Compound filetype
 ----- NOTE: This will return `yaml` commenstring(s),
------       as `ansible` commentstring doesn't exists yet.
+-----       as `ansible` commentstring is not found.
 ---ft.get('ansible.yaml', U.ctype.linewise) -- `#%s`
 ---ft.get('ansible.yaml') -- { '#%s' }
 ---@usage ]]
 function ft.get(lang, ctype)
     local tuple = L[lang]
     if not tuple then
-        return nil
+        return vim.bo.commentstring
     end
     if not ctype then
         return vim.deepcopy(tuple)
     end
-    local cmt_str = tuple[ctype]
-    assert(
-        cmt_str or (ctype ~= require('Comment.utils').ctype.blockwise),
-        { msg = lang .. " doesn't support block comments!" }
-    )
-    return cmt_str
+    return tuple[ctype]
 end
 
 ---Get a language tree for a given range by walking the parse tree recursively.
@@ -236,10 +232,9 @@ end
 function ft.calculate(ctx)
     local buf = A.nvim_get_current_buf()
     local ok, parser = pcall(vim.treesitter.get_parser, buf)
-    local default = ft.get(A.nvim_buf_get_option(buf, 'filetype'), ctx.ctype)
 
     if not ok then
-        return default --[[ @as string ]]
+        return ft.get(vim.bo.filetype, ctx.ctype) --[[ @as string ]]
     end
 
     local lang = ft.contains(parser, {
@@ -249,7 +244,7 @@ function ft.calculate(ctx)
         ctx.range.ecol,
     }):lang()
 
-    return ft.get(lang, ctx.ctype) or default --[[ @as string ]]
+    return ft.get(lang, ctx.ctype) or ft.get(vim.bo.filetype, ctx.ctype) --[[ @as string ]]
 end
 
 ---@export ft

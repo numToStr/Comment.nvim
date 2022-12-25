@@ -4,32 +4,18 @@
 ---Following is the default config for the |comment.usage.setup|. If you want to
 ---override, just modify the option that you want, then it will be merged with the
 ---default config.
----
 --->
----    {
----        padding = true,
----        sticky = true,
----        ignore = nil,
----        toggler = {
----            line = 'gcc',
----            block = 'gbc',
----        },
----        opleader = {
----            line = 'gc',
----            block = 'gb',
----        },
----        extra = {
----            above = 'gcO',
----            below = 'gco',
----            eol = 'gcA',
----        },
----        mappings = {
----            basic = true,
----            extra = true,
----        },
----        pre_hook = nil,
----        post_hook = nil,
----    }
+---  {
+---      padding = true,
+---      sticky = true,
+---      ignore = nil,
+---      toggler = { line = 'gcc', block = 'gbc' },
+---      opleader = { line = 'gc', block = 'gb' },
+---      extra = { above = 'gcO', below = 'gco', eol = 'gcA' },
+---      mappings = { basic = true, extra = true },
+---      pre_hook = nil,
+---      post_hook = nil,
+---  }
 ---<
 ---@brief ]]
 
