@@ -109,32 +109,18 @@ Configuration                                                   *comment.config*
 Following is the default config for the |comment.usage.setup|. If you want to
 override, just modify the option that you want, then it will be merged with the
 default config.
-
 >
-    {
-        padding = true,
-        sticky = true,
-        ignore = nil,
-        toggler = {
-            line = 'gcc',
-            block = 'gbc',
-        },
-        opleader = {
-            line = 'gc',
-            block = 'gb',
-        },
-        extra = {
-            above = 'gcO',
-            below = 'gco',
-            eol = 'gcA',
-        },
-        mappings = {
-            basic = true,
-            extra = true,
-        },
-        pre_hook = nil,
-        post_hook = nil,
-    }
+  {
+      padding = true,
+      sticky = true,
+      ignore = nil,
+      toggler = { line = 'gcc', block = 'gbc' },
+      opleader = { line = 'gc', block = 'gb' },
+      extra = { above = 'gcO', below = 'gco', eol = 'gcA' },
+      mappings = { basic = true, extra = true },
+      pre_hook = nil,
+      post_hook = nil,
+  }
 <
 
 CommentConfig                                     *comment.config.CommentConfig*
@@ -573,7 +559,8 @@ ft.get({lang}, {ctype?})                                        *comment.ft.get*
                              return a copy of { line, block } commentstring.
 
     Returns: ~
-        (nil|string|string[])  Commentstring
+        (nil|string|string[])  Returns stored commentstring, if {lang} is not
+                               recognized then returns native |commentstring|
 
     Usage: ~
         >
@@ -586,7 +573,7 @@ ft.get({lang}, {ctype?})                                        *comment.ft.get*
 
             -- 2. Compound filetype
             -- NOTE: This will return `yaml` commenstring(s),
-            --       as `ansible` commentstring doesn't exists yet.
+            --       as `ansible` commentstring is not found.
             ft.get('ansible.yaml', U.ctype.linewise) -- `#%s`
             ft.get('ansible.yaml') -- { '#%s' }
         <
