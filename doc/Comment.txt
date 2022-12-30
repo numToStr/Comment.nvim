@@ -10,21 +10,21 @@
                     · Smart and Powerful comment plugin ·
 
 
-================================================================================
+==============================================================================
 Table of Contents                                             *comment.contents*
 
-Introduction······················································|comment-nvim|
-Usage····························································|comment.usage|
-Configuration···················································|comment.config|
-Keybindings················································|comment.keybindings|
-Plug Mappings··················································|comment.plugmap|
-Core Lua API·······················································|comment.api|
-Language/Filetype detection·········································|comment.ft|
-Utilities························································|comment.utils|
-Operator-mode API···············································|comment.opfunc|
-Extra API························································|comment.extra|
+Introduction ···················································· |comment-nvim|
+Usage ·························································· |comment.usage|
+Configuration ················································· |comment.config|
+Keybindings ·············································· |comment.keybindings|
+Plug Mappings ················································ |comment.plugmap|
+Core Lua API ····················································· |comment.api|
+Language/Filetype detection ······································· |comment.ft|
+Utilities ······················································ |comment.utils|
+Operator-mode API ············································· |comment.opfunc|
+Extra API ······················································ |comment.extra|
 
-================================================================================
+==============================================================================
 Introduction                                                      *comment-nvim*
 
 Comment.nvim is a smart and powerful comment plugin for neovim. It supports
@@ -62,7 +62,7 @@ behavior, you have to manually return the 'commentstring' from 'pre_hook'.
 Comment.nvim is FOSS and distributed under MIT license. All the source code is
 available at https://github.com/numToStr/Comment.nvim
 
-================================================================================
+==============================================================================
 Usage                                                            *comment.usage*
 
 Before using the plugin, you need to call the `setup()` function to create the
@@ -83,33 +83,33 @@ C.setup({config?})                                         *comment.usage.setup*
         |comment.config|
 
     Usage: ~
-        >
-            -- Use default configuration
-            require('Comment').setup()
+>lua
+        -- Use default configuration
+        require('Comment').setup()
 
-            -- or with custom configuration
-            require('Comment').setup({
-                ignore = '^$',
-                toggler = {
-                    line = '<leader>cc',
-                    block = '<leader>bc',
-                },
-                opleader = {
-                    line = '<leader>c',
-                    block = '<leader>b',
-                },
-            })
-        <
+        -- or with custom configuration
+        require('Comment').setup({
+            ignore = '^$',
+            toggler = {
+                line = '<leader>cc',
+                block = '<leader>bc',
+            },
+            opleader = {
+                line = '<leader>c',
+                block = '<leader>b',
+            },
+        })
+<
 
 
-================================================================================
+==============================================================================
 Configuration                                                   *comment.config*
 
                                                        *comment.config.defaults*
 Following is the default config for the |comment.usage.setup|. If you want to
 override, just modify the option that you want, then it will be merged with the
 default config.
->
+>lua
   {
       padding = true,
       sticky = true,
@@ -192,12 +192,12 @@ Config:get()                                                *comment.config:get*
         (CommentConfig)
 
     Usage: ~
-        >
-            require('Comment.config'):get()
-        <
+>lua
+        require('Comment.config'):get()
+<
 
 
-================================================================================
+==============================================================================
 Keybindings                                                *comment.keybindings*
 
 Comment.nvim provides default keybindings for (un)comment your code. These
@@ -231,7 +231,7 @@ Extra: ~
   *gcO* - Inserts comment above and enters INSERT mode
   *gcA* - Inserts comment at the end of line and enters INSERT mode
 
-================================================================================
+==============================================================================
 Plug Mappings                                                  *comment.plugmap*
 
 Comment.nvim provides <Plug> mappings for most commonly used actions. These
@@ -281,7 +281,7 @@ Usage: ~
     vim.keymap.set('x', 'gc', '<Plug>(comment_toggle_linewise_visual)')
 <
 
-================================================================================
+==============================================================================
 Core Lua API                                                       *comment.api*
 
 This module provides the core lua APIs which is used by the default keybindings
@@ -305,54 +305,54 @@ api.toggle                                                  *comment.api.toggle*
         |comment.config|
 
     Usage: ~
-        >
-            local api = require('Comment.api')
-            local config = require('Comment.config'):get()
+>lua
+        local api = require('Comment.api')
+        local config = require('Comment.config'):get()
 
-            api.toggle.linewise(motion, config?)
-            api.toggle.linewise.current(motion?, config?)
-            api.toggle.linewise.count(count, config?)
+        api.toggle.linewise(motion, config?)
+        api.toggle.linewise.current(motion?, config?)
+        api.toggle.linewise.count(count, config?)
 
-            api.toggle.blockwise(motion, config?)
-            api.toggle.blockwise.current(motion?, config?)
-            api.toggle.blockwise.count(count, config?)
+        api.toggle.blockwise(motion, config?)
+        api.toggle.blockwise.current(motion?, config?)
+        api.toggle.blockwise.count(count, config?)
 
-            -- Toggle current line (linewise) using C-/
-            vim.keymap.set('n', '<C-_>', api.toggle.linewise.current)
+        -- Toggle current line (linewise) using C-/
+        vim.keymap.set('n', '<C-_>', api.toggle.linewise.current)
 
-            -- Toggle current line (blockwise) using C-\
-            vim.keymap.set('n', '<C-\\>', api.toggle.blockwise.current)
+        -- Toggle current line (blockwise) using C-\
+        vim.keymap.set('n', '<C-\\>', api.toggle.blockwise.current)
 
-            -- Toggle lines (linewise) with dot-repeat support
-            -- Example: <leader>gc3j will comment 4 lines
-            vim.keymap.set(
-                'n', '<leader>gc', api.call('toggle.linewise', 'g@'),
-                { expr = true }
-            )
+        -- Toggle lines (linewise) with dot-repeat support
+        -- Example: <leader>gc3j will comment 4 lines
+        vim.keymap.set(
+            'n', '<leader>gc', api.call('toggle.linewise', 'g@'),
+            { expr = true }
+        )
 
-            -- Toggle lines (blockwise) with dot-repeat support
-            -- Example: <leader>gb3j will comment 4 lines
-            vim.keymap.set(
-                'n', '<leader>gb', api.call('toggle.blockwise', 'g@'),
-                { expr = true }
-            )
+        -- Toggle lines (blockwise) with dot-repeat support
+        -- Example: <leader>gb3j will comment 4 lines
+        vim.keymap.set(
+            'n', '<leader>gb', api.call('toggle.blockwise', 'g@'),
+            { expr = true }
+        )
 
-            local esc = vim.api.nvim_replace_termcodes(
-                '<ESC>', true, false, true
-            )
+        local esc = vim.api.nvim_replace_termcodes(
+            '<ESC>', true, false, true
+        )
 
-            -- Toggle selection (linewise)
-            vim.keymap.set('x', '<leader>c', function()
-                vim.api.nvim_feedkeys(esc, 'nx', false)
-                api.toggle.linewise(vim.fn.visualmode())
-            end)
+        -- Toggle selection (linewise)
+        vim.keymap.set('x', '<leader>c', function()
+            vim.api.nvim_feedkeys(esc, 'nx', false)
+            api.toggle.linewise(vim.fn.visualmode())
+        end)
 
-            -- Toggle selection (blockwise)
-            vim.keymap.set('x', '<leader>b', function()
-                vim.api.nvim_feedkeys(esc, 'nx', false)
-                api.toggle.blockwise(vim.fn.visualmode())
-            end)
-        <
+        -- Toggle selection (blockwise)
+        vim.keymap.set('x', '<leader>b', function()
+            vim.api.nvim_feedkeys(esc, 'nx', false)
+            api.toggle.blockwise(vim.fn.visualmode())
+        end)
+<
 
 
                                                   *comment.api.comment.linewise*
@@ -372,18 +372,18 @@ api.comment                                                *comment.api.comment*
         |comment.config|
 
     Usage: ~
-        >
-            local api = require('Comment.api')
-            local config = require('Comment.config'):get()
+>lua
+        local api = require('Comment.api')
+        local config = require('Comment.config'):get()
 
-            api.comment.linewise(motion, config?)
-            api.comment.linewise.current(motion?, config?)
-            api.comment.linewise.count(count, config?)
+        api.comment.linewise(motion, config?)
+        api.comment.linewise.current(motion?, config?)
+        api.comment.linewise.count(count, config?)
 
-            api.comment.blockwise(motion, config?)
-            api.comment.blockwise.current(motion?, config?)
-            api.comment.blockwise.count(count, config?)
-        <
+        api.comment.blockwise(motion, config?)
+        api.comment.blockwise.current(motion?, config?)
+        api.comment.blockwise.count(count, config?)
+<
 
 
                                                 *comment.api.uncomment.linewise*
@@ -403,18 +403,18 @@ api.uncomment                                            *comment.api.uncomment*
         |comment.config|
 
     Usage: ~
-        >
-            local api = require('Comment.api')
-            local config = require('Comment.config'):get()
+>lua
+        local api = require('Comment.api')
+        local config = require('Comment.config'):get()
 
-            api.uncomment.linewise(motion, config?)
-            api.uncomment.linewise.current(motion?, config?)
-            api.uncomment.linewise.count(count, config?)
+        api.uncomment.linewise(motion, config?)
+        api.uncomment.linewise.current(motion?, config?)
+        api.uncomment.linewise.count(count, config?)
 
-            api.uncomment.blockwise(motion, config?)
-            api.uncomment.blockwise.current(motion?, config?)
-            api.uncomment.blockwise.count(count, config?)
-        <
+        api.uncomment.blockwise(motion, config?)
+        api.uncomment.blockwise.current(motion?, config?)
+        api.uncomment.blockwise.count(count, config?)
+<
 
 
 api.insert                                                  *comment.api.insert*
@@ -428,18 +428,18 @@ api.insert                                                  *comment.api.insert*
         |comment.config|
 
     Usage: ~
-        >
-            local api = require('Comment.api')
-            local config = require('Comment.config'):get()
+>lua
+        local api = require('Comment.api')
+        local config = require('Comment.config'):get()
 
-            api.insert.linewise.above(config?)
-            api.insert.linewise.below(config?)
-            api.insert.linewise.eol(config?)
+        api.insert.linewise.above(config?)
+        api.insert.linewise.below(config?)
+        api.insert.linewise.eol(config?)
 
-            api.insert.blockwise.above(config?)
-            api.insert.blockwise.below(config?)
-            api.insert.blockwise.eol(config?)
-        <
+        api.insert.blockwise.above(config?)
+        api.insert.blockwise.below(config?)
+        api.insert.blockwise.eol(config?)
+<
 
 
 api.locked({cb})                                            *comment.api.locked*
@@ -456,26 +456,26 @@ api.locked({cb})                                            *comment.api.locked*
         |comment.opfunc.OpMotion|
 
     Usage: ~
-        >
-            local api = require('Comment.api')
+>lua
+        local api = require('Comment.api')
 
-            vim.keymap.set(
-                'n', '<leader>c', api.locked('toggle.linewise.current')
-            )
+        vim.keymap.set(
+            'n', '<leader>c', api.locked('toggle.linewise.current')
+        )
 
-            local esc = vim.api.nvim_replace_termcodes(
-                '<ESC>', true, false, true
-            )
-            vim.keymap.set('x', '<leader>c', function()
-                vim.api.nvim_feedkeys(esc, 'nx', false)
-                api.locked('toggle.linewise')(vim.fn.visualmode())
-            end)
+        local esc = vim.api.nvim_replace_termcodes(
+            '<ESC>', true, false, true
+        )
+        vim.keymap.set('x', '<leader>c', function()
+            vim.api.nvim_feedkeys(esc, 'nx', false)
+            api.locked('toggle.linewise')(vim.fn.visualmode())
+        end)
 
-            -- NOTE: `locked` method is just a wrapper around `lockmarks`
-            vim.api.nvim_command([[
-                lockmarks lua require('Comment.api').toggle.linewise.current()
-            ]])
-        <
+        -- NOTE: `locked` method is just a wrapper around `lockmarks`
+        vim.api.nvim_command([[
+            lockmarks lua require('Comment.api').toggle.linewise.current()
+        ]])
+<
 
 
 api.call({cb}, {op})                                          *comment.api.call*
@@ -496,20 +496,20 @@ api.call({cb}, {op})                                          *comment.api.call*
         |operatorfunc|
 
     Usage: ~
-        >
-            local api = require('Comment.api')
-            vim.keymap.set(
-                'n', 'gc', api.call('toggle.linewise', 'g@'),
-                { expr = true }
-            )
-            vim.keymap.set(
-                'n', 'gcc', api.call('toggle.linewise.current', 'g@$'),
-                { expr = true }
-            )
-        <
+>lua
+        local api = require('Comment.api')
+        vim.keymap.set(
+            'n', 'gc', api.call('toggle.linewise', 'g@'),
+            { expr = true }
+        )
+        vim.keymap.set(
+            'n', 'gcc', api.call('toggle.linewise.current', 'g@$'),
+            { expr = true }
+        )
+<
 
 
-================================================================================
+==============================================================================
 Language/Filetype detection                                         *comment.ft*
 
 This module is the core of filetype and commentstring detection and uses the
@@ -532,22 +532,22 @@ ft.set({lang}, {val})                                           *comment.ft.set*
         (table)  Returns itself
 
     Usage: ~
-        >
-            local ft = require('Comment.ft')
+>lua
+        local ft = require('Comment.ft')
 
-            --1. Using method signature
-            -- Set only line comment or both
-            -- You can also chain the set calls
-            ft.set('yaml', '#%s').set('javascript', {'//%s', '/*%s*/'})
+        --1. Using method signature
+        -- Set only line comment or both
+        -- You can also chain the set calls
+        ft.set('yaml', '#%s').set('javascript', {'//%s', '/*%s*/'})
 
-            -- 2. Metatable magic
-            ft.javascript = {'//%s', '/*%s*/'}
-            ft.yaml = '#%s'
+        -- 2. Metatable magic
+        ft.javascript = {'//%s', '/*%s*/'}
+        ft.yaml = '#%s'
 
-            -- 3. Multiple filetypes
-            ft({'go', 'rust'}, {'//%s', '/*%s*/'})
-            ft({'toml', 'graphql'}, '#%s')
-        <
+        -- 3. Multiple filetypes
+        ft({'go', 'rust'}, {'//%s', '/*%s*/'})
+        ft({'toml', 'graphql'}, '#%s')
+<
 
 
 ft.get({lang}, {ctype?})                                        *comment.ft.get*
@@ -563,20 +563,20 @@ ft.get({lang}, {ctype?})                                        *comment.ft.get*
                                recognized then returns native |commentstring|
 
     Usage: ~
-        >
-            local ft = require('Comment.ft')
-            local U = require('Comment.utils')
+>lua
+        local ft = require('Comment.ft')
+        local U = require('Comment.utils')
 
-            -- 1. Primary filetype
-            ft.get('rust', U.ctype.linewise) -- `//%s`
-            ft.get('rust') -- `{ '//%s', '/*%s*/' }`
+        -- 1. Primary filetype
+        ft.get('rust', U.ctype.linewise) -- `//%s`
+        ft.get('rust') -- `{ '//%s', '/*%s*/' }`
 
-            -- 2. Compound filetype
-            -- NOTE: This will return `yaml` commenstring(s),
-            --       as `ansible` commentstring is not found.
-            ft.get('ansible.yaml', U.ctype.linewise) -- `#%s`
-            ft.get('ansible.yaml') -- { '#%s' }
-        <
+        -- 2. Compound filetype
+        -- NOTE: This will return `yaml` commenstring(s),
+        --       as `ansible` commentstring is not found.
+        ft.get('ansible.yaml', U.ctype.linewise) -- `#%s`
+        ft.get('ansible.yaml') -- { '#%s' }
+<
 
 
 ft.contains({tree}, {range})                               *comment.ft.contains*
@@ -600,12 +600,12 @@ ft.contains({tree}, {range})                               *comment.ft.contains*
         |lua-treesitter-core|
 
     Usage: ~
-        >
-            local ok, parser = pcall(vim.treesitter.get_parser, 0)
-            assert(ok, "No parser found!")
-            local tree = require('Comment.ft').contains(parser, {0, 0, -1, 0})
-            print('Lang:', tree:lang())
-        <
+>lua
+        local ok, parser = pcall(vim.treesitter.get_parser, 0)
+        assert(ok, "No parser found!")
+        local tree = require('Comment.ft').contains(parser, {0, 0, -1, 0})
+        print('Lang:', tree:lang())
+<
 
 
 ft.calculate({ctx})                                       *comment.ft.calculate*
@@ -621,7 +621,7 @@ ft.calculate({ctx})                                       *comment.ft.calculate*
         |comment.utils.CommentCtx|
 
 
-================================================================================
+==============================================================================
 Utilities                                                        *comment.utils*
 
 CommentCtx                                            *comment.utils.CommentCtx*
@@ -807,7 +807,7 @@ U.is_commented({left}, {right}, {padding}, {scol?}, {ecol?})
         (fun(line:string|string[]):boolean)
 
 
-================================================================================
+==============================================================================
 Operator-mode API                                               *comment.opfunc*
 
 Underlying functions that powers the |comment.api.toggle|, |comment.api.comment|,
@@ -880,7 +880,7 @@ Op.blockwise({param}, {partial?})                     *comment.opfunc.blockwise*
         (integer)  Returns a calculated comment mode
 
 
-================================================================================
+==============================================================================
 Extra API                                                        *comment.extra*
 
 Underlying functions that powers the |comment.api.insert| lua API.
