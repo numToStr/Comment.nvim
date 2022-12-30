@@ -87,7 +87,6 @@ local C = {}
 ---})
 ---@usage ]]
 function C.setup(config)
-    ---@diagnostic disable-next-line: invisible
     local cfg = require('Comment.config'):set(config):get()
 
     if cfg.mappings then

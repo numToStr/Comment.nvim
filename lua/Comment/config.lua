@@ -4,7 +4,7 @@
 ---Following is the default config for the |comment.usage.setup|. If you want to
 ---override, just modify the option that you want, then it will be merged with the
 ---default config.
---->
+--->lua
 ---  {
 ---      padding = true,
 ---      sticky = true,
@@ -103,7 +103,7 @@ local Config = {
     },
 }
 
----@private
+---@package
 ---Updates the default config
 ---@param cfg? CommentConfig
 ---@return RootConfig
