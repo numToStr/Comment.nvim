@@ -50,6 +50,7 @@ local L = setmetatable({
     cuda = { M.cxx_l, M.cxx_b },
     dart = { M.cxx_l, M.cxx_b },
     dhall = { M.dash, M.haskell_b },
+    dosbatch = { 'REM%s' },
     dot = { M.cxx_l, M.cxx_b },
     eelixir = { M.html, M.html },
     elixir = { M.hash },
