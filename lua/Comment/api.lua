@@ -54,7 +54,7 @@ end
 ---Provides API to toggle comments over a region, on current-line, or with a
 ---count using line or block comment string.
 ---
----All functions takes a {motion} argument, except '*.count()' function which
+---All functions take a {motion} argument, except '*.count()' function which
 ---takes an {count} argument, and an optional {config} parameter.
 ---@type table A metatable containing API functions
 ---@see comment.opfunc.OpMotion
