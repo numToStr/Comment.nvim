@@ -54,7 +54,7 @@ end
 ---Provides API to toggle comments over a region, on current-line, or with a
 ---count using line or block comment string.
 ---
----All functions takes a {motion} argument, except '*.count()' function which
+---Every function takes a {motion} argument, except '*.count()' function which
 ---takes an {count} argument, and an optional {config} parameter.
 ---@type table A metatable containing API functions
 ---@see comment.opfunc.OpMotion
@@ -114,7 +114,7 @@ api.toggle = setmetatable({ cmode = U.cmode.toggle }, core)
 ---Provides API to (only) comment a region, on current-line, or with a
 ---count using line or block comment string.
 ---
----All functions takes a {motion} argument, except '*.count()' function which
+---Every function takes a {motion} argument, except '*.count()' function which
 ---takes an {count} argument, and an optional {config} parameter.
 ---@type table A metatable containing API functions
 ---@see comment.opfunc.OpMotion
@@ -138,7 +138,7 @@ api.comment = setmetatable({ cmode = U.cmode.comment }, core)
 ---Provides API to (only) uncomment a region, on current-line, or with a
 ---count using line or block comment string.
 ---
----All functions takes a {motion} argument, except '*.count()' function which
+---Every function takes a {motion} argument, except '*.count()' function which
 ---takes an {count} argument, and an optional {config} parameter.
 ---@type table A metatable containing API functions
 ---@see comment.opfunc.OpMotion
@@ -158,7 +158,7 @@ api.comment = setmetatable({ cmode = U.cmode.comment }, core)
 api.uncomment = setmetatable({ cmode = U.cmode.uncomment }, core)
 
 ---Provides API to to insert comment on previous, next or at the end-of-line.
----All functions takes an optional {config} parameter.
+---Every function takes an optional {config} parameter.
 ---@type table A metatable containing API functions
 ---@see comment.config
 ---@usage [[
