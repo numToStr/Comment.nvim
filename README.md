@@ -195,7 +195,7 @@ For advance use cases, use [nvim-ts-context-commentstring](https://github.com/Jo
 
 #### Smart block uncomment
 
-Using [nvim-treesitter-textobjects]([url](https://github.com/nvim-treesitter/nvim-treesitter-textobjects)) it is possible to smart uncomment blocks.
+Using [nvim-treesitter-textobjects](https://github.com/nvim-treesitter/nvim-treesitter-textobjects) it is possible to smart uncomment blocks.
 
 ```lua
 require('nvim-treesitter.configs').setup({
