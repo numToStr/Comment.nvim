@@ -68,8 +68,7 @@ local call = require('Comment.api').call
 ---     NORMAL mode. These powers the |{visual}gc| and |{visual}gb| keybindings.
 ---
 ---Usage: ~
----
---->
+--->lua
 ---    -- Toggle current line or with count
 ---    vim.keymap.set('n', 'gcc', function()
 ---        return vim.v.count == 0
