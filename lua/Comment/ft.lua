@@ -29,6 +29,7 @@ local M = {
     lisp_l = ';;%s',
     lisp_b = '#|%s|#',
     twig = '{#%s#}',
+    vim = '"%s',
 }
 
 ---Lang table that contains commentstring (linewise/blockwise) for multiple filetypes
@@ -124,7 +125,8 @@ local L = setmetatable({
     twig = { M.twig, M.twig },
     typescript = { M.cxx_l, M.cxx_b },
     typescriptreact = { M.cxx_l, M.cxx_b },
-    vim = { '"%s' },
+    vim = { M.vim },
+    vifm = { M.vim },
     vue = { M.html, M.html },
     xml = { M.html, M.html },
     xdefaults = { '!%s' },
