@@ -193,6 +193,24 @@ For advance use cases, use [nvim-ts-context-commentstring](https://github.com/Jo
 
 <a id="hooks"></a>
 
+#### Smart block uncomment
+
+Using `nvim-treesitter-textobjects` it is possible to smart uncomment blocks.
+
+```lua
+require('nvim-treesitter.configs').setup({
+    -- nvim-treesitter/nvim-treesitter-textobjects
+    textobjects = {
+        select = {
+            enable = true,
+            keymaps = {
+                ['uc'] = '@comment.outer', -- <-- This one does the magic
+            },
+        },
+    },
+})
+```
+
 ### 🎣 Hooks
 
 There are two hook methods i.e `pre_hook` and `post_hook` which are called before comment and after comment respectively. Both should be provided during [`setup()`](#setup).
