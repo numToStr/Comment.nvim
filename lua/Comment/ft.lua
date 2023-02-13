@@ -146,6 +146,30 @@ local L = setmetatable({
     end,
 })
 
+---Maps a filteype to a parsername for filetypes
+---that don't have their own parser (yet).
+---From: <https://github.com/nvim-treesitter/nvim-treesitter/blob/cda8b291ef6fc4e04036e2ea6cf0de8aa84c2656/lua/nvim-treesitter/parsers.lua#L4-L23>.
+local filetype_to_parsername = {
+  javascriptreact = "javascript",
+  ecma = "javascript",
+  jsx = "javascript",
+  PKGBUILD = "bash",
+  html_tags = "html",
+  ["typescript.tsx"] = "tsx",
+  ["html.handlebars"] = "glimmer",
+  systemverilog = "verilog",
+  cls = "latex",
+  sty = "latex",
+  OpenFOAM = "foam",
+  pandoc = "markdown",
+  rmd = "markdown",
+  quarto = "markdown",
+  cs = "c_sharp",
+  tape = "vhs",
+  dosini = "ini",
+  confini = "ini",
+}
+
 local ft = {}
 
 ---Sets a commentstring(s) for a filetype/language
@@ -239,7 +263,7 @@ end
 function ft.calculate(ctx)
     local buf = A.nvim_get_current_buf()
     local filetype = vim.bo.filetype
-    local parsername = require 'nvim-treesitter.parsers'.filetype_to_parsername[filetype] or filetype
+    local parsername = filetype_to_parsername[filetype] or filetype
     local ok, parser = pcall(vim.treesitter.get_parser, buf, parsername)
 
     if not ok then
