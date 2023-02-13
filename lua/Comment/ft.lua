@@ -150,24 +150,7 @@ local L = setmetatable({
 ---that don't have their own parser (yet).
 ---From: <https://github.com/nvim-treesitter/nvim-treesitter/blob/cda8b291ef6fc4e04036e2ea6cf0de8aa84c2656/lua/nvim-treesitter/parsers.lua#L4-L23>.
 local filetype_to_parsername = {
-  javascriptreact = "javascript",
-  ecma = "javascript",
-  jsx = "javascript",
-  PKGBUILD = "bash",
-  html_tags = "html",
-  ["typescript.tsx"] = "tsx",
-  ["html.handlebars"] = "glimmer",
-  systemverilog = "verilog",
-  cls = "latex",
-  sty = "latex",
-  OpenFOAM = "foam",
-  pandoc = "markdown",
-  rmd = "markdown",
   quarto = "markdown",
-  cs = "c_sharp",
-  tape = "vhs",
-  dosini = "ini",
-  confini = "ini",
 }
 
 local ft = {}
