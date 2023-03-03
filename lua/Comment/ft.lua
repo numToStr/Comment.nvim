@@ -135,6 +135,7 @@ local L = setmetatable({
     xml = { M.html, M.html },
     xdefaults = { '!%s' },
     yaml = { M.hash },
+    yuck = { M.lisp_l },
     zig = { M.cxx_l }, -- Zig doesn't have block comments
 }, {
     -- Support for compound filetype i.e. 'ios.swift', 'ansible.yaml' etc.
