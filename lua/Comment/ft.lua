@@ -249,7 +249,7 @@ end
 function ft.calculate(ctx)
     local buf = A.nvim_get_current_buf()
     local filetype = vim.bo.filetype
-    local parsername = filetype_to_parsername[filetype] or filetype
+    local parsername = filetype_to_parsername[filetype] or vim.treesitter.language.get_lang(filetype)
     local ok, parser = pcall(vim.treesitter.get_parser, buf, parsername)
 
     if not ok then
