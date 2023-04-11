@@ -117,7 +117,7 @@ Following are the **default** config for the [`setup()`](#setup). If you want to
 
 ### 🔥 Usage
 
-When you call [`setup()`](#setup) method, `Comment.nvim` sets up some basic mapping which can used in NORMAL and VISUAL mode to get you started with the pleasure of commenting stuff out.
+When you call [`setup()`](#setup) method, `Comment.nvim` sets up some basic mapping which can be used in NORMAL and VISUAL mode to get you started with the pleasure of commenting stuff out.
 
 <a id="basic-mappings"></a>
 
