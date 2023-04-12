@@ -558,8 +558,7 @@ ft.get({lang}, {ctype?})                                        *comment.ft.get*
                              return a copy of { line, block } commentstring.
 
     Returns: ~
-        (nil|string|string[])  Returns stored commentstring, if {lang} is not
-                               recognized then returns native |commentstring|
+        (nil|string|string[])  Returns stored commentstring
 
     Usage: ~
 >lua
