@@ -26,16 +26,11 @@ local query = [[
         [(jsx_fragment) (jsx_element)] @jsx)
 ]]
 
-local trees = {
-    typescriptreact = 'tsx',
-    javascriptreact = 'javascript',
-}
-
 ---Checks whether parser's language matches the filetype that supports jsx syntax
 ---@param lang string
 ---@return boolean
 local function is_jsx(lang)
-    return lang == trees.typescriptreact or lang == trees.javascriptreact
+    return lang == 'tsx' or lang == 'javascript'
 end
 
 -- This function is a workaround for `+` treesitter quantifier
@@ -87,7 +82,7 @@ local function capture(parser, range)
         return false
     end
 
-    local Q = vim.treesitter.query.parse_query(lang, query)
+    local Q = vim.treesitter.query.parse(lang, query)
 
     local id, lnum, lines = 0, nil, nil
 
@@ -126,14 +121,7 @@ jsx.commentstring = '{/*%s*/}'
 ---})
 ---@usage ]]
 function jsx.calculate(ctx)
-    local buf = vim.api.nvim_get_current_buf()
-    local filetype = vim.api.nvim_buf_get_option(buf, 'filetype')
-
-    -- NOTE:
-    -- `get_parser` panics for `{type,java}scriptreact` filetype
-    -- bcz their parser's name is different from their filetype
-    -- Maybe report the issue to `nvim-treesitter` or core(?)
-    local ok, tree = pcall(vim.treesitter.get_parser, buf, trees[filetype] or filetype)
+    local ok, tree = pcall(vim.treesitter.get_parser, vim.api.nvim_get_current_buf())
 
     if not ok then
         return
