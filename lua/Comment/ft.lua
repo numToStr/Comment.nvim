@@ -182,8 +182,7 @@ end
 ---@param lang string Filetype/Language of the buffer
 ---@param ctype? integer See |comment.utils.ctype|. If given `nil`, it'll
 ---return a copy of { line, block } commentstring.
----@return nil|string|string[] #Returns stored commentstring, if {lang} is not
----recognized then returns native |commentstring|
+---@return nil|string|string[] #Returns stored commentstring
 ---@usage [[
 ---local ft = require('Comment.ft')
 ---local U = require('Comment.utils')
@@ -201,7 +200,7 @@ end
 function ft.get(lang, ctype)
     local tuple = L[lang]
     if not tuple then
-        return vim.bo.commentstring
+        return nil
     end
     if not ctype then
         return vim.deepcopy(tuple)
