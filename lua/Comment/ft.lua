@@ -96,6 +96,7 @@ local L = setmetatable({
     make = { M.hash },
     mbsyncrc = { M.dbl_hash },
     meson = { M.hash },
+    nextflow = { M.cxx_l, M.cxx_b },
     nim = { M.hash, '#[%s]#' },
     nix = { M.hash, M.cxx_b },
     nu = { M.hash },
