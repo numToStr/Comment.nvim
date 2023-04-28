@@ -55,6 +55,7 @@ local L = setmetatable({
     dhall = { M.dash, M.haskell_b },
     dosbatch = { 'REM%s' },
     dot = { M.cxx_l, M.cxx_b },
+    dts = { M.cxx_l, M.cxx_b },
     editorconfig = { M.hash },
     eelixir = { M.html, M.html },
     elixir = { M.hash },
