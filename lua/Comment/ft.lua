@@ -105,6 +105,7 @@ local L = setmetatable({
     python = { M.hash }, -- Python doesn't have block comments
     php = { M.cxx_l, M.cxx_b },
     prisma = { M.cxx_l },
+    proto = { M.cxx_l, M.cxx_b },
     quarto = { M.html, M.html },
     r = { M.hash }, -- R doesn't have block comments
     readline = { M.hash },
