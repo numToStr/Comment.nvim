@@ -102,6 +102,7 @@ local L = setmetatable({
     nix = { M.hash, M.cxx_b },
     nu = { M.hash },
     ocaml = { M.fsharp_b, M.fsharp_b },
+    odin = { M.cxx_l, M.cxx_b },
     plantuml = { "'%s", "/'%s'/" },
     purescript = { M.dash, M.haskell_b },
     python = { M.hash }, -- Python doesn't have block comments
