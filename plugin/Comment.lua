@@ -4,7 +4,7 @@ local call = require('Comment.api').call
 ---@mod comment.keybindings Keybindings
 ---@brief [[
 ---Comment.nvim provides default keybindings for (un)comment your code. These
----keybinds are enabled upon calling |commen.usage.setup| and can be configured
+---keybinds are enabled upon calling |comment.usage.setup| and can be configured
 ---or disabled, if desired.
 ---
 ---Basic: ~
