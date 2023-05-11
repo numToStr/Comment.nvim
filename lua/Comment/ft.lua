@@ -136,6 +136,7 @@ local L = setmetatable({
     typescript = { M.cxx_l, M.cxx_b },
     typescriptreact = { M.cxx_l, M.cxx_b },
     v = { M.cxx_l, M.cxx_b },
+    verilog = { M.cxx_l },
     vim = { M.vim },
     vifm = { M.vim },
     vue = { M.html, M.html },
