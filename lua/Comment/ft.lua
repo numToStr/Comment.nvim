@@ -64,6 +64,7 @@ local L = setmetatable({
     faust = { M.cxx_l, M.cxx_b },
     fennel = { M.semicolon },
     fish = { M.hash },
+    func = { M.lisp_l },
     fsharp = { M.cxx_l, M.fsharp_b },
     gdb = { M.hash },
     gdscript = { M.hash },
