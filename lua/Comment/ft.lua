@@ -47,6 +47,7 @@ local L = setmetatable({
     cmake = { M.hash, M.hash_bracket },
     conf = { M.hash },
     conkyrc = { M.dash, M.dash_bracket },
+    corn = { M.cxx_l },
     cpp = { M.cxx_l, M.cxx_b },
     cs = { M.cxx_l, M.cxx_b },
     css = { M.cxx_b, M.cxx_b },
