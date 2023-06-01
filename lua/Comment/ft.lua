@@ -97,6 +97,7 @@ local L = setmetatable({
     markdown = { M.html, M.html },
     make = { M.hash },
     mbsyncrc = { M.dbl_hash },
+    mermaid = { "%%%s" },
     meson = { M.hash },
     nextflow = { M.cxx_l, M.cxx_b },
     nim = { M.hash, '#[%s]#' },
