@@ -80,6 +80,7 @@ local L = setmetatable({
     html = { M.html, M.html },
     htmldjango = { M.html, M.html },
     idris = { M.dash, M.haskell_b },
+    idris2 = { M.dash, M.haskell_b },
     ini = { M.hash },
     java = { M.cxx_l, M.cxx_b },
     javascript = { M.cxx_l, M.cxx_b },
