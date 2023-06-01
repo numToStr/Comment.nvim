@@ -89,6 +89,7 @@ local L = setmetatable({
     jsonnet = { M.cxx_l, M.cxx_b },
     julia = { M.hash, '#=%s=#' },
     kotlin = { M.cxx_l, M.cxx_b },
+    lean = { M.dash, '/-%s-/' },
     lidris = { M.dash, M.haskell_b },
     lilypond = { M.latex, '%{%s%}' },
     lisp = { M.lisp_l, M.lisp_b },
