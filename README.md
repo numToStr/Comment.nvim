@@ -17,6 +17,21 @@
 
 ### 🚀 Installation
 
+- With [lazy.nvim](https://github.com/folke/lazy.nvim)
+
+```lua
+return {
+    'numToStr/Comment.nvim',
+    keys = { -- example keymaps for lazy loading this plugin.
+      { "gcc", mode = "n", desc = "Toggles the current line using linewise comment" },
+      { "gbc", mode = "n", desc = "Toggles the current line using blockwise comment" },
+      { "gc", mode = "v", desc = "Toggles the region using linewise comment" },
+      { "gb", mode = "v", desc = "Toggles the region using blockwise comment" },
+    },
+    opts = {} -- lazy equivalent to setup({}) function
+}
+```
+
 - With [packer.nvim](https://github.com/wbthomason/packer.nvim)
 
 ```lua
