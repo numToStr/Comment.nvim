@@ -118,6 +118,7 @@ local L = setmetatable({
     readline = { M.hash },
     rego = { M.hash },
     remind = { M.hash },
+    rescript = { M.cxx_l, M.cxx_b },
     robot = { M.hash }, -- Robotframework doesn't have block comments
     ruby = { M.hash },
     rust = { M.cxx_l, M.cxx_b },
