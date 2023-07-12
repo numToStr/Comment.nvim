@@ -73,6 +73,7 @@ local L = setmetatable({
     glsl = { M.cxx_l, M.cxx_b },
     gnuplot = { M.hash, M.hash_bracket },
     go = { M.cxx_l, M.cxx_b },
+    gomod = { M.cxx_l },
     graphql = { M.hash },
     groovy = { M.cxx_l, M.cxx_b },
     handlebars = { M.handlebars, M.handlebars },
