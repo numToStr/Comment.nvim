@@ -18,7 +18,7 @@
 ---@brief [[
 ---Comment.nvim is a smart and powerful comment plugin for neovim. It supports
 ---dot-repeat, counts, line ('//') and block ('/* */') comments, and can be used
----with motion and text-objects. It has native integration with |tressitter| to
+---with motion and text-objects. It has native integration with |treesitter| to
 ---support embedded filetypes like html, vue, markdown with codeblocks etc.
 ---@brief ]]
 ---@tag comment.dotrepeat
