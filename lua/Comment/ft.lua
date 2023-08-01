@@ -14,7 +14,6 @@ local A = vim.api
 
 ---Common commentstring shared b/w multiple languages
 local M = {
-    astro = '<!--%s-->', --same as html
     cxx_l = '//%s',
     cxx_b = '/*%s*/',
     dbl_hash = '##%s',
