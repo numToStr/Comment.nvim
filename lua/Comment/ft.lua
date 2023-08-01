@@ -119,6 +119,7 @@ local L = setmetatable({
     quarto = { M.html, M.html },
     r = { M.hash }, -- R doesn't have block comments
     racket = { M.lisp_l, M.lisp_b },
+    rasi = { M.cxx_l, M.cxx_b },
     readline = { M.hash },
     rego = { M.hash },
     remind = { M.hash },
