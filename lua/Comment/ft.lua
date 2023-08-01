@@ -125,6 +125,7 @@ local L = setmetatable({
     ron = { M.cxx_l, M.cxx_b },
     ruby = { M.hash },
     rust = { M.cxx_l, M.cxx_b },
+    sbt = { M.cxx_l, M.cxx_b },
     scala = { M.cxx_l, M.cxx_b },
     scheme = { M.lisp_l, M.lisp_b },
     sh = { M.hash },
