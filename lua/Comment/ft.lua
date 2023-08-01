@@ -120,6 +120,7 @@ local L = setmetatable({
     rego = { M.hash },
     remind = { M.hash },
     robot = { M.hash }, -- Robotframework doesn't have block comments
+    ron = { M.cxx_l, M.cxx_b },
     ruby = { M.hash },
     rust = { M.cxx_l, M.cxx_b },
     scala = { M.cxx_l, M.cxx_b },
