@@ -17,6 +17,18 @@
 
 ### 🚀 Installation
 
+- With [lazy.nvim](https://github.com/folke/lazy.nvim)
+
+```lua
+{
+    'numToStr/Comment.nvim',
+    opts = {
+        -- add any options here
+    },
+    event = "BufRead",
+}
+```
+
 - With [packer.nvim](https://github.com/wbthomason/packer.nvim)
 
 ```lua
