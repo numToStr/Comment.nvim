@@ -31,6 +31,7 @@ local M = {
     lisp_b = '#|%s|#',
     twig = '{#%s#}',
     vim = '"%s',
+    lean_b = '/-%s-/',
 }
 
 ---Lang table that contains commentstring (linewise/blockwise) for multiple filetypes
@@ -90,8 +91,8 @@ local L = setmetatable({
     jsonnet = { M.cxx_l, M.cxx_b },
     julia = { M.hash, '#=%s=#' },
     kotlin = { M.cxx_l, M.cxx_b },
-    lean = { M.dash, '/-%s-/' },
-    lean3 = { M.dash, '/-%s-/' },
+    lean = { M.dash, M.lean_b },
+    lean3 = { M.dash, M.lean_b },
     lidris = { M.dash, M.haskell_b },
     lilypond = { M.latex, '%{%s%}' },
     lisp = { M.lisp_l, M.lisp_b },
