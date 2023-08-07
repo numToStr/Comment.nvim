@@ -130,6 +130,10 @@ end
 function U.get_count_lines(count)
     local srow = unpack(A.nvim_win_get_cursor(0))
     local erow = (srow + count) - 1
+    local fold_end = vim.fn.foldclosedend(erow)
+    if fold_end ~= -1 then
+        erow = fold_end + 1
+    end
     local lines = A.nvim_buf_get_lines(0, srow - 1, erow, false)
 
     return lines, { srow = srow, scol = 0, erow = erow, ecol = 0 }
