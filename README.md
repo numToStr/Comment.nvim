@@ -26,7 +26,8 @@
     opts = {
         -- add any options here
     },
-    lazy = false,
+    -- Also change this if you change your keybindings
+    keys = { 'gcc', 'gbc', 'gco', 'gcO', 'gcA', { 'gc', mode = {'v', 'n'} }, { 'gb', mode = {'v', 'n'} } },
 }
 
 ```
