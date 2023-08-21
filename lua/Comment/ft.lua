@@ -116,6 +116,7 @@ local L = setmetatable({
     odin = { M.cxx_l, M.cxx_b },
     plantuml = { "'%s", "/'%s'/" },
     purescript = { M.dash, M.haskell_b },
+    puppet = { M.hash },
     python = { M.hash }, -- Python doesn't have block comments
     php = { M.cxx_l, M.cxx_b },
     prisma = { M.cxx_l },
