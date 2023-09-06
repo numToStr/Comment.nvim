@@ -83,6 +83,7 @@ local L = setmetatable({
     handlebars = { M.handlebars, M.handlebars },
     haskell = { M.dash, M.haskell_b },
     haxe = { M.cxx_l, M.cxx_b },
+    hcl = { M.hash, M.cxx_b },
     heex = { M.html, M.html },
     html = { M.html, M.html },
     htmldjango = { M.html, M.html },
