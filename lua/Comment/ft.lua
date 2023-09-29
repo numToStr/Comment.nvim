@@ -57,6 +57,7 @@ local L = setmetatable({
     cuda = { M.cxx_l, M.cxx_b },
     dart = { M.cxx_l, M.cxx_b },
     dhall = { M.dash, M.haskell_b },
+    dnsmasq = { M.hash },
     dosbatch = { 'REM%s' },
     dot = { M.cxx_l, M.cxx_b },
     dts = { M.cxx_l, M.cxx_b },
