@@ -155,6 +155,7 @@ local L = setmetatable({
     typescriptreact = { M.cxx_l, M.cxx_b },
     typst = { M.cxx_l, M.cxx_b },
     v = { M.cxx_l, M.cxx_b },
+    vala = { M.cxx_l, M.cxx_b },
     verilog = { M.cxx_l },
     vhdl = { M.dash },
     vim = { M.vim },
