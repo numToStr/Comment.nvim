@@ -160,6 +160,7 @@ local L = setmetatable({
     vim = { M.vim },
     vifm = { M.vim },
     vue = { M.html, M.html },
+    wgsl = { M.cxx_l, M.cxx_b },
     xdefaults = { '!%s' },
     xml = { M.html, M.html },
     xonsh = { M.hash }, -- Xonsh doesn't have block comments
