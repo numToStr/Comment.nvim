@@ -72,6 +72,7 @@ local L = setmetatable({
     fsharp = { M.cxx_l, M.fsharp_b },
     gdb = { M.hash },
     gdscript = { M.hash },
+    gdshader = { M.cxx_l, M.cxx_b },
     gitignore = { M.hash },
     gleam = { M.cxx_l },
     glsl = { M.cxx_l, M.cxx_b },
