@@ -108,6 +108,7 @@ local L = setmetatable({
     mbsyncrc = { M.dbl_hash },
     mermaid = { '%%%s' },
     meson = { M.hash },
+    mojo = { M.hash },
     nextflow = { M.cxx_l, M.cxx_b },
     nim = { M.hash, '#[%s]#' },
     nix = { M.hash, M.cxx_b },
