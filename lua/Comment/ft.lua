@@ -32,6 +32,7 @@ local M = {
     twig = '{#%s#}',
     vim = '"%s',
     lean_b = '/-%s-/',
+    tla_comment = '\\*%s',
 }
 
 ---Lang table that contains commentstring (linewise/blockwise) for multiple filetypes
@@ -148,6 +149,7 @@ local L = setmetatable({
     terraform = { M.hash, M.cxx_b },
     tex = { M.latex },
     template = { M.dbl_hash },
+    tla = { M.tla_comment },
     tmux = { M.hash },
     toml = { M.hash },
     twig = { M.twig, M.twig },
