@@ -158,6 +158,10 @@ Mappings                                               *comment.config.Mappings*
                             `gc{motion}` and `gb{motion}` (default: 'true')
         {extra}  (boolean)  Enable extra mapping; `gco`, `gcO` and `gcA`
                             (default: 'true')
+        {line}	 (boolean)  Enables operator-pending mapping; `gcc`
+                            `gc{motion}` (default: 'true')
+        {block}	 (boolean)  Enables operator-pending mapping; `gbc`
+                            `gb{motion}` (default: 'true')
 
 
 Toggler                                                 *comment.config.Toggler*
