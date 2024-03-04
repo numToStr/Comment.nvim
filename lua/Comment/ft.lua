@@ -40,6 +40,7 @@ local M = {
 local L = setmetatable({
     arduino = { M.cxx_l, M.cxx_b },
     applescript = { M.hash },
+    antlr4 = { M.cxx_l, M.cxx_b },
     astro = { M.html },
     autohotkey = { M.semicolon, M.cxx_b },
     bash = { M.hash },
