@@ -23,56 +23,56 @@
 ---@class CommentConfig
 ---Controls space between the comment
 ---and the line (default: 'true')
----@field padding boolean|fun():boolean
+---@field padding? boolean|fun():boolean
 ---Whether cursor should stay at the
 ---same position. Only works in NORMAL
 ---mode mappings (default: 'true')
----@field sticky boolean
+---@field sticky? boolean
 ---Lua pattern used to ignore lines
 ---during (un)comment (default: 'nil')
----@field ignore string|fun():string
+---@field ignore? string|fun():string
 ---Enables |comment.keybindings|
 ---NOTE: If given 'false', then the
 ---plugin won't create any mappings
----@field mappings Mappings|false
----@field toggler Toggler See |comment.config.Toggler|
----@field opleader Opleader See |comment.config.Opleader|
----@field extra ExtraMapping See |comment.config.ExtraMapping|
+---@field mappings? Mappings|false
+---@field toggler? Toggler See |comment.config.Toggler|
+---@field opleader? Opleader See |comment.config.Opleader|
+---@field extra? ExtraMapping See |comment.config.ExtraMapping|
 ---Function to call before (un)comment.
 ---It is called with a {ctx} argument
 ---of type |comment.utils.CommentCtx|
 ---(default: 'nil')
----@field pre_hook fun(c: CommentCtx): string
+---@field pre_hook? fun(c: CommentCtx): string
 ---Function to call after (un)comment.
 ---It is called with a {ctx} argument
 ---of type |comment.utils.CommentCtx|
 ---(default: 'nil')
----@field post_hook fun(c: CommentCtx)
+---@field post_hook? fun(c: CommentCtx)
 
 ---Create default mappings
 ---@class Mappings
 ---Enables operator-pending mapping; `gcc`, `gbc`,
 ---`gc{motion}` and `gb{motion}` (default: 'true')
----@field basic boolean
+---@field basic? boolean
 ---Enable extra mapping; `gco`, `gcO` and `gcA`
 ---(default: 'true')
----@field extra boolean
+---@field extra? boolean
 
 ---LHS of toggle mappings in NORMAL
 ---@class Toggler
----@field line string Linewise comment (default: 'gcc')
----@field block string Blockwise comment (default: 'gbc')
+---@field line? string Linewise comment (default: 'gcc')
+---@field block? string Blockwise comment (default: 'gbc')
 
 ---LHS of operator-mode mappings in NORMAL and VISUAL mode
 ---@class Opleader
----@field line string Linewise comment (default: 'gc')
----@field block string Blockwise comment (default: 'gb')
+---@field line? string Linewise comment (default: 'gc')
+---@field block? string Blockwise comment (default: 'gb')
 
 ---LHS of extra mappings
 ---@class ExtraMapping
----@field below string Inserts comment below (default: 'gco')
----@field above string Inserts comment above (default: 'gcO')
----@field eol string Inserts comment at the end of line (default: 'gcA')
+---@field below? string Inserts comment below (default: 'gco')
+---@field above? string Inserts comment above (default: 'gcO')
+---@field eol? string Inserts comment at the end of line (default: 'gcA')
 
 ---@private
 ---@class RootConfig
