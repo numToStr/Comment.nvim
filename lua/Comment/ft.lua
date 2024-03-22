@@ -32,6 +32,7 @@ local M = {
     twig = '{#%s#}',
     vim = '"%s',
     lean_b = '/-%s-/',
+    ruby_block = '=begin%s=end',
 }
 
 ---Lang table that contains commentstring (linewise/blockwise) for multiple filetypes
@@ -130,7 +131,7 @@ local L = setmetatable({
     rescript = { M.cxx_l, M.cxx_b },
     robot = { M.hash }, -- Robotframework doesn't have block comments
     ron = { M.cxx_l, M.cxx_b },
-    ruby = { M.hash },
+    ruby = { M.hash, M.ruby_block },
     rust = { M.cxx_l, M.cxx_b },
     sbt = { M.cxx_l, M.cxx_b },
     scala = { M.cxx_l, M.cxx_b },
