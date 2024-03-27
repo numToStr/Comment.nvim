@@ -86,6 +86,7 @@ local L = setmetatable({
     heex = { M.html, M.html },
     html = { M.html, M.html },
     htmldjango = { M.html, M.html },
+    hyprlang = { M.hash }, -- Hyprlang doesn't have block comments
     idris = { M.dash, M.haskell_b },
     idris2 = { M.dash, M.haskell_b },
     ini = { M.hash },
