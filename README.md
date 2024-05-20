@@ -233,7 +233,9 @@ You can also integrate [nvim-ts-context-commentstring](https://github.com/Joosep
 
 ```lua
 {
-    pre_hook = require('ts_context_commentstring.integrations.comment_nvim').create_pre_hook(),
+    pre_hook = function()
+        require('ts_context_commentstring.integrations.comment_nvim').create_pre_hook()
+    end,
 }
 ```
 
