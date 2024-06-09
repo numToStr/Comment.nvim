@@ -144,6 +144,7 @@ local L = setmetatable({
     svelte = { M.html, M.html },
     swift = { M.cxx_l, M.cxx_b },
     sxhkdrc = { M.hash },
+    systemverilog = { M.cxx_l, M.cxx_b },
     tablegen = { M.cxx_l, M.cxx_b },
     teal = { M.dash, M.dash_bracket },
     terraform = { M.hash, M.cxx_b },
