@@ -50,6 +50,7 @@ local L = setmetatable({
     blueprint = { M.cxx_l }, -- Blueprint doesn't have block comments
     c = { M.cxx_l, M.cxx_b },
     cabal = { M.dash },
+    cairo = { M.cxx_l },
     cmake = { M.hash, M.hash_bracket },
     conf = { M.hash },
     conkyrc = { M.dash, M.dash_bracket },
