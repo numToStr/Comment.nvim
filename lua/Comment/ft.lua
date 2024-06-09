@@ -130,6 +130,7 @@ local L = setmetatable({
     racket = { M.lisp_l, M.lisp_b },
     rasi = { M.cxx_l, M.cxx_b },
     readline = { M.hash },
+    reason = { M.cxx_l, M.cxx_b },
     rego = { M.hash },
     remind = { M.hash },
     rescript = { M.cxx_l, M.cxx_b },
