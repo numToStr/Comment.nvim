@@ -140,6 +140,7 @@ local L = setmetatable({
     rust = { M.cxx_l, M.cxx_b },
     sbt = { M.cxx_l, M.cxx_b },
     scala = { M.cxx_l, M.cxx_b },
+    scss = { M.cxx_b, M.cxx_b },
     scheme = { M.lisp_l, M.lisp_b },
     sh = { M.hash },
     solidity = { M.cxx_l, M.cxx_b },
