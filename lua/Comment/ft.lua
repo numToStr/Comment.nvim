@@ -101,6 +101,7 @@ local L = setmetatable({
     jsonc = { M.cxx_l },
     jsonnet = { M.cxx_l, M.cxx_b },
     julia = { M.hash, '#=%s=#' },
+    kdl = { M.cxx_l, M.cxx_b },
     kotlin = { M.cxx_l, M.cxx_b },
     lean = { M.dash, M.lean_b },
     lean3 = { M.dash, M.lean_b },
