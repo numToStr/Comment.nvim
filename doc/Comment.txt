@@ -262,7 +262,7 @@ custom comment function, check out 'comment.api' section.
   *<Plug>(comment_toggle_blockwise_visual)*
 
      Toggle comment on the selected region with linewise/blockwise comment in
-     NORMAL mode. These powers the |{visual}gc| and |{visual}gb| keybindings.
+     VISUAL mode. These powers the |{visual}gc| and |{visual}gb| keybindings.
 
 Usage: ~
 >lua
