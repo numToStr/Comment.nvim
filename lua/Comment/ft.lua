@@ -161,6 +161,7 @@ local L = setmetatable({
     terraform = { M.hash, M.cxx_b },
     tex = { M.latex },
     template = { M.dbl_hash },
+    tidal = { M.dash, M.haskell_b },
     tmux = { M.hash },
     toml = { M.hash },
     twig = { M.twig, M.twig },
