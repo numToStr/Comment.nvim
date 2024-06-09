@@ -121,6 +121,7 @@ local L = setmetatable({
     objcpp = { M.cxx_l, M.cxx_b },
     ocaml = { M.fsharp_b, M.fsharp_b },
     odin = { M.cxx_l, M.cxx_b },
+    openscad = { M.cxx_l, M.cxx_b },
     plantuml = { "'%s", "/'%s'/" },
     purescript = { M.dash, M.haskell_b },
     puppet = { M.hash },
