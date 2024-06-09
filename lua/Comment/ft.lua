@@ -96,6 +96,7 @@ local L = setmetatable({
     java = { M.cxx_l, M.cxx_b },
     javascript = { M.cxx_l, M.cxx_b },
     javascriptreact = { M.cxx_l, M.cxx_b },
+    jq = { M.hash },
     jsonc = { M.cxx_l },
     jsonnet = { M.cxx_l, M.cxx_b },
     julia = { M.hash, '#=%s=#' },
