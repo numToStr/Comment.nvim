@@ -132,6 +132,7 @@ local L = setmetatable({
     odin = { M.cxx_l, M.cxx_b },
     openscad = { M.cxx_l, M.cxx_b },
     plantuml = { "'%s", "/'%s'/" },
+    plsql = { M.dash, M.cxx_b },
     purescript = { M.dash, M.haskell_b },
     puppet = { M.hash },
     python = { M.hash }, -- Python doesn't have block comments
