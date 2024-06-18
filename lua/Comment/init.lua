@@ -97,31 +97,45 @@ function C.setup(config)
         -- Basic Mappings
         if cfg.mappings.basic then
             -- NORMAL mode mappings
-            K('n', cfg.opleader.line, '<Plug>(comment_toggle_linewise)', { desc = 'Comment toggle linewise' })
-            K('n', cfg.opleader.block, '<Plug>(comment_toggle_blockwise)', { desc = 'Comment toggle blockwise' })
 
-            K('n', cfg.toggler.line, function()
-                return vvar('count') == 0 and '<Plug>(comment_toggle_linewise_current)'
-                    or '<Plug>(comment_toggle_linewise_count)'
-            end, { expr = true, desc = 'Comment toggle current line' })
-            K('n', cfg.toggler.block, function()
-                return vvar('count') == 0 and '<Plug>(comment_toggle_blockwise_current)'
-                    or '<Plug>(comment_toggle_blockwise_count)'
-            end, { expr = true, desc = 'Comment toggle current block' })
+            if cfg.mappings.line then
+                K('n', cfg.opleader.line, '<Plug>(comment_toggle_linewise)', { desc = 'Comment toggle linewise' })
+            end
+            if cfg.mappings.block then
+                K('n', cfg.opleader.block, '<Plug>(comment_toggle_blockwise)', { desc = 'Comment toggle blockwise' })
+            end
+
+            if cfg.mappings.line then
+                K('n', cfg.toggler.line, function()
+                    return vvar('count') == 0 and '<Plug>(comment_toggle_linewise_current)'
+                        or '<Plug>(comment_toggle_linewise_count)'
+                end, { expr = true, desc = 'Comment toggle current line' })
+            end
+
+            if cfg.mappings.block then
+                K('n', cfg.toggler.block, function()
+                    return vvar('count') == 0 and '<Plug>(comment_toggle_blockwise_current)'
+                        or '<Plug>(comment_toggle_blockwise_count)'
+                end, { expr = true, desc = 'Comment toggle current block' })
+            end
 
             -- VISUAL mode mappings
-            K(
-                'x',
-                cfg.opleader.line,
-                '<Plug>(comment_toggle_linewise_visual)',
-                { desc = 'Comment toggle linewise (visual)' }
-            )
-            K(
-                'x',
-                cfg.opleader.block,
-                '<Plug>(comment_toggle_blockwise_visual)',
-                { desc = 'Comment toggle blockwise (visual)' }
-            )
+            if cfg.mappings.line then
+                K(
+                    'x',
+                    cfg.opleader.line,
+                    '<Plug>(comment_toggle_linewise_visual)',
+                    { desc = 'Comment toggle linewise (visual)' }
+                )
+            end
+            if cfg.mappings.block then
+                K(
+                    'x',
+                    cfg.opleader.block,
+                    '<Plug>(comment_toggle_blockwise_visual)',
+                    { desc = 'Comment toggle blockwise (visual)' }
+                )
+            end
         end
 
         -- Extra Mappings

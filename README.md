@@ -120,6 +120,10 @@ Following are the **default** config for the [`setup()`](#setup). If you want to
         basic = true,
         ---Extra mapping; `gco`, `gcO`, `gcA`
         extra = true,
+        ---Operator-pending mapping; `gc` gc[count]{motion}`
+        line = true,
+        ---Operator-pending mapping; `gbc` `gb[count]{motion}`
+        block = true,
     },
     ---Function to call before (un)comment
     pre_hook = nil,

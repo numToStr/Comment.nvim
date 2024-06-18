@@ -57,6 +57,12 @@
 ---Enable extra mapping; `gco`, `gcO` and `gcA`
 ---(default: 'true')
 ---@field extra boolean
+---Enable line mapping; `gcc`
+---(default: 'true')
+---@field line boolean
+---Enable block mapping; `gbc`
+---(default: 'true')
+---@field block boolean
 
 ---LHS of toggle mappings in NORMAL
 ---@class Toggler
@@ -86,6 +92,8 @@ local Config = {
         mappings = {
             basic = true,
             extra = true,
+            line = true,
+            block = true
         },
         toggler = {
             line = 'gcc',
