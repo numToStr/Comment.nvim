@@ -47,6 +47,7 @@ local L = setmetatable({
     bash = { M.hash },
     beancount = { M.semicolon },
     bib = { M.latex },
+    bicep = { M.cxx_l, M.cxx_b },
     blueprint = { M.cxx_l }, -- Blueprint doesn't have block comments
     c = { M.cxx_l, M.cxx_b },
     cabal = { M.dash },
