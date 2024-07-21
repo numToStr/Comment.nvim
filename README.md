@@ -88,6 +88,9 @@ Following are the **default** config for the [`setup()`](#setup). If you want to
     padding = true,
     ---Whether the cursor should stay at its position
     sticky = true,
+    ---If filetype of the buffer is part of the following list
+    ---then only block comments will be used, even for toggler.line keymap
+    only_block_ft = {},
     ---Lines to be ignored while (un)comment
     ignore = nil,
     ---LHS of toggle mappings in NORMAL mode

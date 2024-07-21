@@ -28,6 +28,10 @@
 ---same position. Only works in NORMAL
 ---mode mappings (default: 'true')
 ---@field sticky boolean
+---Use only block comments if the
+---filetype is in the following
+---array of filetypes (default: {})
+---@field only_block_ft string[]
 ---Lua pattern used to ignore lines
 ---during (un)comment (default: 'nil')
 ---@field ignore string|fun():string
@@ -83,6 +87,7 @@ local Config = {
     config = {
         padding = true,
         sticky = true,
+        block_comments_ft = {},
         mappings = {
             basic = true,
             extra = true,

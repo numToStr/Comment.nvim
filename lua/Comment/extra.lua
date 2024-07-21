@@ -22,12 +22,13 @@ end
 ---@param cfg CommentConfig
 local function ins_on_line(lnum, ctype, cfg)
     local row, col = unpack(A.nvim_win_get_cursor(0))
+    local block_ft = vim.tbl_contains(cfg.only_block_ft, vim.bo.ft)
 
     ---@type CommentCtx
     local ctx = {
         cmode = U.cmode.comment,
         cmotion = U.cmotion.line,
-        ctype = ctype,
+        ctype = block_ft and U.ctype.blockwise or ctype,
         range = { srow = row, scol = col, erow = row, ecol = col },
     }
 
@@ -65,12 +66,13 @@ end
 ---@param cfg CommentConfig
 function extra.insert_eol(ctype, cfg)
     local srow, scol = unpack(A.nvim_win_get_cursor(0))
+    local block_ft = vim.tbl_contains(cfg.only_block_ft, vim.bo.ft)
 
     ---@type CommentCtx
     local ctx = {
         cmode = U.cmode.comment,
         cmotion = U.cmotion.line,
-        ctype = ctype,
+        ctype = block_ft and U.ctype.blockwise or ctype,
         range = { srow = srow, scol = scol, erow = srow, ecol = scol },
     }
     local lcs, rcs = U.parse_cstr(cfg, ctx)

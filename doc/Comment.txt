@@ -127,27 +127,29 @@ CommentConfig                                     *comment.config.CommentConfig*
     Plugin's configuration
 
     Fields: ~
-        {padding}    (boolean|fun():boolean)     Controls space between the comment
-                                                 and the line (default: 'true')
-        {sticky}     (boolean)                   Whether cursor should stay at the
-                                                 same position. Only works in NORMAL
-                                                 mode mappings (default: 'true')
-        {ignore}     (string|fun():string)       Lua pattern used to ignore lines
-                                                 during (un)comment (default: 'nil')
-        {mappings}   (Mappings|false)            Enables |comment.keybindings|
-                                                 NOTE: If given 'false', then the
-                                                 plugin won't create any mappings
-        {toggler}    (Toggler)                   See |comment.config.Toggler|
-        {opleader}   (Opleader)                  See |comment.config.Opleader|
-        {extra}      (ExtraMapping)              See |comment.config.ExtraMapping|
-        {pre_hook}   (fun(c:CommentCtx):string)  Function to call before (un)comment.
-                                                 It is called with a {ctx} argument
-                                                 of type |comment.utils.CommentCtx|
-                                                 (default: 'nil')
-        {post_hook}  (fun(c:CommentCtx))         Function to call after (un)comment.
-                                                 It is called with a {ctx} argument
-                                                 of type |comment.utils.CommentCtx|
-                                                 (default: 'nil')
+        {padding}       (boolean|fun():boolean)    Controls space between the comment
+                                                   and the line (default: 'true')
+        {sticky}        (boolean)                  Whether cursor should stay at the
+                                                   same position. Only works in NORMAL
+                                                   mode mappings (default: 'true')
+        {only_block_ft} (string[])                 Always use block comments
+                                                   (default: '{}')
+        {ignore}        (string|fun():string)      Lua pattern used to ignore lines
+                                                   during (un)comment (default: 'nil')
+        {mappings}      (Mappings|false)           Enables |comment.keybindings|
+                                                   NOTE: If given 'false', then the
+                                                   plugin won't create any mappings
+        {toggler}       (Toggler)                  See |comment.config.Toggler|
+        {opleader}      (Opleader)                 See |comment.config.Opleader|
+        {extra}         (ExtraMapping)             See |comment.config.ExtraMapping|
+        {pre_hook}      (fun(c:CommentCtx):string) Function to call before (un)comment.
+                                                   It is called with a {ctx} argument
+                                                   of type |comment.utils.CommentCtx|
+                                                   (default: 'nil')
+        {post_hook}     (fun(c:CommentCtx))        Function to call after (un)comment.
+                                                   It is called with a {ctx} argument
+                                                   of type |comment.utils.CommentCtx|
+                                                   (default: 'nil')
 
 
 Mappings                                               *comment.config.Mappings*

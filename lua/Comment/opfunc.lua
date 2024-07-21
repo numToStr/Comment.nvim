@@ -32,7 +32,8 @@ function Op.opfunc(motion, cfg, cmode, ctype)
     -- If we are doing char or visual motion on the same line
     -- then we would probably want block comment instead of line comment
     local is_partial = cmotion == U.cmotion.char or cmotion == U.cmotion.v
-    local is_blockx = is_partial and range.srow == range.erow
+    local block_ft = vim.tbl_contains(cfg.only_block_ft, vim.bo.ft)
+    local is_blockx = block_ft or (is_partial and range.srow == range.erow)
 
     local lines = U.get_lines(range)
 
