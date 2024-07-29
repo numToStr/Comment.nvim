@@ -93,6 +93,7 @@ local L = setmetatable({
     hcl = { M.hash, M.cxx_b },
     heex = { M.html, M.html },
     html = { M.html, M.html },
+    htmlangular = { M.html, M.html },
     htmldjango = { M.html, M.html },
     hyprlang = { M.hash },
     idris = { M.dash, M.haskell_b },
