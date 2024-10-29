@@ -14,6 +14,7 @@ local A = vim.api
 
 ---Common commentstring shared b/w multiple languages
 local M = {
+    blade = '{{-- %s --}}',
     cxx_l = '//%s',
     cxx_b = '/*%s*/',
     dbl_hash = '##%s',
@@ -47,6 +48,7 @@ local L = setmetatable({
     bash = { M.hash },
     beancount = { M.semicolon },
     bib = { M.latex },
+    blade = { M.blade },
     blueprint = { M.cxx_l }, -- Blueprint doesn't have block comments
     c = { M.cxx_l, M.cxx_b },
     cabal = { M.dash },
