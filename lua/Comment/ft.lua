@@ -248,6 +248,9 @@ end
 ---ft.get('ansible.yaml') -- { '#%s' }
 ---@usage ]]
 function ft.get(lang, ctype)
+    -- NOTE:  Add conversion for those parser names doesn't match to filetype
+    lang = lang == 'c_sharp' and 'cs' or lang
+    lang = lang == 'powershell' and 'ps1' or lang
     local tuple = L[lang]
     if not tuple then
         return nil
