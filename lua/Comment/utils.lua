@@ -199,7 +199,8 @@ function U.commenter(left, right, padding, scol, ecol, tabbed)
     local pad = U.get_pad(padding)
     local ll = U.is_empty(left) and left or (left .. pad)
     local rr = U.is_empty(right) and right or (pad .. right)
-    local empty = string.rep(tabbed and '\t' or ' ', scol or 0) .. left .. right
+    -- Only use ll (and not also rr) since we don't want to add padding twice 
+    local empty = string.rep(tabbed and '\t' or ' ', scol or 0) .. ll .. right
     local is_lw = scol and not ecol
 
     return function(line)
