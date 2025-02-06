@@ -176,6 +176,7 @@ local L = setmetatable({
     typescript = { M.cxx_l, M.cxx_b },
     typescriptreact = { M.cxx_l, M.cxx_b },
     typst = { M.cxx_l, M.cxx_b },
+    uiua = { M.hash }, -- Uiua doesn't have block comments
     v = { M.cxx_l, M.cxx_b },
     vala = { M.cxx_l, M.cxx_b },
     verilog = { M.cxx_l },
