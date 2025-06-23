@@ -140,6 +140,7 @@ local L = setmetatable({
     proto = { M.cxx_l, M.cxx_b },
     quarto = { M.html, M.html },
     r = { M.hash }, -- R doesn't have block comments
+    rhai = { M.cxx_l, M.cxx_b },
     racket = { M.lisp_l, M.lisp_b },
     rasi = { M.cxx_l, M.cxx_b },
     readline = { M.hash },
