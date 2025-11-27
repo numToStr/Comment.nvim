@@ -99,6 +99,7 @@ local L = setmetatable({
     idris2 = { M.dash, M.haskell_b },
     ini = { M.hash },
     jai = { M.cxx_l, M.cxx_b },
+    janet = { M.hash },
     java = { M.cxx_l, M.cxx_b },
     javascript = { M.cxx_l, M.cxx_b },
     javascriptreact = { M.cxx_l, M.cxx_b },
