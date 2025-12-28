@@ -261,7 +261,7 @@ The `post_hook` can be implemented to cover some niche use cases like the follow
 
 ### 🚫 Ignoring lines
 
-You can use `ignore` to ignore certain lines during comment/uncomment. It can takes lua regex string or a function that returns a regex string and should be provided during [`setup()`](#setup).
+You can use `ignore` to ignore certain lines during comment/uncomment. It can take a lua regex string or a function that returns a regex string and should be provided during [`setup()`](#setup).
 
 > NOTE: Ignore only works when with linewise comment. This is by design. As ignoring lines in block comments doesn't make that much sense.
 
