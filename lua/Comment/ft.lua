@@ -51,6 +51,7 @@ local L = setmetatable({
     c = { M.cxx_l, M.cxx_b },
     cabal = { M.dash },
     cairo = { M.cxx_l },
+    caddy = { M.hash },
     cmake = { M.hash, M.hash_bracket },
     conf = { M.hash },
     conkyrc = { M.dash, M.dash_bracket },
