@@ -369,7 +369,7 @@ end
 ---@param ... unknown
 function U.catch(fn, ...)
     xpcall(fn, function(err)
-        vim.notify(string.format('[Comment.nvim] %s', err.msg), vim.log.levels.WARN)
+        vim.notify(string.format('[Comment.nvim] %s', tostring(err)), vim.log.levels.WARN)
     end, ...)
 end
 

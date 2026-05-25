@@ -277,7 +277,14 @@ end
 ---print('Lang:', tree:lang())
 ---@usage ]]
 function ft.contains(tree, range)
-    for lang, child in pairs(tree:children()) do
+    if not tree then
+        return nil
+    end
+    local ok, children = pcall(tree.children, tree)
+    if not ok or not children then
+        return tree
+    end
+    for lang, child in pairs(children) do
         if lang ~= 'comment' and child:contains(range) then
             return ft.contains(child, range)
         end
@@ -297,14 +304,21 @@ function ft.calculate(ctx)
         return ft.get(vim.bo.filetype, ctx.ctype) --[[ @as string ]]
     end
 
-    local lang = ft.contains(parser, {
+    local tree = ft.contains(parser, {
         ctx.range.srow - 1,
         ctx.range.scol,
         ctx.range.erow - 1,
         ctx.range.ecol,
-    }):lang()
+    })
+    local lang = tree and tree:lang()
 
-    return ft.get(lang, ctx.ctype) or ft.get(vim.bo.filetype, ctx.ctype) --[[ @as string ]]
+    if lang then
+        local result = ft.get(lang, ctx.ctype)
+        if result then
+            return result
+        end
+    end
+    return ft.get(vim.bo.filetype, ctx.ctype) --[[ @as string ]]
 end
 
 ---@export ft
