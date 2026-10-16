@@ -159,6 +159,7 @@ local L = setmetatable({
     solidity = { M.cxx_l, M.cxx_b },
     supercollider = { M.cxx_l, M.cxx_b },
     sql = { M.dash, M.cxx_b },
+    sshconfig = { M.hash },
     stata = { M.cxx_l, M.cxx_b },
     svelte = { M.html, M.html },
     swift = { M.cxx_l, M.cxx_b },
